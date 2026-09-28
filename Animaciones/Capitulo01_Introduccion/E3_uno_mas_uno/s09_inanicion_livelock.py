@@ -46,6 +46,8 @@ class InanicionLivelock(EscenaCurso):
             self.play(FadeIn(lp), run_time=0.15)
             self.play(lp.animate.move_to(ina.get_right() + DOWN * 0.3), run_time=0.7)
 
+        # pausa pedida por el usuario: el bloque se parte aquí
+        with self.narrar("b2"):
             # «sigue avanzando» — un recurso; P1 y P2 se lo turnan
             self.en("avanza")
             self.corte()
@@ -95,7 +97,7 @@ class InanicionLivelock(EscenaCurso):
 
     # ------------------------------------------------------------------ b2
     def livelock(self):
-        with self.narrar("b2"):
+        with self.narrar("b3"):
             # «la más engañosa» — la tercera carta tiembla
             self.en("enganosa")
             self.corte()

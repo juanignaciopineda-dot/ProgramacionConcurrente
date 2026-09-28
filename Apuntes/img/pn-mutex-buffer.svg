@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="620" height="360" viewBox="0 0 620 360" version="1.1">
+  <style>
+    text { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; fill: #78829a; }
+    .tit { font-size: 13.5px; font-weight: 600; }
+    .cap { font-size: 11.5px; }
+    .lb  { font-size: 11.5px; text-anchor: middle; }
+    .pl  { fill: none; stroke: #78829a; stroke-width: 1.8; }
+    .tr  { fill: none; stroke: #f0883e; stroke-width: 2.2; }
+    .tk  { fill: #4c8dff; }
+    .edge { fill: none; stroke: #78829a; stroke-width: 1.5; marker-end: url(#ah); }
+  </style>
+  <defs>
+    <marker id="ah" markerWidth="9" markerHeight="7" refX="8.5" refY="3.5" orient="auto">
+      <polygon points="0 0, 9 3.5, 0 7" fill="#78829a"/>
+    </marker>
+  </defs>
+
+  <text class="tit" x="20" y="28" fill="#ff6b6b">Exclusión mutua con N recursos</text>
+  <text class="cap" x="20" y="46">Es exactamente el semáforo de N permisos</text>
+
+  <circle class="pl" cx="60" cy="100" r="20"/>
+  <circle class="tk" cx="60" cy="100" r="5"/>
+  <text class="lb" x="60" y="74">fuera</text>
+
+  <rect class="tr" x="46" y="146" width="28" height="9"/>
+  <circle class="pl" cx="60" cy="200" r="20"/>
+  <text class="lb" x="22" y="204">SC</text>
+  <rect class="tr" x="46" y="246" width="28" height="9"/>
+
+  <circle class="pl" cx="160" cy="175" r="22"/>
+  <circle class="tk" cx="152" cy="169" r="4.5"/>
+  <circle class="tk" cx="168" cy="169" r="4.5"/>
+  <circle class="tk" cx="160" cy="183" r="4.5"/>
+  <text class="lb" x="160" y="140">recursos</text>
+
+  <circle class="pl" cx="260" cy="100" r="20"/>
+  <circle class="tk" cx="260" cy="100" r="5"/>
+  <text class="lb" x="260" y="74">fuera</text>
+
+  <rect class="tr" x="246" y="146" width="28" height="9"/>
+  <circle class="pl" cx="260" cy="200" r="20"/>
+  <text class="lb" x="298" y="204">SC</text>
+  <rect class="tr" x="246" y="246" width="28" height="9"/>
+
+  <line class="edge" x1="60" y1="122" x2="60" y2="140"/>
+  <line class="edge" x1="60" y1="157" x2="60" y2="176"/>
+  <line class="edge" x1="60" y1="222" x2="60" y2="240"/>
+  <path class="edge" d="M 44 250 Q 8 175 44 106"/>
+
+  <line class="edge" x1="260" y1="122" x2="260" y2="140"/>
+  <line class="edge" x1="260" y1="157" x2="260" y2="176"/>
+  <line class="edge" x1="260" y1="222" x2="260" y2="240"/>
+  <path class="edge" d="M 276 250 Q 312 175 276 106"/>
+
+  <line class="edge" x1="140" y1="167" x2="78" y2="152"/>
+  <line class="edge" x1="180" y1="167" x2="242" y2="152"/>
+  <path class="edge" d="M 76 252 Q 120 232 146 190"/>
+  <path class="edge" d="M 244 252 Q 200 232 174 190"/>
+
+  <text class="cap" x="20" y="300">Con 1 ficha: exclusión mutua estricta, un solo proceso en la sección crítica.</text>
+  <text class="cap" x="20" y="318">Con 3 fichas: hasta tres procesos a la vez, y un mismo proceso puede tomar varias.</text>
+  <text class="cap" x="20" y="340" fill="#3fb950">Invariante: M(SC izq) + M(SC der) + M(recursos) = 3</text>
+
+  <line x1="340" y1="20" x2="340" y2="350" stroke="#78829a" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
+
+  <text class="tit" x="370" y="28" fill="#c86bd8">Buffer acotado</text>
+  <text class="cap" x="370" y="46">Productor / consumidor con capacidad 3</text>
+
+  <circle class="pl" cx="410" cy="140" r="22"/>
+  <circle class="tk" cx="402" cy="134" r="4.5"/>
+  <circle class="tk" cx="418" cy="134" r="4.5"/>
+  <circle class="tk" cx="410" cy="148" r="4.5"/>
+  <text class="lb" x="410" y="104">libres</text>
+
+  <circle class="pl" cx="560" cy="140" r="22"/>
+  <text class="lb" x="560" y="104">ocupados</text>
+
+  <rect class="tr" x="481" y="126" width="9" height="28"/>
+  <text class="lb" x="485" y="116" fill="#f0883e">producir</text>
+
+  <rect class="tr" x="481" y="236" width="9" height="28"/>
+  <text class="lb" x="485" y="286" fill="#f0883e">consumir</text>
+
+  <line class="edge" x1="432" y1="140" x2="475" y2="140"/>
+  <line class="edge" x1="491" y1="140" x2="534" y2="140"/>
+
+  <path class="edge" d="M 566 162 Q 560 250 496 250"/>
+  <path class="edge" d="M 476 250 Q 410 250 408 164"/>
+
+  <text class="cap" x="370" y="318">"producir" sólo dispara si hay lugar libre;</text>
+  <text class="cap" x="370" y="336">"consumir" sólo si hay algo ocupado.</text>
+</svg>

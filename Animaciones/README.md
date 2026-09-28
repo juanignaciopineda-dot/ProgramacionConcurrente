@@ -69,7 +69,7 @@ fuente de texto, no se renderiza: tiene formato viejo, sin momentos.
 | E1 · El error que ningún test encontró | `E1_el_error_invisible/` | 01 a 04 (+ gancho y cierre nuevos) | **Terminado y subido a YouTube** (1080p60, 9:56, 0 avisos). Renders borrados del disco: se regenera con `render.py --calidad qh` |
 | E2 · La ilusión de hacerlo todo a la vez | `E2_la_ilusion/` | 05 Multiprogramación, 06 Hilos, 07 Concurrencia vs paralelismo, 08 Interleaving (+ gancho y cierre nuevos) | **Terminado y subido a YouTube** (1080p60, 9:09). Renders borrados: se regenera con `render.py --calidad qh` |
 | E3 · Uno más uno igual a uno | `E3_uno_mas_uno/` | 09 Condición de carrera, 10 Sección crítica, 11 Problemas clásicos (+ gancho, cierre y bloque «rebobinemos» nuevos) | **Terminado y subido a YouTube** (1080p60, 8:20, 0 avisos). Renders borrados: se regenera con `render.py --calidad qh`. Incluye 3 pausas pedidas por el usuario (bloques partidos en 08, 09 y 10) |
-| E4 · Demostrar que nunca falla | `E4_nunca_falla/` | 12 Interacción y mensajes, 13 Corrección y modelado, 14 Puente a Petri (+ gancho y cierre nuevos) | Borrador 480p armado. Falta el visto bueno del usuario (paso 9). El cierre anuncia el capítulo 2 |
+| E4 · Demostrar que nunca falla | `E4_nunca_falla/` | 12 Interacción y mensajes, 13 Corrección y modelado, 14 Puente a Petri (+ gancho y cierre nuevos) | **Terminado y subido a YouTube** (1080p60, 10:34, 0 avisos). Renders borrados: se regenera con `render.py --calidad qh`. El cierre anuncia el capítulo 2 |
 
 - El cierre de E1 anuncia E2 con el título "La ilusión de hacerlo todo a la vez".
   Cada episodio tiene que anunciar el siguiente de la misma forma, **también
@@ -142,6 +142,18 @@ Hay dos puntos donde se frena a esperar al usuario (🟡).
 9. 🟡 **Mandar el mp4 al usuario** y esperar su visto bueno o sus comentarios.
 10. **Render final:** `python render.py <carpeta> --calidad qh`. Entregar el mp4,
     el `.srt` y `capitulos.txt` de `salida/`.
+11. **Subir a YouTube y limpiar** (antes de pushear al repositorio):
+    - subir el mp4 de 1080p a YouTube (título, descripción con `capitulos.txt`);
+    - verificar en Studio que quedó subido y procesado (duración correcta, 1080p);
+    - **limpiar los residuos**: borrar `media/`, `salida/`, `__pycache__/`, `render.log` y
+      `lista.txt` del episodio. Es todo regenerable y está en `.gitignore`;
+    - dejar el episodio **listo para renderizarse de nuevo con un solo comando**
+      (`python render.py <carpeta> --calidad qh`): solo quedan `guion.md` y las
+      escenas `sNN_*.py`, y cualquier pieza compartida nueva va en `comun/`;
+    - recién entonces `git add`, commit y push, y anotar en la fila de §1 que está subido.
+
+    Los videos nunca van al repositorio: el código es la fuente y el mp4 se regenera
+    (la voz se vuelve a sintetizar con edge-tts, así que necesita internet).
 
 ---
 
@@ -548,6 +560,9 @@ bloques de color macizos (ver `Indicate` en §10), íconos que no se entienden.
 - [ ] Cada escena tiene `**Capítulo YouTube:**` y la primera empieza en 0:00.
 - [ ] El cierre anuncia el episodio siguiente.
 - [ ] README actualizado si apareció una trampa nueva o una herramienta nueva.
+- [ ] Antes de pushear: video subido y verificado en YouTube, residuos limpiados
+      (`media/`, `salida/`, `__pycache__/`, `render.log`, `lista.txt`) y el episodio
+      renderizable con un solo comando (§2, paso 11).
 
 ---
 

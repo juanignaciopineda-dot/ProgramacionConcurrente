@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="620" height="330" viewBox="0 0 620 330" version="1.1">
+  <style>
+    text { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; fill: #78829a; }
+    .tit { font-size: 14px; font-weight: 600; }
+    .cap { font-size: 11.5px; }
+    .cel { font-size: 15px; text-anchor: middle; }
+    .cell { fill: none; stroke: #78829a; stroke-width: 1.4; }
+    .edge { fill: none; stroke: #78829a; stroke-width: 1.6; marker-end: url(#ah); }
+  </style>
+  <defs>
+    <marker id="ah" markerWidth="9" markerHeight="7" refX="8.5" refY="3.5" orient="auto">
+      <polygon points="0 0, 9 3.5, 0 7" fill="#78829a"/>
+    </marker>
+  </defs>
+
+  <text class="tit" x="20" y="28">Máquina de Turing</text>
+  <text class="cap" x="20" y="48">Cinta infinita dividida en celdas + cabezal de lectura / escritura + unidad de control</text>
+
+  <text class="cel" x="26" y="106">…</text>
+  <rect class="cell" x="44"  y="80" width="44" height="46"/>
+  <rect class="cell" x="88"  y="80" width="44" height="46"/>
+  <rect class="cell" x="132" y="80" width="44" height="46"/>
+  <rect class="cell" x="176" y="80" width="44" height="46"/>
+  <rect class="cell" x="220" y="80" width="44" height="46" stroke="#f0883e" stroke-width="2.2"/>
+  <rect class="cell" x="264" y="80" width="44" height="46"/>
+  <rect class="cell" x="308" y="80" width="44" height="46"/>
+  <rect class="cell" x="352" y="80" width="44" height="46"/>
+  <rect class="cell" x="396" y="80" width="44" height="46"/>
+  <text class="cel" x="414" y="106">…</text>
+
+  <text class="cel" x="66"  y="110">#</text>
+  <text class="cel" x="110" y="110">#</text>
+  <text class="cel" x="154" y="110">a</text>
+  <text class="cel" x="198" y="110">a</text>
+  <text class="cel" x="242" y="110" fill="#f0883e">a</text>
+  <text class="cel" x="286" y="110">a</text>
+  <text class="cel" x="330" y="110">a</text>
+  <text class="cel" x="374" y="110">b</text>
+  <text class="cel" x="418" y="110">b</text>
+
+  <polygon points="242,140 230,164 254,164" fill="none" stroke="#f0883e" stroke-width="2"/>
+  <rect x="182" y="164" width="120" height="44" rx="6" fill="none" stroke="#f0883e" stroke-width="2"/>
+  <text class="cel" x="242" y="192" fill="#f0883e" style="font-size:13px">control: q</text>
+
+  <line class="edge" x1="302" y1="186" x2="360" y2="186"/>
+
+  <text class="cap" x="372" y="172" style="font-size:13px" fill="#4c8dff">δ(q, a) = (p, #, R)</text>
+  <text class="cap" x="372" y="192">1. cambia al estado p</text>
+  <text class="cap" x="372" y="210">2. escribe # sobre la a leída</text>
+  <text class="cap" x="372" y="228">3. mueve el cabezal a la derecha</text>
+
+  <line x1="20" y1="252" x2="600" y2="252" stroke="#78829a" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
+
+  <text class="cap" x="20" y="276">Los tres efectos pueden darse juntos o por separado. El cabezal se mueve a izquierda (L), a derecha (R) o se detiene.</text>
+  <text class="cap" x="20" y="296">L(MT) = conjunto de palabras que hacen que la máquina se PARE en un estado final.</text>
+  <text class="cap" x="20" y="316" fill="#3fb950">Autómata lineal acotado = la misma máquina, pero con marcas # y $ que el cabezal no puede pasar ni sobrescribir.</text>
+</svg>

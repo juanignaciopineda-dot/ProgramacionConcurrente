@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="620" height="470" viewBox="0 0 620 470" version="1.1">
+  <style>
+    text { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; fill: #78829a; }
+    .tit { font-size: 13.5px; font-weight: 600; }
+    .cap { font-size: 11.5px; }
+    .lb  { font-size: 11.5px; text-anchor: middle; }
+    .lr  { font-size: 11.5px; }
+    .pl  { fill: none; stroke: #78829a; stroke-width: 1.8; }
+    .tr  { fill: none; stroke: #f0883e; stroke-width: 2.2; }
+    .tk  { fill: #4c8dff; }
+    .edge { fill: none; stroke: #78829a; stroke-width: 1.5; marker-end: url(#ah); }
+  </style>
+  <defs>
+    <marker id="ah" markerWidth="9" markerHeight="7" refX="8.5" refY="3.5" orient="auto">
+      <polygon points="0 0, 9 3.5, 0 7" fill="#78829a"/>
+    </marker>
+  </defs>
+
+  <!-- (a) ciclo estacional -->
+  <text class="tit" x="20" y="30" fill="#3fb950">(a) Autónoma</text>
+  <text class="cap" x="20" y="48">Ciclo estacional: no se sabe cuándo dispara</text>
+
+  <circle class="pl" cx="115" cy="95" r="20"/>
+  <circle class="tk" cx="115" cy="95" r="5"/>
+  <text class="lb" x="115" y="72">primavera</text>
+
+  <circle class="pl" cx="185" cy="165" r="20"/>
+  <text class="lb" x="222" y="168">verano</text>
+
+  <circle class="pl" cx="115" cy="235" r="20"/>
+  <text class="lb" x="115" y="268">otoño</text>
+
+  <circle class="pl" cx="45" cy="165" r="20"/>
+  <text class="lb" x="24" y="140">invierno</text>
+
+  <rect class="tr" x="160" y="102" width="9" height="27" transform="rotate(45 164.5 115.5)"/>
+  <rect class="tr" x="160" y="201" width="9" height="27" transform="rotate(135 164.5 214.5)"/>
+  <rect class="tr" x="61"  y="201" width="9" height="27" transform="rotate(225 65.5 214.5)"/>
+  <rect class="tr" x="61"  y="102" width="9" height="27" transform="rotate(315 65.5 115.5)"/>
+  <text class="lb" x="188" y="106" fill="#f0883e">T1</text>
+
+  <line class="edge" x1="135.3" y1="103.4" x2="152.5" y2="110.5"/>
+  <line class="edge" x1="169.5" y1="127.5" x2="176.6" y2="144.7"/>
+  <line class="edge" x1="176.6" y1="185.3" x2="169.5" y2="202.5"/>
+  <line class="edge" x1="152.5" y1="219.5" x2="135.3" y2="226.6"/>
+  <line class="edge" x1="94.7"  y1="226.6" x2="77.5"  y2="219.5"/>
+  <line class="edge" x1="60.5"  y1="202.5" x2="53.4"  y2="185.3"/>
+  <line class="edge" x1="53.4"  y1="144.7" x2="60.5"  y2="127.5"/>
+  <line class="edge" x1="77.5"  y1="110.5" x2="94.7"  y2="103.4"/>
+
+  <!-- (b) motor: sincronizada -->
+  <text class="tit" x="320" y="30" fill="#ff6b6b">(b) No autónoma — sincronizada</text>
+  <text class="cap" x="320" y="48">El disparo espera un evento externo</text>
+
+  <circle class="pl" cx="400" cy="100" r="20"/>
+  <circle class="tk" cx="400" cy="100" r="5"/>
+  <text class="lr" x="428" y="96">motor detenido</text>
+
+  <rect class="tr" x="386" y="146" width="28" height="9"/>
+  <text class="lr" x="428" y="154" fill="#ff6b6b">orden de inicio</text>
+
+  <circle class="pl" cx="400" cy="200" r="20"/>
+  <text class="lr" x="428" y="196">motor en marcha</text>
+
+  <rect class="tr" x="386" y="246" width="28" height="9"/>
+  <text class="lr" x="428" y="254" fill="#ff6b6b">orden de parada</text>
+
+  <line class="edge" x1="400" y1="122" x2="400" y2="140"/>
+  <line class="edge" x1="400" y1="157" x2="400" y2="176"/>
+  <line class="edge" x1="400" y1="222" x2="400" y2="240"/>
+  <path class="edge" d="M 384 251 Q 330 176 384 105"/>
+
+  <line x1="20" y1="296" x2="600" y2="296" stroke="#78829a" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
+
+  <!-- (c) semáforo: temporizada -->
+  <text class="tit" x="20" y="322" fill="#c86bd8">(c) No autónoma — temporizada</text>
+  <text class="cap" x="20" y="340">Semáforo: cada transición dispara un tiempo fijo después de sensibilizarse</text>
+
+  <circle class="pl" cx="80" cy="390" r="20"/>
+  <circle class="tk" cx="80" cy="390" r="5"/>
+  <text class="lb" x="80" y="428">verde</text>
+
+  <rect class="tr" x="155" y="376" width="9" height="28"/>
+  <text class="lb" x="160" y="366" fill="#c86bd8">60 s</text>
+
+  <circle class="pl" cx="240" cy="390" r="20"/>
+  <text class="lb" x="240" y="428">ámbar</text>
+
+  <rect class="tr" x="315" y="376" width="9" height="28"/>
+  <text class="lb" x="320" y="366" fill="#c86bd8">5 s</text>
+
+  <circle class="pl" cx="400" cy="390" r="20"/>
+  <text class="lb" x="400" y="428">rojo</text>
+
+  <rect class="tr" x="475" y="376" width="9" height="28"/>
+  <text class="lb" x="480" y="366" fill="#c86bd8">45 s</text>
+
+  <line class="edge" x1="102" y1="390" x2="149" y2="390"/>
+  <line class="edge" x1="166" y1="390" x2="216" y2="390"/>
+  <line class="edge" x1="262" y1="390" x2="309" y2="390"/>
+  <line class="edge" x1="326" y1="390" x2="376" y2="390"/>
+  <line class="edge" x1="422" y1="390" x2="469" y2="390"/>
+  <path class="edge" d="M 484 402 Q 282 466 84 412"/>
+
+  <text class="cap" x="510" y="386">La red es la</text>
+  <text class="cap" x="510" y="404">misma; cambia</text>
+  <text class="cap" x="510" y="422">qué gobierna</text>
+  <text class="cap" x="510" y="440">el disparo.</text>
+</svg>

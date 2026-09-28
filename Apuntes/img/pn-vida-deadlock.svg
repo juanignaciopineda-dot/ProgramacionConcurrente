@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="620" height="380" viewBox="0 0 620 380" version="1.1">
+  <style>
+    text { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; fill: #78829a; }
+    .tit { font-size: 13px; font-weight: 600; }
+    .cap { font-size: 11.5px; }
+    .lb  { font-size: 11px; text-anchor: middle; }
+    .ring { fill: none; }
+  </style>
+
+  <text class="tit" x="20" y="26">Niveles de vivacidad — cada anillo contiene al siguiente</text>
+
+  <circle class="ring" cx="180" cy="200" r="168" stroke="#ff6b6b" stroke-width="2"/>
+  <text class="lb" x="180" y="46" fill="#ff6b6b">Todas las RdP</text>
+
+  <circle class="ring" cx="180" cy="210" r="130" stroke="#f0883e" stroke-width="2"/>
+  <text class="lb" x="180" y="92" fill="#f0883e">Libres de deadlock</text>
+
+  <circle class="ring" cx="180" cy="222" r="92" stroke="#4c8dff" stroke-width="2"/>
+  <text class="lb" x="180" y="140" fill="#4c8dff">Quasi-vivas</text>
+  <text class="cap" x="180" y="154" fill="#4c8dff">(cada transición dispara alguna vez)</text>
+
+  <circle class="ring" cx="180" cy="236" r="54" stroke="#3fb950" stroke-width="2"/>
+  <text class="lb" x="180" y="222" fill="#3fb950">Vivas</text>
+  <text class="cap" x="180" y="236" fill="#3fb950">(cada transición</text>
+  <text class="cap" x="180" y="250" fill="#3fb950">SIEMPRE puede</text>
+  <text class="cap" x="180" y="264" fill="#3fb950">volver a disparar)</text>
+
+  <line x1="330" y1="20" x2="330" y2="360" stroke="#78829a" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
+
+  <text class="tit" x="360" y="26">Lo que NO implica lo otro</text>
+
+  <text class="cap" x="360" y="56" fill="#4c8dff">Quasi-viva ⇏ libre de deadlock</text>
+  <text class="cap" x="360" y="74">Puede disparar cada transición una vez</text>
+  <text class="cap" x="360" y="90">y aun así terminar atascada.</text>
+
+  <text class="cap" x="360" y="126" fill="#3fb950">Viva ⇒ libre de deadlock</text>
+  <text class="cap" x="360" y="144">Si siempre se puede volver a disparar</text>
+  <text class="cap" x="360" y="160">cualquier transición, nunca hay un</text>
+  <text class="cap" x="360" y="176">marcado sin salida.</text>
+
+  <text class="cap" x="360" y="212" fill="#ff6b6b">Vivacidad y deadlock dependen de M₀</text>
+  <text class="cap" x="360" y="230">Una red viva para M₀ puede dejar de</text>
+  <text class="cap" x="360" y="246">serlo para M₀' ≥ M₀ — agregar fichas</text>
+  <text class="cap" x="360" y="262">NO siempre ayuda.</text>
+
+  <text class="cap" x="360" y="298" fill="#c86bd8">"Se comporta bien"</text>
+  <text class="cap" x="360" y="316">= viva Y acotada. El estándar mínimo</text>
+  <text class="cap" x="360" y="332">para confiar en un modelo de</text>
+  <text class="cap" x="360" y="348">concurrencia.</text>
+</svg>

@@ -50,6 +50,8 @@ class Invariantes(EscenaCurso):
             self.play(FadeIn(cursor), run_time=0.15)
             self.play(cursor.animate.set_x(X1 - 1.0), run_time=max(0.6, self.margen() - 0.1), rate_func=linear)
 
+        # pausa pedida por el usuario: el bloque se parte aquí
+        with self.narrar("b2"):
             # «nunca hay más de un proceso» — el invariante del ejemplo
             self.en("ejemplo")
             regla = VGroup(Text("en sección crítica", color=TXT, weight=BOLD).scale(0.7),

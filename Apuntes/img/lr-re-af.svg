@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="620" height="360" viewBox="0 0 620 360" version="1.1">
+  <style>
+    text { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; fill: #78829a; }
+    .tit { font-size: 14px; font-weight: 600; }
+    .cap { font-size: 11.5px; }
+    .re  { font-size: 13.5px; fill: #4c8dff; font-weight: 600; }
+    .lb  { font-size: 13px; text-anchor: middle; fill: #f0883e; }
+    .node { fill: none; stroke: #78829a; stroke-width: 1.6; }
+    .edge { fill: none; stroke: #78829a; stroke-width: 1.5; marker-end: url(#ah); }
+  </style>
+  <defs>
+    <marker id="ah" markerWidth="8" markerHeight="6" refX="7.5" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#78829a"/>
+    </marker>
+  </defs>
+
+  <text class="tit" x="20" y="26">Equivalencia entre expresiones regulares básicas y autómatas finitos</text>
+
+  <!-- fila 1 -->
+  <text class="re" x="34" y="70">λ</text>
+  <line class="edge" x1="20" y1="120" x2="46" y2="120"/>
+  <circle class="node" cx="66" cy="120" r="18"/>
+  <line class="edge" x1="86" y1="120" x2="142" y2="120"/>
+  <text class="lb" x="114" y="110">λ</text>
+  <circle class="node" cx="162" cy="120" r="18"/>
+  <circle class="node" cx="162" cy="120" r="13"/>
+
+  <text class="re" x="234" y="70">a</text>
+  <line class="edge" x1="220" y1="120" x2="246" y2="120"/>
+  <circle class="node" cx="266" cy="120" r="18"/>
+  <line class="edge" x1="286" y1="120" x2="342" y2="120"/>
+  <text class="lb" x="314" y="110">a</text>
+  <circle class="node" cx="362" cy="120" r="18"/>
+  <circle class="node" cx="362" cy="120" r="13"/>
+
+  <text class="re" x="434" y="70">a*</text>
+  <line class="edge" x1="440" y1="120" x2="466" y2="120"/>
+  <circle class="node" cx="490" cy="120" r="18"/>
+  <circle class="node" cx="490" cy="120" r="13"/>
+  <path class="edge" d="M 476 108 C 462 74 518 74 504 108"/>
+  <text class="lb" x="490" y="72">a</text>
+  <text class="cap" x="528" y="124">acepta λ</text>
+
+  <line x1="20" y1="182" x2="600" y2="182" stroke="#78829a" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
+
+  <!-- fila 2 -->
+  <text class="re" x="34" y="222">a+</text>
+  <line class="edge" x1="20" y1="272" x2="46" y2="272"/>
+  <circle class="node" cx="66" cy="272" r="18"/>
+  <line class="edge" x1="86" y1="272" x2="142" y2="272"/>
+  <text class="lb" x="114" y="262">a</text>
+  <circle class="node" cx="162" cy="272" r="18"/>
+  <circle class="node" cx="162" cy="272" r="13"/>
+  <path class="edge" d="M 148 260 C 134 226 190 226 176 260"/>
+  <text class="lb" x="162" y="224">a</text>
+
+  <text class="re" x="234" y="222">a + b</text>
+  <line class="edge" x1="220" y1="272" x2="246" y2="272"/>
+  <circle class="node" cx="266" cy="272" r="18"/>
+  <path class="edge" d="M 282 262 Q 314 236 346 262"/>
+  <text class="lb" x="314" y="232">a</text>
+  <path class="edge" d="M 282 282 Q 314 308 346 282"/>
+  <text class="lb" x="314" y="326">b</text>
+  <circle class="node" cx="362" cy="272" r="18"/>
+  <circle class="node" cx="362" cy="272" r="13"/>
+
+  <text class="re" x="434" y="222">(a + b)*</text>
+  <line class="edge" x1="440" y1="272" x2="466" y2="272"/>
+  <circle class="node" cx="490" cy="272" r="18"/>
+  <circle class="node" cx="490" cy="272" r="13"/>
+  <path class="edge" d="M 476 260 C 462 226 518 226 504 260"/>
+  <text class="lb" x="490" y="224">a</text>
+  <path class="edge" d="M 504 284 C 518 318 462 318 476 284"/>
+  <text class="lb" x="490" y="336">b</text>
+
+  <text class="cap" x="20" y="352">El doble círculo marca los estados finales; la flecha suelta de la izquierda marca el estado inicial.</text>
+</svg>

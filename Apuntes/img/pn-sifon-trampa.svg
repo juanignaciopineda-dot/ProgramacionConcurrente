@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="620" height="330" viewBox="0 0 620 330" version="1.1">
+  <style>
+    text { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; fill: #78829a; }
+    .tit { font-size: 13.5px; font-weight: 600; }
+    .cap { font-size: 11.5px; }
+    .lb  { font-size: 11.5px; text-anchor: middle; }
+    .pl  { fill: none; stroke: #78829a; stroke-width: 1.8; }
+    .tr  { fill: none; stroke: #f0883e; stroke-width: 2.2; }
+    .tk  { fill: #4c8dff; }
+    .edge { fill: none; stroke: #78829a; stroke-width: 1.5; marker-end: url(#ah); }
+    .zone { fill: none; stroke-width: 2; stroke-dasharray: 5 4; }
+  </style>
+  <defs>
+    <marker id="ah" markerWidth="9" markerHeight="7" refX="8.5" refY="3.5" orient="auto">
+      <polygon points="0 0, 9 3.5, 0 7" fill="#78829a"/>
+    </marker>
+  </defs>
+
+  <text class="tit" x="20" y="26" fill="#ff6b6b">Sifón {P1, P2} — sólo puede PERDER fichas</text>
+  <text class="cap" x="20" y="44">Sus entradas (T1) ⊆ sus salidas (T1, T2): todo lo que le entra, también le puede salir</text>
+
+  <circle class="pl" cx="90" cy="120" r="20"/>
+  <circle class="tk" cx="90" cy="120" r="5"/>
+  <text class="lb" x="90" y="94">P1</text>
+  <circle class="pl" cx="190" cy="120" r="20"/>
+  <text class="lb" x="190" y="94">P2</text>
+
+  <rect class="zone" x="62" y="92" width="156" height="56" rx="30" stroke="#ff6b6b"/>
+
+  <rect class="tr" x="126" y="106" width="9" height="28"/>
+  <text class="lb" x="130" y="98" fill="#f0883e">T1</text>
+  <line class="edge" x1="110" y1="120" x2="122" y2="120"/>
+  <line class="edge" x1="139" y1="120" x2="170" y2="120"/>
+
+  <rect class="tr" x="216" y="106" width="9" height="28"/>
+  <text class="lb" x="220" y="98" fill="#f0883e">T2</text>
+  <line class="edge" x1="210" y1="120" x2="212" y2="120"/>
+  <line class="edge" x1="229" y1="120" x2="270" y2="120"/>
+
+  <circle class="pl" cx="290" cy="120" r="20"/>
+  <text class="lb" x="322" y="124">P3</text>
+
+  <text class="cap" x="20" y="180">Si dispara T2, la ficha sale del sifón para siempre: una vez vacío ({P1,P2}=0), ninguna transición</text>
+  <text class="cap" x="20" y="196">de salida del sifón vuelve a habilitarse. Un sifón vacío es un problema de diseño permanente.</text>
+
+  <line x1="20" y1="220" x2="600" y2="220" stroke="#78829a" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
+
+  <text class="tit" x="20" y="246" fill="#3fb950">Trampa {P4, P5} — sólo puede GANAR fichas</text>
+  <text class="cap" x="20" y="264">Sus salidas (T3) ⊆ sus entradas (T2, T3): es la propiedad DUAL del sifón</text>
+
+  <circle class="pl" cx="90" cy="300" r="20"/>
+  <circle class="tk" cx="90" cy="300" r="5"/>
+  <text class="lb" x="60" y="304">P4</text>
+
+  <rect class="zone" x="62" y="272" width="156" height="56" rx="30" stroke="#3fb950"/>
+
+  <rect class="tr" x="126" y="286" width="9" height="28"/>
+  <text class="lb" x="130" y="278" fill="#f0883e">T2</text>
+  <line class="edge" x1="110" y1="300" x2="122" y2="300"/>
+  <line class="edge" x1="139" y1="300" x2="170" y2="300"/>
+
+  <circle class="pl" cx="190" cy="300" r="20"/>
+  <text class="lb" x="190" y="274">P5</text>
+
+  <rect class="tr" x="216" y="286" width="9" height="28"/>
+  <text class="lb" x="245" y="278" fill="#f0883e">T3</text>
+  <path class="edge" d="M 210 288 C 225 265 225 335 210 312"/>
+
+  <text class="cap" x="360" y="290">Una vez que la trampa tiene</text>
+  <text class="cap" x="360" y="308">una ficha, nunca vuelve a</text>
+  <text class="cap" x="360" y="324">vaciarse — la conserva pase</text>
+  <text class="cap" x="360" y="340">lo que pase después.</text>
+</svg>

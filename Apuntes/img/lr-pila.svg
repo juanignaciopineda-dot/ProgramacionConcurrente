@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="620" height="360" viewBox="0 0 620 360" version="1.1">
+  <style>
+    text { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; fill: #78829a; }
+    .tit { font-size: 14px; font-weight: 600; }
+    .cap { font-size: 11.5px; }
+    .cel { font-size: 15px; text-anchor: middle; }
+    .cell { fill: none; stroke: #78829a; stroke-width: 1.4; }
+    .edge { fill: none; stroke: #78829a; stroke-width: 1.6; marker-end: url(#ah); }
+  </style>
+  <defs>
+    <marker id="ah" markerWidth="9" markerHeight="7" refX="8.5" refY="3.5" orient="auto">
+      <polygon points="0 0, 9 3.5, 0 7" fill="#78829a"/>
+    </marker>
+  </defs>
+
+  <text class="tit" x="20" y="28">Autómata de pila</text>
+  <text class="cap" x="20" y="48">Cinta de sólo lectura que avanza en un único sentido  +  una pila auxiliar</text>
+
+  <rect class="cell" x="40"  y="76" width="42" height="44"/>
+  <rect class="cell" x="82"  y="76" width="42" height="44" stroke="#f0883e" stroke-width="2.2"/>
+  <rect class="cell" x="124" y="76" width="42" height="44"/>
+  <rect class="cell" x="166" y="76" width="42" height="44"/>
+  <rect class="cell" x="208" y="76" width="42" height="44"/>
+  <rect class="cell" x="250" y="76" width="42" height="44"/>
+
+  <text class="cel" x="61"  y="105">a</text>
+  <text class="cel" x="103" y="105" fill="#f0883e">a</text>
+  <text class="cel" x="145" y="105">b</text>
+  <text class="cel" x="187" y="105">b</text>
+  <text class="cel" x="229" y="105">λ</text>
+  <text class="cel" x="271" y="105">λ</text>
+
+  <line class="edge" x1="292" y1="98" x2="330" y2="98"/>
+  <text class="cap" x="336" y="102">la cinta sólo avanza →</text>
+
+  <polygon points="103,132 91,156 115,156" fill="none" stroke="#f0883e" stroke-width="2"/>
+  <rect x="43" y="156" width="120" height="46" rx="6" fill="none" stroke="#f0883e" stroke-width="2"/>
+  <text class="cel" x="103" y="185" fill="#f0883e" style="font-size:13px">control: q</text>
+
+  <path class="edge" d="M 168 172 L 236 172"/>
+  <path class="edge" d="M 236 194 L 168 194"/>
+  <text class="cap" x="176" y="166">push</text>
+  <text class="cap" x="176" y="212">pop</text>
+
+  <rect class="cell" x="252" y="132" width="60" height="34" stroke="#4c8dff" stroke-width="2"/>
+  <rect class="cell" x="252" y="166" width="60" height="34" stroke="#4c8dff" stroke-width="2"/>
+  <rect class="cell" x="252" y="200" width="60" height="34" stroke="#4c8dff" stroke-width="2"/>
+  <text class="cel" x="282" y="156" fill="#4c8dff">a</text>
+  <text class="cel" x="282" y="190" fill="#4c8dff">a</text>
+  <text class="cel" x="282" y="224" fill="#4c8dff">Z</text>
+  <text class="cap" x="320" y="140" fill="#4c8dff">tope de la pila</text>
+  <text class="cap" x="320" y="228" fill="#4c8dff">fondo (Z₀)</text>
+
+  <text class="cap" x="390" y="172" style="font-size:13px">Transición  a , Z ; aZ</text>
+  <text class="cap" x="390" y="192">leo a de la cinta,</text>
+  <text class="cap" x="390" y="210">saco Z del tope,</text>
+  <text class="cap" x="390" y="228">y apilo aZ (queda una a más).</text>
+
+  <line x1="20" y1="256" x2="600" y2="256" stroke="#78829a" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
+
+  <text class="cap" x="20" y="280">Configuración: (q, w, α) — estado actual, entrada que falta leer, contenido de la pila.  Movimiento: ⊢</text>
+  <text class="cap" x="20" y="300">Con λ en la entrada se manipula la pila sin consumir cinta. Si la pila se vacía, el autómata se detiene.</text>
+  <text class="cap" x="20" y="322" fill="#3fb950">Reconoce los lenguajes de tipo 2 (libres de contexto), como a ⁿ bⁿ, que ningún autómata finito puede reconocer.</text>
+</svg>

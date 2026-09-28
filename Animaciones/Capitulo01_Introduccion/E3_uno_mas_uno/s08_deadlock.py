@@ -83,6 +83,8 @@ class Deadlock(EscenaCurso):
             it = Text("interbloqueo", color=INK).scale(0.55).next_to(dl, DOWN, buff=0.3)
             self.play(FadeIn(it, shift=UP * 0.2), run_time=0.3)
 
+        # pausa pedida por el usuario: el bloque se parte aquí
+        with self.narrar("b3"):
             # «esperándose mutuamente» — P1 y P2 frente a frente
             self.en("esperan")
             self.corte()

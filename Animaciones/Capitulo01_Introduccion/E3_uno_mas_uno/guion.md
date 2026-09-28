@@ -23,6 +23,9 @@ Cambios de texto respecto del guion base (para revisar):
   fácilmente", "pasillo angosto" → "pasillo estrecho", "nos corremos para el
   mismo lado" → "nos apartamos hacia el mismo lado".
 
+- Pausas pedidas por el usuario (tras «interbloqueo:», «sutil:» y «de la ejecución,»):
+  se partieron 08 b2, 09 b1 y 10 b1 en dos bloques; el texto no cambió.
+
 ---
 
 # Escena 01 — Gancho
@@ -353,15 +356,19 @@ fácilmente entre sí.
 - «se confunden fácilmente» → `confunden`: las tarjetas se barajan
 
 <!-- b2 -->
-La primera es el deadlock, o interbloqueo: dos o más procesos se quedan
-esperándose mutuamente, sin que ninguno pueda avanzar. El caso típico: el
-proceso uno ya tomó el recurso A y ahora pide el B; el proceso dos ya
-tomó el B y ahora pide el A. Ninguno va a soltar lo que tiene hasta
-conseguir lo que le falta, y lo que le falta lo tiene, justamente, el
-otro. Los dos quedan congelados, sin consumir procesador, para siempre.
+La primera es el deadlock, o interbloqueo:
 
 - «el deadlock» → `deadlock`: la primera tarjeta se da vuelta: «deadlock»
 - «interbloqueo» → `interbloqueo`: debajo, «interbloqueo»
+
+<!-- b3 -->
+dos o más procesos se quedan esperándose mutuamente, sin que ninguno pueda
+avanzar. El caso típico: el proceso uno ya tomó el recurso A y ahora pide el
+B; el proceso dos ya tomó el B y ahora pide el A. Ninguno va a soltar lo que
+tiene hasta conseguir lo que le falta, y lo que le falta lo tiene,
+justamente, el otro. Los dos quedan congelados, sin consumir procesador,
+para siempre.
+
 - «esperándose mutuamente» → `esperan`: corte; P1 y P2 frente a frente
 - «sin que ninguno pueda avanzar» → `avanzar`: los dos intentan moverse y solo tiemblan
 - «El caso típico» → `caso`: aparecen los recursos A y B, como candados
@@ -384,15 +391,18 @@ otro. Los dos quedan congelados, sin consumir procesador, para siempre.
 ## Narración
 
 <!-- b1 -->
-La segunda es la inanición, o starvation, y es más sutil: aquí el sistema,
-en conjunto, sí sigue avanzando, pero hay un proceso puntual que queda
-fuera para siempre. Si dos procesos se turnan un recurso entre ellos sin
-parar, un tercero que también lo pide puede no conseguirlo jamás, aunque
-el recurso nunca deje de usarse.
+La segunda es la inanición, o starvation, y es más sutil:
 
 - «la inanición» → `inanicion`: vuelven las tarjetas; la segunda se da vuelta: «inanición»
 - «starvation» → `starvation`: debajo, «starvation»
 - «es más sutil» → `sutil`: la tarjeta se acerca y una lupa pasa por encima
+
+<!-- b2 -->
+aquí el sistema, en conjunto, sí sigue avanzando, pero hay un proceso
+puntual que queda fuera para siempre. Si dos procesos se turnan un recurso
+entre ellos sin parar, un tercero que también lo pide puede no conseguirlo
+jamás, aunque el recurso nunca deje de usarse.
+
 - «sigue avanzando» → `avanza`: corte; un recurso al centro; P1 y P2 entran y salen, alternándose
 - «un proceso puntual» → `p3`: P3 aparece a un costado
 - «queda fuera para siempre» → `fuera`: P3 intenta entrar y rebota
@@ -401,7 +411,7 @@ el recurso nunca deje de usarse.
 - «no conseguirlo jamás» → `jamas`: el contador de intentos de P3 sube, en rojo
 - «nunca deje de usarse» → `usarse`: el recurso brilla, siempre ocupado
 
-<!-- b2 -->
+<!-- b3 -->
 La tercera es la más engañosa de las tres, y se confunde fácilmente con el
 deadlock: el livelock. Aquí los procesos no se bloquean: siguen activos,
 consumiendo procesador, reaccionando todo el tiempo a lo que hace el
@@ -434,13 +444,9 @@ sin embargo ninguno de los dos logra pasar.
 ## Narración
 
 <!-- b1 -->
-Y hay un cuarto problema, más general que engloba en parte a los otros:
-la violación de invariantes. Un invariante es una condición que debería
-cumplirse siempre, en cualquier instante de la ejecución, como "nunca hay
-más de un proceso a la vez en la sección crítica". Cuando la
-sincronización falla, basta con que exista un solo interleaving que
-rompa esa condición, aunque sea por un instante, para que el programa
-esté mal.
+Y hay un cuarto problema, más general que engloba en parte a los otros: la
+violación de invariantes. Un invariante es una condición que debería
+cumplirse siempre, en cualquier instante de la ejecución,
 
 - «un cuarto problema» → `cuarto`: las tres tarjetas; aparece una cuarta
 - «engloba en parte» → `engloba`: la cuarta crece y cubre en parte a las otras
@@ -448,6 +454,12 @@ esté mal.
 - «Un invariante es una condición» → `condicion`: la tarjeta se agranda al centro
 - «debería cumplirse siempre» → `siempre`: corte; línea de tiempo con una banda verde continua
 - «en cualquier instante» → `cualquier`: un cursor recorre la banda verde
+
+<!-- b2 -->
+como "nunca hay más de un proceso a la vez en la sección crítica". Cuando la
+sincronización falla, basta con que exista un solo interleaving que rompa
+esa condición, aunque sea por un instante, para que el programa esté mal.
+
 - «nunca hay más de un proceso» → `ejemplo`: arriba, «en sección crítica ≤ 1»
 - «a la vez en la sección crítica» → `sc`: debajo, la sala con un solo proceso dentro
 - «la sincronización falla» → `falla`: sobre la línea, un contador «1» que avanza con el tiempo
