@@ -66,9 +66,9 @@ fuente de texto, no se renderiza: tiene formato viejo, sin momentos.
 
 | Episodio | Carpeta | Escenas de `guion_base.md` | Estado |
 |---|---|---|---|
-| E1 · El error que ningún test encontró | `E1_el_error_invisible/` | 01 a 04 (+ gancho y cierre nuevos) | **Terminado.** Render final 1080p60 (9:56, 0 avisos) en `salida/`: mp4, srt y capitulos.txt |
-| E2 · La ilusión de hacerlo todo a la vez | `E2_la_ilusion/` | 05 Multiprogramación, 06 Hilos, 07 Concurrencia vs paralelismo, 08 Interleaving (+ gancho y cierre nuevos) | **Terminado**: aprobado y renderizado en 1080p60 (9:09), en `salida/` |
-| E3 · Uno más uno igual a uno | `E3_uno_mas_uno/` | 09 Condición de carrera, 10 Sección crítica, 11 Problemas clásicos (+ gancho, cierre y bloque «rebobinemos» nuevos) | Borrador 480p (8:21), 0 avisos. Falta el visto bueno del usuario (paso 9) |
+| E1 · El error que ningún test encontró | `E1_el_error_invisible/` | 01 a 04 (+ gancho y cierre nuevos) | **Terminado y subido a YouTube** (1080p60, 9:56, 0 avisos). Renders borrados del disco: se regenera con `render.py --calidad qh` |
+| E2 · La ilusión de hacerlo todo a la vez | `E2_la_ilusion/` | 05 Multiprogramación, 06 Hilos, 07 Concurrencia vs paralelismo, 08 Interleaving (+ gancho y cierre nuevos) | **Terminado y subido a YouTube** (1080p60, 9:09). Renders borrados: se regenera con `render.py --calidad qh` |
+| E3 · Uno más uno igual a uno | `E3_uno_mas_uno/` | 09 Condición de carrera, 10 Sección crítica, 11 Problemas clásicos (+ gancho, cierre y bloque «rebobinemos» nuevos) | **Terminado y subido a YouTube** (1080p60, 8:20, 0 avisos). Renders borrados: se regenera con `render.py --calidad qh`. Incluye 3 pausas pedidas por el usuario (bloques partidos en 08, 09 y 10) |
 | E4 · Demostrar que nunca falla | `E4_nunca_falla/` | 12 Interacción y mensajes, 13 Corrección y modelado, 14 Puente a Petri (+ gancho y cierre nuevos) | Borrador 480p armado. Falta el visto bueno del usuario (paso 9). El cierre anuncia el capítulo 2 |
 
 - El cierre de E1 anuncia E2 con el título "La ilusión de hacerlo todo a la vez".
