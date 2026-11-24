@@ -1,4 +1,4 @@
--
+
 # Java — Conceptos Básicos
 
 ###### **Modificadores de acceso**
@@ -208,6 +208,13 @@ Rectángulo con un operador de interacción en la esquina y uno o más operandos
   Caso típico de la filmina: `agregar()` y `eliminar()` pueden llamarse en paralelo, pero cada uno debe funcionar como región crítica.
 - El mensaje asincrónico modela el `start()` de un hilo; el sincrónico, una llamada común que bloquea al emisor.
 
+###### **Los ejemplos de la filmina**
+- **Ej. 1 — préstamo de un libro**: actores *Socio* y *Encargado*, objetos *Libro*, *Ficha socio*, *Ficha libro*, *Préstamo*. Secuencia: coger libro → solicitar préstamo → verificar situación del socio (respuesta punteada "situación socio ok") → verificar situación del libro → introducir préstamo → autorizar préstamo. Es el caso típico de mensajes sincrónicos con su retorno.
+- **Ej. 2a/2b — los tres chanchitos** (tracemodeler.com): un fragmento `par` con tres operandos, uno por chanchito construyendo su casa (`new()` de *StrawHouse*, *WoodHouse*, *BrickHouse*). El 2b agrega lo que la filmina pide "recordar etiquetar": **comentario** (nota con la esquina doblada), **fin de la vida de un objeto** (la `X` cuando el lobo sopla y la casa colapsa), **pila de llamadas** (ocurrencias de ejecución apiladas) y **retorno explícito**.
+- **Apéndice — pedido de comida**: muestra todos los elementos numerados de la tabla de arriba, incluyendo un fragmento **`ref`** (*Interaction Use*): una caja que **referencia otro diagrama de secuencia** ("Completar pedido y pagar") en lugar de dibujarlo, y mensajes **encontrado** (desde un punto negro, "hambre") y **perdido** (hacia un punto negro, "actualización de existencias").
+
+Herramientas que recomienda la cátedra: **Visual Paradigm**, **StarUML**, **Trace Modeler** y **Papyrus**. Tutorial: http://www.tracemodeler.com/articles/a_quick_introduction_to_uml_sequence_diagrams/
+
 # Introducción a la Programación Concurrente
 
 ## Historia y motivación
@@ -293,6 +300,58 @@ La semántica típica de un programa concurrente se da con un sistema de transic
 Un estado no es solo el valor de las variables globales. Incluye también dos variables implícitas: los program counters de cada proceso, que indican en qué sentencia está parado cada uno. Por eso, con dos variables booleanas `y1`, `y2`, un contador `in_critical` y dos procesos, el espacio de estados es el producto de todos los valores posibles por todas las posiciones posibles de los dos pc.
 
 Cada sentencia atómica define un conjunto de transiciones. `in_critical++`, por ejemplo, relaciona cada estado con aquel en el que `y1` e `y2` no cambian, `in_critical` se incrementa en uno, y el pc del proceso que la ejecutó avanza.
+
+###### **El ejemplo de la filmina: `y1`, `y2`, `in_critical`**
+Es un intento de exclusión mutua "a mano", escrito primero en Promela (el lenguaje del model checker SPIN):
+
+```c
+int y1 = 0;  int y2 = 0;  short in_critical = 0;
+
+active proctype process_1() {        active proctype process_2() {
+  do                                   do
+  :: true ->                           :: true ->
+     y1 = y2 + 1;                         y2 = y1 + 1;
+     (y2 == 0) || (y1 <= y2);             (y1 == 0) || (y2 < y1);   // espera (guarda bloqueante)
+     in_critical++;                       in_critical++;
+     in_critical--;                       in_critical--;
+     y1 = 0;                              y2 = 0;
+  od                                   od
+}                                    }
+```
+
+y después en Java, con tres clases: `Variable` (los tres enteros compartidos), y `Process1` / `Process2` que implementan `Runnable` y reciben **la misma** instancia de `Variable`. La guarda de Promela se traduce como espera activa:
+
+```java
+public void run() {                       // Process1
+    while (true) {
+        v.y1 = v.y2 + 1;
+        while (!(v.y2 == 0 || v.y1 < v.y2)) { }   // espera activa
+        v.inCritical++;
+        v.inCritical--;
+        v.y1 = 0;
+        System.out.print("Process 1 - inCritical  ");
+        System.out.println(v.inCritical);
+    }
+}
+```
+
+`Main` crea la `Variable`, los dos procesos y los dos `Thread`, los arranca e imprime "Bye World!" — que sale enseguida, porque `main` no espera a nadie. La propiedad de seguridad que se quiere es `in_critical <= 1` siempre. La asignación `y1 = y2 + 1` **no es atómica** (leer `y2`, sumar, escribir `y1`), así que existen interleavings en los que ambos procesos pasan la guarda y `in_critical` llega a 2; y, como dice la filmina, el test que produzca justo esa intercalación (o el *overflow* de `y1`/`y2` si siguen creciendo) es prácticamente imposible de construir a mano. Es exactamente el tipo de error que el model checking encuentra y el testing no.
+
+###### **Un sistema de transición chiquito, y la pregunta de la filmina**
+Para practicar la definición, la filmina usa un sistema abstracto de dos variables binarias:
+
+$$(S,\ s_0,\ \rightarrow) \quad S = \{0,1\}\times\{0,1\} \qquad s_0 = (0,0)$$
+$$(x,y) \rightarrow (x,0) \qquad (x,y) \rightarrow (x,1) \qquad (x,y) \rightarrow (y,y)$$
+
+Es decir: en un paso se puede poner $y$ en 0, poner $y$ en 1, o copiar $y$ en $x$. Desde $(0,0)$ se alcanzan los cuatro estados. Y la pregunta: ¿cuáles de estas secuencias son ejecuciones?
+
+| Secuencia (comienzo) | ¿Ejecución? | Por qué |
+|---|---|---|
+| $(0,0)(0,0)(0,1)(1,1)(1,0)(1,1)(1,0)\dots$ | **Sí** | Cada paso es una de las tres reglas |
+| $(0,1)(0,0)\dots$ | **No** | No arranca en $s_0 = (0,0)$ |
+| $(0,0)(0,1)(1,0)\dots$ | **No** | De $(0,1)$ a $(1,0)$ cambian **las dos** componentes; la única regla que cambia $x$ es copiar $y$, que daría $(1,1)$ |
+
+Es el criterio general: una secuencia es ejecución si arranca en el estado inicial y **cada par consecutivo** está en la relación de transición.
 
 ###### **Interleaving**
 Este es el concepto central del modelo computacional de la materia:
@@ -434,6 +493,17 @@ Las transiciones:
 4. **Terminación**: se liberan su contexto y su pila.
 
 Cuando un hilo está en ejecución tiene acceso a todos los recursos asignados a la tarea.
+
+###### **Monohilo y multihilo**
+Un proceso que tiene un solo hilo de ejecución es **monohilo**: en ese caso proceso e hilo coinciden. Las ventajas de los hilos aparecen con el **multihilo**, cuando un proceso tiene varios hilos que realizan actividades distintas, cooperativas o no. Lo que tiene cada hilo, según la filmina:
+
+- Su **estado**.
+- Su **contexto de procesador**: el punto de ejecución (la instrucción), que se salva para poder reanudarlo si se lo interrumpe.
+- Su **pila de ejecución**.
+- Un espacio de almacenamiento estático para sus variables (las locales).
+- **Acceso a los recursos de la tarea**, compartidos por todos los hilos de la tarea.
+
+La filmina también muestra el diagrama de estados de un hilo **en Java** (*New → Ready-to-Run ⇄ Running*, con *Sleeping*, *Waiting* y *Blocking* como estados de espera y *Dead* al final), que se desarrolla en la sección de `Thread.State`.
 
 ## Concurrencia: principios generales
 
@@ -966,7 +1036,14 @@ Por eso $ab+c$ significa $(ab)+c$ y no $a(b+c)$: la concatenación se evalúa an
 | Distributividad | $\alpha(\beta + \gamma) = \alpha\beta + \alpha\gamma$ |
 | Neutro de la concatenación | $\lambda\alpha = \alpha\lambda = \alpha$ |
 | Absorbente | $\varnothing\,\alpha = \alpha\,\varnothing = \varnothing$ |
-| Cierre | $(\alpha^*)^* = \alpha^*$ ; $\lambda^* = \lambda$ ; $\alpha^+ = \alpha\alpha^*$ ; $\alpha^* = \alpha^+ + \lambda$ |
+| Cierre | $(\alpha^*)^* = \alpha^*$ ; $\lambda^* = \lambda$ ; $\alpha^+ = \alpha\alpha^*$ ; $\alpha^* = \alpha^+ + \lambda = \alpha\alpha^* + \lambda$ ; $(\alpha + \lambda)^* = \alpha^*$ |
+| Cierre de una unión (la de la filmina) | $(\alpha + \beta)^* = (\alpha^* + \beta^*)^* = (\alpha^*\beta^*)^*$ |
+
+Y la definición formal que usa JFLAP: dado un alfabeto $\Sigma$, el conjunto $R$ de todas las expresiones regulares es el menor que cumple
+
+$$R = \{\varnothing, \lambda\} \cup \Sigma \cup \{ab \mid a,b \in R\} \cup \{a+b \mid a,b \in R\} \cup \{a^* \mid a \in R\} \cup \{(a) \mid a \in R\}$$
+
+o sea: los casos base (vacío, cadena vacía, cada símbolo) más lo que se arma con concatenación, unión, estrella y paréntesis.
 
 Ejemplos de la filmina, para fijar la lectura de cada operador:
 
@@ -1311,6 +1388,35 @@ El camino inverso, con los casos borde que la filmina remarca porque son los que
 
 El paso 3 es el corazón: cada arco del autómata es una producción de la gramática. Y el "agregar además $A \to a$" es lo que permite **terminar** la derivación, porque en la gramática no existe el concepto de estado final.
 
+###### **Ejemplo resuelto de la filmina**
+$$L_3 = \{\, x\,c^{3m} \mid x \in \{a,b\}^*,\ \text{la cantidad de } b \text{ en } x \text{ es par},\ m \ge 0 \,\}$$
+
+Es decir: una cadena de `a` y `b` con una cantidad par de `b`, seguida de una cantidad de `c` múltiplo de 3. El autómata es $M_{3D} = \langle \{e_0,\dots,e_4\},\ \{a,b,c\},\ \delta,\ e_0,\ \{e_0, e_4\} \rangle$:
+
+```mermaid
+stateDiagram-v2
+    direction LR
+    [*] --> e0
+    e0 --> e0 : a
+    e0 --> e1 : b
+    e1 --> e1 : a
+    e1 --> e0 : b
+    e0 --> e2 : c
+    e2 --> e3 : c
+    e3 --> e4 : c
+    e4 --> e2 : c
+    e0 --> [*]
+    e4 --> [*]
+```
+
+$e_0$/$e_1$ cuentan la paridad de las `b`; $e_2 \to e_3 \to e_4$ cuenta las `c` módulo 3. Asociando $S = e_0$, $A = e_1$, $B = e_2$, $C = e_3$, $D = e_4$, JFLAP da la gramática:
+
+$$S \to aS \mid bA \mid cB \mid \lambda \qquad A \to aA \mid bS \qquad B \to cC \qquad C \to cD \qquad D \to cB \mid \lambda$$
+
+Notar que JFLAP resuelve los estados finales con producciones $X \to \lambda$ ($S \to \lambda$, $D \to \lambda$) en lugar de agregar $A \to a$ por cada arco que entra a un final, y que **sí** deja a $S$ a la derecha ($A \to bS$) aunque al estado inicial le entren arcos. Las dos gramáticas generan el mismo lenguaje; la del algoritmo de la cátedra evita $\lambda$ salvo en $S \to \lambda$ y nunca pone a $S$ a la derecha, que es la forma estricta de tipo 3.
+
+La filmina deja un segundo ejemplo derivado con JFLAP, $L_7 = \{\, a^{2n} b^{2k+1} \mid n \ge 1,\ k \ge 0 \,\} \cup \{\, ax \mid x \in \{a,b\}^* \text{ y } x \text{ contiene la subcadena } ba \,\}$, con un AFD mínimo de 7 estados ($p_0 \dots p_6$, finales $p_3$ y $p_6$): es buena práctica rehacerlo aplicando los cuatro pasos.
+
 ## Expresiones regulares ↔ autómatas finitos
 
 Dada una expresión regular existe un autómata finito capaz de reconocer el lenguaje que define, y recíprocamente, dado un autómata finito se puede expresar con una ER el lenguaje que reconoce. La conversión arranca de las equivalencias entre las ER **básicas** y sus autómatas:
@@ -1362,11 +1468,11 @@ Dos procesos de 10 estados dan 100 estados; cinco procesos dan 100.000. Esa es e
 
 ## Ejercicios Propuestos
 
-1. Sea el lenguaje $L_3 = \{\, w \mid w \in \{a,b\}^*,\ \text{la cantidad de } b \text{ es par},\ |w| \ge 0 \,\}$.
+1. Sea el lenguaje de la filmina $L_3 = \{\, x\,c^{3m} \mid x \in \{a,b\}^*,\ \text{la cantidad de } b \text{ es par},\ m \ge 0 \,\}$ (el autómata está resuelto en la sección del algoritmo AF → gramática).
 
-   a) Construí un AFD que lo reconozca (alcanza con dos estados).
-   b) Escribí la expresión regular correspondiente.
-   c) Obtené la gramática regular aplicando el algoritmo AF → $G_3$, con cuidado en el caso borde: el estado inicial es también final.
+   a) Primero, sólo la parte $x$: construí el AFD de las cadenas sobre $\{a,b\}$ con cantidad par de `b` (alcanza con dos estados).
+   b) Escribí la expresión regular de $L_3$ completo.
+   c) Obtené la gramática regular aplicando el algoritmo AF → $G_3$ **de la cátedra** (sin $\lambda$ salvo $S \to \lambda$, y sin $S$ a la derecha), con cuidado en los casos borde: el estado inicial es también final y le entran arcos. Comparala con la que da JFLAP.
 
 2. Sea el lenguaje $L_4 = \{\, w \mid w \in \{0,1\}^*,\ w \text{ contiene } 00 \text{ ó } 11 \,\}$.
 
@@ -1469,6 +1575,47 @@ Las únicas excepciones son:
 - Las clases atómicas de `java.util.concurrent.atomic` (`AtomicInteger`, etc.).
 
 Todo lo demás hay que protegerlo con `synchronized`, un `Lock` o un semáforo — que es justo el tema de la sección siguiente.
+
+###### **El ejemplo del práctico: la red `y1`/`y2` pasada a Java con `static`**
+El práctico abre con el mismo ejemplo Promela de la Introducción (`process_1`/`process_2` con `y1`, `y2`, `in_critical`) y lo traduce a Java usando **atributos estáticos** como memoria compartida:
+
+```java
+public abstract class Tarea implements Runnable {
+    protected static int y1 = 0, y2 = 0;
+    protected static int critical = 0;       // un solo valor para TODAS las tareas
+}
+
+public class T1 extends Tarea {
+    @Override
+    public void run() {
+        while (true) {
+            Tarea.y1 = Tarea.y2 + 1;
+            while (!(Tarea.y2 == 0) && !(Tarea.y1 <= Tarea.y2)) { }   // espera activa
+            Tarea.critical++;
+            Tarea.critical--;
+            Tarea.y1 = 0;
+            if (Tarea.critical != 0) {
+                System.out.println("Valor CRITICAL desde T1 = " + Tarea.critical);
+                System.out.println("Valor Y1 desde T1 = " + Tarea.y1);
+                System.out.println("Valor Y2 desde T1 = " + Tarea.y2);
+            }
+        }
+    }
+}
+// T2 es simétrica: y2 = y1 + 1; espera (y1 == 0) || (y2 < y1); usa y2.
+
+public class Proceso {
+    public Proceso() {
+        new Thread(new T1()).start();
+        new Thread(new T2()).start();
+    }
+}
+public class Main {
+    public static void main(String[] args) { new Proceso(); }
+}
+```
+
+Las dos tareas son objetos **distintos**, pero como `y1`, `y2` y `critical` son `static`, comparten las mismas variables. Si el protocolo de entrada funcionara, `critical` sería siempre 0 al salir, y el `if` nunca imprimiría nada. En la corrida de la filmina la consola se llena de líneas `Valor CRITICAL desde T1 = -1` (y `= 1` desde T2): los `++`/`--` de los dos hilos se intercalan, se pierden actualizaciones, y la exclusión mutua **no** se cumple. Es la respuesta experimental a la pregunta: los `static` no son thread-safe, son exactamente lo contrario.
 
 ## Atributos de la clase Thread
 
@@ -1604,6 +1751,8 @@ public class Main {
 }
 ```
 
+En la filmina la versión es un poco distinta: `run()` cuenta primos con `current` de 1 a `max = 200L` (con el comentario "pocos números, ¿qué pasa con prioridad?"), `isPrime` prueba divisores de 2 a `number - 1` y devuelve `true` para `number <= 2`, `main` imprime antes los valores `MIN_PRIORITY`, `NORM_PRIORITY` y `MAX_PRIORITY` (1, 5 y 10) y los hilos se llaman `"My Thread " + i`. En la salida todos terminan con `Number of Primes: 47` (46 primos hasta 200, más el 1 que esa versión de `isPrime` cuenta como primo) y en un orden que **no** respeta las prioridades. El LOG muestra justamente el fenómeno de la "foto": `My Thread 0` pasa de `NEW` directo a `TERMINATED`.
+
 ###### **Las preguntas del práctico, respondidas**
 
 **¿Qué sucedió con la prioridad?** En general, **nada de lo que uno esperaría**. Los hilos con `MAX_PRIORITY` no terminan sistemáticamente antes que los de `MIN_PRIORITY`. Tres razones:
@@ -1631,7 +1780,7 @@ Además, `getState()` es **una foto**: entre que se lee el estado y se lo escrib
 
 # Sincronización con `synchronized` — fundamentos
 
-*(Clase 4, 2021. Ejemplos: `Account`/`Bank`/`Company` y `Cinema` son literales del Java 7 Concurrency Cookbook, cap. 2 — que es de donde salen las filminas. El ejemplo de la playa de estacionamiento es propio de la cátedra; el código no está en el PDF (son capturas), así que va reconstruido a partir del enunciado.)*
+*(Clase 4, 2021. Ejemplos: `Account`/`Bank`/`Company` y `Cinema` son literales del Java 7 Concurrency Cookbook, cap. 2 — que es de donde salen las filminas. El ejemplo de la playa de estacionamiento es el del Java 9 Concurrency Cookbook, cap. 2, recipe 1 (`com.packtpub.java9.concurrency.cookbook.chapter02.recipe01`); el código de abajo es el de las capturas de la filmina.)*
 
 Esta sección es el escalón anterior a `ReadWriteLock` y `Semaphore`, que se desarrollan en la sección siguiente: antes de esos mecanismos "de biblioteca", Java tiene uno **integrado en el lenguaje**, la palabra reservada `synchronized`.
 
@@ -1641,7 +1790,7 @@ Una de las situaciones más comunes en programas concurrentes es que **más de u
 
 La solución es la **sección crítica** (SC): un bloque de código que accede al recurso y que **no puede ser ejecutado por más de un hilo a la vez**. Java ofrece varios mecanismos para implementarla; el más básico es `synchronized`.
 
-> Cuando más de un hilo espera a que otro termine dentro de la SC, la JVM elige uno y el resto espera su turno — sin garantía de orden, salvo que se pida explícitamente *fairness* (como ya vimos con `Lock`).
+> Cuando más de un hilo espera a que otro termine dentro de la SC, la JVM elige uno y el resto espera su turno — sin garantía de orden, salvo que se pida explícitamente *fairness*, cosa que `synchronized` no permite y `Lock` sí (se ve en la sección siguiente).
 
 ## `synchronized` en un método
 
@@ -1724,58 +1873,87 @@ synchronized (llave) {
 }
 ```
 
-###### **Ejemplo de cátedra: la playa de estacionamiento**
-El ejercicio de la filmina: una playa de estacionamiento con tres clases —**Caja** (cobra por vehículo), **Estadística** (cuenta autos y motos, y avisa a la Caja cuando sale un auto) y **Sensor** (detecta entradas/salidas y actualiza la Estadística). El punto del ejercicio es que **autos y motos son contadores independientes**, así que conviene usar **dos llaves distintas** — una por cada contador — en vez de sincronizar todo el objeto con una sola.
+###### **Ejemplo: la playa de estacionamiento**
+El ejercicio de la filmina: una playa de estacionamiento con tres clases —**Caja** (`ParkingCash`, contabiliza el dinero), **Estadística** (`ParkingStats`, cuenta autos y motos, y cuando sale un vehículo ejecuta el pago en la Caja) y **Sensor** (detecta entradas y salidas y actualiza la Estadística). El punto del ejercicio es que **autos y motos son contadores independientes**, así que conviene usar **dos llaves distintas** —una por cada contador— en vez de sincronizar todo el objeto con una sola.
 
 ```java
 public class ParkingCash {
-    private double total;
-    private final double costo;
+    private static final int cost = 2;
+    private long cash;
 
-    public ParkingCash(double costo) { this.costo = costo; }
+    public ParkingCash() { cash = 0; }
 
-    public synchronized void vehiclePay() {        // un solo auto a la vez accede a la caja
-        total += costo;
+    public synchronized void vehiclePay() {        // un solo vehículo a la vez accede a la caja
+        cash += cost;
     }
 
     public void close() {
-        System.out.printf("Caja cerrada. Total recaudado: %.2f%n", total);
+        System.out.printf("Closing accounting");
+        long totalAmmount;
+        synchronized (this) {                       // bloque sincronizado sobre el propio objeto
+            totalAmmount = cash;
+            cash = 0;
+        }
+        System.out.printf("The total amount is : %d", totalAmmount);
     }
 }
 ```
 
 ```java
 public class ParkingStats {
-    private int autos;
-    private int motos;
-    private final Object controlAutos = new Object();   // llave independiente para autos
-    private final Object controlMotos = new Object();   // llave independiente para motos
-    private final ParkingCash caja;
+    private long numberCars;
+    private long numberMotorcycles;
+    private final Object controlCars, controlMotorcycles;   // dos llaves independientes
+    private ParkingCash cash;
 
-    public ParkingStats(ParkingCash caja) { this.caja = caja; }
+    public ParkingStats(ParkingCash cash) {
+        numberCars = 0;
+        numberMotorcycles = 0;
+        controlCars = new Object();
+        controlMotorcycles = new Object();
+        this.cash = cash;
+    }
 
-    public void carComeIn()  { synchronized (controlAutos) { autos++; } }
-    public void carGoOut()   { synchronized (controlAutos) { autos--; } caja.vehiclePay(); }
-    public void motoComeIn() { synchronized (controlMotos) { motos++; } }
-    public void motoGoOut()  { synchronized (controlMotos) { motos--; } caja.vehiclePay(); }
+    public void carComeIn() {
+        synchronized (controlCars) { numberCars++; }
+    }
+    public void carGoOut() {
+        synchronized (controlCars) { numberCars--; }
+        cash.vehiclePay();
+    }
+    public void motoComeIn() {
+        synchronized (controlMotorcycles) { numberMotorcycles++; }
+    }
+    public void motoGoOut() {
+        synchronized (controlMotorcycles) { numberMotorcycles--; }
+        cash.vehiclePay();
+    }
 
-    public int getNumberCars() { synchronized (controlAutos) { return autos; } }
-    public int getNumberMotorcycles() { synchronized (controlMotos) { return motos; } }
+    public long getNumberCars() {
+        synchronized (controlCars) { return numberCars; }
+    }
+    public long getNumberMotorcycles() {
+        synchronized (controlMotorcycles) { return numberMotorcycles; }
+    }
 }
 ```
 
 ```java
 public class Sensor implements Runnable {
-    private final ParkingStats estado;
-    public Sensor(ParkingStats estado) { this.estado = estado; }
+    private ParkingStats stats;
+    public Sensor(ParkingStats stats) { this.stats = stats; }
 
     @Override
     public void run() {
         for (int i = 0; i < 10; i++) {
-            estado.carComeIn();  estado.carComeIn();
-            estado.motoComeIn();
-            estado.motoGoOut();
-            estado.carGoOut();   estado.carGoOut();
+            stats.carComeIn();
+            stats.carComeIn();
+            try { TimeUnit.MILLISECONDS.sleep(50); } catch (InterruptedException e) { e.printStackTrace(); }
+            stats.motoComeIn();
+            try { TimeUnit.MILLISECONDS.sleep(50); } catch (InterruptedException e) { e.printStackTrace(); }
+            stats.motoGoOut();
+            stats.carGoOut();
+            stats.carGoOut();
         }
     }
 }
@@ -1783,31 +1961,49 @@ public class Sensor implements Runnable {
 
 ```java
 public class Main {
-    public static void main(String[] args) throws InterruptedException {
-        int nSensores = 8;
-        ParkingCash caja = new ParkingCash(2.0);
-        ParkingStats estado = new ParkingStats(caja);
+    public static void main(String[] args) {
+        ParkingCash cash = new ParkingCash();
+        ParkingStats stats = new ParkingStats(cash);
 
-        Thread[] hilos = new Thread[nSensores];
-        for (int i = 0; i < nSensores; i++) {
-            hilos[i] = new Thread(new Sensor(estado));
-            hilos[i].start();
+        System.out.println("Parking Simulator");
+        int numberSensors = 2 * Runtime.getRuntime().availableProcessors();
+        Thread[] threads = new Thread[numberSensors];
+        for (int i = 0; i < numberSensors; i++) {
+            Sensor sensor = new Sensor(stats);
+            Thread thread = new Thread(sensor);
+            thread.start();
+            threads[i] = thread;
         }
-        for (Thread h : hilos) h.join();
 
-        caja.close();
-        System.out.printf("Autos: %d, Motos: %d%n",
-            estado.getNumberCars(), estado.getNumberMotorcycles());
+        for (int i = 0; i < numberSensors; i++) {
+            try {
+                threads[i].join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        System.out.printf("Number of cars: %d\n", stats.getNumberCars());
+        System.out.printf("Number of motorcycles: %d\n", stats.getNumberMotorcycles());
+        cash.close();
     }
 }
 ```
 
-**Cómo funciona**: cada `Sensor` hace, 10 veces, la secuencia "2 autos entran, 1 moto entra, 1 moto sale, 2 autos salen" — entran y salen la misma cantidad de veces. Con 8 sensores:
+**Cómo funciona**: cada `Sensor` hace, 10 veces, la secuencia "2 autos entran, 1 moto entra, 1 moto sale, 2 autos salen" —entran y salen la misma cantidad de veces—. La cantidad de sensores es `2 × availableProcessors()`; la cuenta de la filmina supone **8 sensores** (una máquina de 4 núcleos):
 
-- **Autos y motos esperados al final**: 0 (entran y salen en igual cantidad).
-- **Recaudación esperada**: cada salida de vehículo paga, y hay 3 salidas por vuelta (2 autos + 1 moto) — $8 \text{ sensores} \times 10 \text{ vueltas} \times 3 \text{ vehículos} \times 2.00 = 480.00$.
+- **Autos y motos esperados al final**: 0.
+- **Recaudación esperada**: hay 3 salidas por vuelta (2 autos + 1 moto) y cada una paga 2: $8 \text{ sensores} \times 10 \text{ vueltas} \times 3 \text{ vehículos} \times 2 = 480$.
 
-Si se sacan los `synchronized`, en algunas corridas los contadores **no** vuelven a 0 y la recaudación **no** da 480 — es la condición de carrera de `contador++`/`contador--` que ya se vio en la sección de interleaving, ahora con un ejemplo completo.
+Las tres salidas que muestra la filmina:
+
+| Versión | Autos | Motos | Recaudación |
+|---|---|---|---|
+| Con todos los `synchronized` | 0 | 0 | **480** |
+| Sin `synchronized` en `vehiclePay()` | 0 | 0 | **468** — se perdieron 6 pagos en carreras sobre `cash += cost` |
+| Sin **ningún** `synchronized` | **−4** | **4** | **416** — también se rompen los contadores |
+
+Es la condición de carrera de `contador++`/`contador--` de la sección de interleaving, ahora medida. El `sleep(50)` entre operaciones es el "delay" que la filmina menciona para **forzar** que los hilos se intercalen.
 
 **Regla de diseño**: `synchronized` penaliza el rendimiento porque serializa. Hay que usarlo sólo donde hace falta, y mantener la sección crítica **lo más corta posible** (*SC as short as possible*).
 
@@ -1883,6 +2079,25 @@ public class TicketOffice1 implements Runnable {
 ```
 
 ```java
+public class TicketOffice2 implements Runnable {
+    private final Cinema cinema;
+    public TicketOffice2(Cinema cinema) { this.cinema = cinema; }
+
+    @Override
+    public void run() {
+        cinema.sellTickets2(2);
+        cinema.sellTickets2(4);
+        cinema.sellTickets1(2);
+        cinema.sellTickets1(1);
+        cinema.returnTickets2(2);
+        cinema.sellTickets1(3);
+        cinema.sellTickets2(2);
+        cinema.sellTickets1(2);
+    }
+}
+```
+
+```java
 public class Main {
     public static void main(String[] args) throws InterruptedException {
         Cinema cinema = new Cinema();
@@ -1900,6 +2115,10 @@ public class Main {
     }
 }
 ```
+
+**Resultado esperado** (el de la filmina): `Room 1 Vacancies: 5` y `Room 2 Vacancies: 6`. Se puede verificar a mano: en la sala 1 se venden $3+2+5+2+1+3+2 = 18$ y se devuelven 3, así que quedan $20 - 18 + 3 = 5$; en la sala 2 se venden $2+2+2+2+2+4+2 = 16$ y se devuelven 2, quedan $20 - 16 + 2 = 6$. Como todas las ventas caben (el `if` nunca rechaza en este orden), el resultado no depende del interleaving — **si** la sincronización es correcta.
+
+La filmina 22 de la carpeta (diagrama de secuencia del cine) dibuja este mismo programa: `Main` crea `Cinema` y las dos boleterías, las arranca y hace `join`; cada venta o devolución aparece dentro de un fragmento **`critical`** con guarda `[controlCinema1]` o `[controlCinema2]`, y las operaciones sobre salas distintas se agrupan en un **`par`** — la notación UML exacta para "dos regiones críticas con llaves distintas pueden correr en paralelo".
 
 Cuando se sincroniza con un objeto como llave, la JVM garantiza que **sólo un hilo a la vez** puede ejecutar **cualquiera** de los bloques que usan esa misma llave — no importa en qué método estén. `sellTickets1` y `returnTickets1` comparten `controlCinema1`, así que se excluyen mutuamente entre sí; pero `sellTickets1` y `sellTickets2` usan llaves distintas, así que **sí pueden ejecutarse en paralelo**, porque protegen recursos independientes.
 
@@ -1937,7 +2156,7 @@ Referencia: *CERT LCK01-J. Do not synchronize on objects that may be reused* —
 | `notify()` | Despierta a **un** hilo arbitrario del *wait set*, elegido por el planificador, y lo pasa a *listo* |
 | `notifyAll()` | Despierta a **todos** los hilos del *wait set* |
 
-Es exactamente el estado `WAITING` de `Thread.State` que ya vimos en la sección anterior: `wait()` sin plazo lleva a `WAITING`; con plazo (`wait(t)`) lleva a `TIMED_WAITING`.
+Es exactamente el estado `WAITING` de `Thread.State` que ya vimos en el capítulo de Threads: `wait()` sin plazo lleva a `WAITING`; con plazo (`wait(t)`) lleva a `TIMED_WAITING`.
 
 ###### **Ejemplo: productor/consumidor con `wait`/`notifyAll`**
 El caso de uso clásico: un buffer acotado donde el productor no puede escribir si está lleno, y el consumidor no puede leer si está vacío.
@@ -1985,11 +2204,11 @@ Dos detalles de diseño que son la parte que hay que entender, no memorizar:
 - **`while`, nunca `if`**. `notifyAll()` despierta a **todos** los hilos dormidos, pero no garantiza que la condición siga siendo válida para cada uno cuando les toque correr — puede que otro hilo se haya adelantado y vuelto a llenar el buffer. Por eso, al despertar, hay que **volver a chequear** la condición; con `if` se seguiría de largo con una condición que ya no vale.
 - **`notifyAll()` y no `notify()`**. Con productores y consumidores mezclados en el mismo *wait set*, `notify()` podría despertar a un hilo del tipo equivocado (otro productor, cuando lo que hace falta es despertar a un consumidor). `notifyAll()` es más caro pero seguro: despierta a todos, y cada uno vuelve a evaluar su propio `while`.
 
-Esta es, en código, la misma idea que ya está modelada como red de Petri en la sección anterior: el buffer con lugares "libres"/"ocupados" donde *producir* y *consumir* se autolimitan por el propio marcado. `wait()`/`notifyAll()` es la implementación en Java de esa misma restricción estructural.
+Esta es, en código, la misma idea que se modela como red de Petri en el capítulo de Redes de Petri (sección de modelos básicos): el buffer con lugares "libres"/"ocupados" donde *producir* y *consumir* se autolimitan por el propio marcado. `wait()`/`notifyAll()` es la implementación en Java de esa misma restricción estructural.
 
 ## `synchronized` vs `Lock`: cuándo usar cada uno
 
-Ya vimos `Lock`, `ReentrantLock`, `ReadWriteLock` y `Semaphore` en la sección siguiente. La pregunta natural es cuándo conviene cada mecanismo:
+`Lock`, `ReentrantLock`, `ReadWriteLock` y `Semaphore` se desarrollan en la sección siguiente. Adelantando, la pregunta natural es cuándo conviene cada mecanismo:
 
 **Ventajas de `Lock` sobre `synchronized`**:
 - Permite estructurar bloques de forma más flexible (por ejemplo, tomar el lock en un método y liberarlo en otro — aunque es peligroso y hay que ser muy cuidadoso).
@@ -2426,6 +2645,8 @@ public class PrintQueue {
 
 Las clases `Job` y `Main` **no cambian**.
 
+La filmina 23 de la carpeta es el **diagrama de secuencia** de este programa, y vale como ejemplo de cómo se dibuja concurrencia en UML: `Main` crea la `PrintQueue` (que hace `new Semaphore(3)`) y, en un `loop [12]`, crea y arranca los `Job`. Después hay un fragmento **`par [3 Job Threads]`** —sólo tres a la vez, porque el semáforo deja pasar tres—: cada `Job` llama a `printJob(o)`, que hace `acquire()` sobre el `Semaphore`, después `getPrinter()`, cuyo interior es un fragmento **`critical [lockPrinter]`** con un `loop [3]` y un `alt [si freePrinter]` que elige la impresora; luego `print` y `release()`. El `critical` es el `Lock`, el `par` acotado es el semáforo.
+
 Dos observaciones sobre el diseño, que son el punto del ejercicio:
 
 - El semáforo inicializado en 3 limita el acceso a los **primeros tres hilos** que llamen a `acquire()`; el resto queda bloqueado hasta que alguno haga `release()`. Eso es todo lo que hace el semáforo: **contar**.
@@ -2464,7 +2685,7 @@ Y acá viene el enganche con lo que sigue: **este ejemplo es literalmente una re
 
 # Interrupción, sleep y join de hilos
 
-*(Clase 5, 2024. Los ejemplos son capturas; el código de `FileSearch` está reconstruido a partir del enunciado paso a paso de la filmina, que es muy detallado.)*
+*(Clase 5, 2024. Los ejemplos son los del Java Concurrency Cookbook, cap. 1; el código de abajo es el de las capturas de la filmina.)*
 
 Un programa Java con varios hilos termina recién cuando **todos** sus hilos no-daemon terminan su ejecución. A veces hace falta terminar un hilo antes de tiempo —para cortar un programa, o cancelar una tarea— y Java da tres mecanismos relacionados con el ciclo de vida de un hilo: **interrupción**, **sleep** y **join**.
 
@@ -2474,37 +2695,79 @@ Java ofrece un mecanismo para indicarle a un hilo nuestra **voluntad de detenerl
 
 > El hilo **puede ignorar** la petición y seguir trabajando. `interrupt()` no mata al hilo: sólo levanta una **bandera** interna. Es una petición gentil, no una orden.
 
-```java
-Thread hilo = new Thread(tarea);
-hilo.start();
-// ... 10 segundos después ...
-hilo.interrupt();     // sólo levanta el flag "interrupted"
-```
-
 Qué hace exactamente `interrupt()` depende de en qué está el hilo en ese momento:
 
-- Si el hilo está **corriendo código normal**, no pasa nada automáticamente: sólo se pone en `true` el flag interno, consultable con `isInterrupted()`. El propio código tiene que chequear ese flag y decidir qué hacer.
+- Si el hilo está **corriendo código normal**, no pasa nada automáticamente: sólo se pone en `true` el flag interno. El propio código tiene que consultarlo y decidir qué hacer.
 - Si el hilo está **bloqueado** en `sleep()`, `wait()` o `join()`, esos métodos **lanzan `InterruptedException`** inmediatamente, y **el flag se borra** (queda en `false`) en el momento de lanzar la excepción.
 
-###### **Mecanismo básico: consultar el flag**
-Para un programa simple, sin recursividad ni muchos métodos, alcanza con consultar `isInterrupted()` en el bucle principal de la tarea:
+Hay dos formas de consultar el flag, y la diferencia importa:
+
+| Método | Sobre qué hilo | ¿Borra el flag? |
+|---|---|---|
+| `isInterrupted()` (de instancia) | El hilo sobre el que se llama | **No** |
+| `Thread.interrupted()` (estático) | El hilo **actual** | **Sí**: devuelve el valor y lo deja en `false` |
+
+###### **Ejemplo: `PrimeGenerator`**
+El programa crea un hilo que genera números primos y, 10 segundos después, pide su fin con el mecanismo de interrupción:
 
 ```java
-public class Task implements Runnable {
+public class PrimeGenerator extends Thread {
     @Override
     public void run() {
-        while (!Thread.currentThread().isInterrupted()) {
-            // trabajo...
+        long number = 1L;
+        while (true) {
+            if (isPrime(number)) {
+                System.out.println("Number" + number + " is Prime");
+            }
+            if (isInterrupted()) {                       // consulta el flag de ESTE hilo
+                System.out.printf("The prime generator has been interrupted\n");
+                return;
+            }
+            number++;
         }
-        System.out.println("Tarea interrumpida, finalizando.");
+    }
+
+    private boolean isPrime(long number) {
+        if (number <= 2) return true;
+        for (long i = 2; i < number; i++) {
+            if ((number % i) == 0) return false;
+        }
+        return true;
     }
 }
 ```
 
-**Pregunta de la filmina**: ¿qué pasa si se agrega un `Thread.sleep()` en el `main`, **después** del `interrupt()`, antes de imprimir los flags? La respuesta es que no cambia nada respecto de la interrupción en sí — el `sleep()` en el `main` sólo demora la impresión, le da tiempo al hilo interrumpido a reaccionar y terminar su iteración actual antes de que se lean sus flags finales. Sin ese `sleep()`, se puede leer el estado del hilo **antes** de que llegue a notar la interrupción.
+```java
+public class Main {
+    public static void main(String[] args) {
+        Thread task = new PrimeGenerator();
+        task.start();
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        task.interrupt();
+    }
+}
+```
+
+La salida es una lista de primos (en la corrida de la filmina, hasta alrededor de 148 000) y al final `The prime generator has been interrupted`. Como el hilo consulta el flag en **cada vuelta**, reacciona casi de inmediato.
+
+###### **La versión 2 del cookbook y la pregunta del `sleep`**
+La versión 2 agrega, después del `interrupt()`, la impresión del estado del hilo desde `main`. La filmina muestra las dos corridas:
+
+| | Sin `sleep` después del `interrupt()` | Con `sleep` después del `interrupt()` |
+|---|---|---|
+| `Status of the Thread` | `RUNNABLE` | `TERMINATED` |
+| `isInterrupted` | `true` | `false` |
+| `isAlive` | `true` | `false` |
+| Dónde aparece "has been Interrupted" | **Después** de las líneas de `main` | **Antes** |
+
+**Qué pasa si se coloca un `sleep` en el `main` después del `interrupt()`**: sin la pausa, `main` lee el estado **antes** de que el generador haya llegado a consultar el flag: el hilo sigue vivo, en `RUNNABLE`, con el flag en `true`. Con la pausa, el generador alcanza a ver el flag, imprimir su mensaje y retornar: cuando `main` mira, el hilo ya está `TERMINATED`, no está vivo, y `isInterrupted()` da `false` porque en la JVM de la filmina (Java 9) el flag de un hilo **terminado** ya no se informa. Ojo si lo probás con un JDK moderno: desde Java 14 el estado de interrupción se conserva después de terminar, y esa última línea daría `true`. Es el mismo fenómeno de "foto" de `getState()`: lo que se lee depende de **cuándo** se lee.
 
 ###### **Mecanismo por excepción: `InterruptedException`**
-El chequeo manual de flag es adecuado sólo para programas simples. Cuando hay **recursividad** o varios métodos involucrados, conviene usar el mecanismo de excepción: comprobar la interrupción y **lanzar** `InterruptedException` explícitamente, para que se propague y se capture en un solo lugar (típicamente en `run()`).
+El chequeo manual de flag es adecuado sólo para programas simples. Cuando hay **recursividad** o varios métodos involucrados, conviene usar el mecanismo de excepción: comprobar la interrupción y **lanzar** `InterruptedException` explícitamente, para que se propague y se capture en un solo lugar (en `run()`).
 
 ## Ejercicio: buscador de archivos interrumpible
 
@@ -2512,12 +2775,13 @@ El ejercicio completo de la filmina: un hilo que busca un archivo por nombre, re
 
 ```java
 public class FileSearch implements Runnable {
-    private final String fileName;
-    private final String initPath;
+    private String initPath;
+    private String fileName;
 
-    public FileSearch(String fileName, String initPath) {
-        this.fileName = fileName;
+    public FileSearch(String initPath, String fileName) {
+        super();
         this.initPath = initPath;
+        this.fileName = fileName;
     }
 
     @Override
@@ -2527,33 +2791,33 @@ public class FileSearch implements Runnable {
             try {
                 directoryProcess(file);
             } catch (InterruptedException e) {
-                System.out.printf("%s: Búsqueda interrumpida%n", Thread.currentThread().getName());
+                System.out.printf("%s: La busqueda ha sido interrumpida",
+                    Thread.currentThread().getName());
             }
         }
     }
 
     private void directoryProcess(File file) throws InterruptedException {
-        File[] list = file.listFiles();
+        File list[] = file.listFiles();
         if (list != null) {
-            for (File f : list) {
-                if (f.isDirectory()) {
-                    directoryProcess(f);          // recursión sobre subdirectorios
+            for (int i = 0; i < list.length; i++) {
+                if (list[i].isDirectory()) {
+                    directoryProcess(list[i]);          // recursión sobre subdirectorios
                 } else {
-                    fileProcess(f);
+                    fileProcess(list[i]);
                 }
             }
         }
-        // recién después de procesar TODO el directorio, se chequea la interrupción
-        if (Thread.currentThread().isInterrupted()) {
+        if (Thread.interrupted()) {                     // después de procesar TODO el directorio
             throw new InterruptedException();
         }
     }
 
     private void fileProcess(File file) throws InterruptedException {
         if (file.getName().equals(fileName)) {
-            System.out.printf("%s: %s%n", Thread.currentThread().getName(), file.getAbsolutePath());
+            System.out.printf("%s : %s\n", Thread.currentThread().getName(), file.getAbsolutePath());
         }
-        if (Thread.currentThread().isInterrupted()) {
+        if (Thread.interrupted()) {
             throw new InterruptedException();
         }
     }
@@ -2562,39 +2826,87 @@ public class FileSearch implements Runnable {
 
 ```java
 public class Main {
-    public static void main(String[] args) throws InterruptedException {
-        FileSearch buscador = new FileSearch("config.xml", "C:\\");
+    public static void main(String[] args) {
+        FileSearch buscador = new FileSearch("C:\\", "log.txt");
         Thread hilo = new Thread(buscador);
-        hilo.start();
 
-        Thread.sleep(10000);      // espera 10 segundos
-        hilo.interrupt();         // interrumpe la búsqueda
+        hilo.start();      // si pongo run, el hilo nunca se detiene, ¿por qué?
+
+        try {
+            TimeUnit.SECONDS.sleep(10);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        hilo.interrupt();
     }
 }
 ```
 
-Notar que tanto `directoryProcess` como `fileProcess` chequean la interrupción **después** de hacer su trabajo, y **lanzan** la excepción en vez de simplemente cortar: eso permite que la recursión se **desenrolle limpiamente**, propagando la interrupción hacia arriba en la pila de llamadas hasta el `catch` de `run()`.
+Tanto `directoryProcess` como `fileProcess` chequean la interrupción **después** de hacer su trabajo, y **lanzan** la excepción en vez de simplemente cortar: eso permite que la recursión se **desenrolle limpiamente**, propagando la interrupción hacia arriba en la pila de llamadas hasta el `catch` de `run()`. Usan `Thread.interrupted()`, que **borra** el flag al leerlo: no importa, porque la información ya viaja en la excepción.
 
 ###### **La pregunta trampa del ejercicio**
-> Si se modifica el código para llamar a `buscador.run()` **desde el main**, en vez de `hilo.start()`, el buscador **SÍ** encuentra el archivo. Si se ejecuta con `start()`, **no** lo encuentra. ¿Cuál es el problema?
+> Si se modifica el código para llamar a `buscador.run()` **desde el main**, en vez de `hilo.start()`, el buscador **SÍ** encuentra el archivo. Si se ejecuta con `start()`, **no** lo encuentra. ¿Cuál es el problema? ¿Alguna solución?
 
-La respuesta está en la misma distinción que ya vimos en el Ejercicio 1: `run()` ejecuta **todo, secuencialmente, en el hilo main**, así que la búsqueda tiene tiempo de sobra para completarse antes de que el programa termine. Con `start()`, la búsqueda corre en un **hilo aparte**, y **el `main` no espera a que termine** — el programa puede llegar al final de `main()` y la JVM puede cerrar el proceso (o al menos el `main` sigue de largo) antes de que el hilo de búsqueda haya recorrido el directorio completo. **No es un problema de interrupción, es un problema de sincronización de finalización** — y la solución es exactamente `join()`, el tema de la próxima sección.
+**Con `start()`** la búsqueda corre en un hilo aparte, y `main` sigue: duerme 10 segundos y llama a `hilo.interrupt()`. Recorrer `C:\` completo lleva **mucho más** que 10 segundos, así que el buscador ve el flag en el próximo `fileProcess`, lanza la excepción y termina con "La busqueda ha sido interrumpida" **antes de llegar** al `log.txt`. No es que `main` "no espere": la JVM no cierra el proceso mientras quede un hilo no-daemon vivo. Es que `main` **lo corta** a los 10 segundos.
+
+**Con `run()`** la búsqueda se ejecuta **en el hilo `main`**, de forma secuencial y sin límite de tiempo: `main` no llega al `sleep` ni al `interrupt()` hasta que la búsqueda terminó, así que recorre todo el disco y encuentra el archivo. Y cuando por fin se ejecuta `hilo.interrupt()`, es sobre un `Thread` que **nunca arrancó**: no tiene ningún efecto. Por eso el comentario del código dice "si pongo run, el hilo nunca se detiene": la interrupción nunca le llega a la búsqueda.
+
+**Soluciones**, según lo que se quiera:
+- Si lo que se quiere es **encontrar** el archivo, darle más tiempo (o no interrumpir) y usar `hilo.join()` para que `main` espere el final, o `hilo.join(ms)` para esperar con un plazo.
+- Si lo que se quiere es un **límite de tiempo**, mantener el `interrupt()` pero arrancar desde un directorio más chico o con menos profundidad.
+
+En los dos casos, `run()` no es solución: elimina la concurrencia y, con ella, la posibilidad de cancelar.
 
 ## `sleep()`: suspender la ejecución un tiempo
 
-Para suspender un hilo por un tiempo determinado —por ejemplo, un hilo que lee un sensor y después no hace nada durante un minuto— está el método estático `Thread.sleep(long ms)`.
+Para suspender un hilo por un tiempo determinado —por ejemplo, un hilo que lee un sensor y después no hace nada durante un minuto— está el método estático `Thread.sleep(long ms)`, o `sleep()` del enumerado `TimeUnit`.
 
 ```java
 Thread.sleep(1000);                          // milisegundos
 TimeUnit.SECONDS.sleep(1);                   // equivalente, más legible
 ```
 
-Cuando el plazo termina, el hilo **no se ejecuta inmediatamente**: pasa a la cola de listos y continúa con la instrucción siguiente **cuando la JVM le asigne tiempo de CPU** — el mismo matiz que ya vimos en el modelo de estados: de `TIMED_WAITING` siempre se vuelve a `RUNNABLE`, no directo a ejecutar.
+Cuando el plazo termina, el hilo **no se ejecuta inmediatamente**: pasa a la cola de listos y continúa con la instrucción siguiente **cuando la JVM le asigne tiempo de CPU** — de `TIMED_WAITING` siempre se vuelve a `RUNNABLE`, no directo a ejecutar.
 
-###### **`interrupt()` sobre un hilo dormido**
-En el ejercicio del buscador de archivos, `interrupt()` hacía que el hilo **terminara** (porque el código relanzaba la excepción y `run()` salía). En un hilo que sólo hace `sleep()` en un bucle, el comportamiento **por defecto** de una `InterruptedException` no capturada de forma especial es distinto: si el `catch` **no** vuelve a lanzar ni retorna, el hilo simplemente **sigue** con la siguiente vuelta del bucle — el `interrupt()` despertó al `sleep()`, pero no mató nada.
+###### **Ejemplo: `FileClock`**
+Un hilo que muestra la fecha por consola cada segundo, diez veces:
 
-Esa es la diferencia entre la **gentileza** del mecanismo de Java y el método **deprecado** `Thread.stop()`: `stop()` mataba el hilo de inmediato, en cualquier punto de su ejecución, sin darle chance de liberar recursos, cerrar archivos o dejar datos en un estado consistente — por eso está deprecado desde Java 1.2. `interrupt()` deja that decisión en manos del código de la tarea.
+```java
+public class FileClock implements Runnable {
+    @Override
+    public void run() {
+        for (int i = 0; i < 10; i++) {
+            System.out.printf("%s\n", new Date());
+            try {
+                TimeUnit.SECONDS.sleep(1);
+            } catch (InterruptedException e) {
+                System.out.printf("The FileClock has been interrupted");
+                return;
+            }
+        }
+    }
+}
+
+public class FileMain {
+    public static void main(String[] args) {
+        FileClock clock = new FileClock();
+        Thread thread = new Thread(clock);
+        thread.start();
+        try {
+            TimeUnit.SECONDS.sleep(5);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        thread.interrupt();
+    }
+}
+```
+
+###### **Las preguntas de la filmina: ¿qué pasa al ejecutar `interrupt()`? ¿Por qué?**
+Se imprimen unas cinco fechas y después `The FileClock has been interrupted`: el hilo **termina**, igual que en el ejercicio anterior, pero por un camino distinto. El hilo pasa casi todo el tiempo dormido, así que el `interrupt()` lo encuentra **dentro de `sleep()`**: el `sleep` se despierta antes de tiempo lanzando `InterruptedException` (y borrando el flag). Lo que decide que el hilo termine es el **`return` del `catch`**, que escribió el programador. Si el `catch` sólo imprimiera el mensaje, el bucle seguiría con la próxima vuelta y el hilo completaría sus diez fechas: la interrupción habría acortado **un** `sleep` y nada más, porque el flag ya está en `false` y nadie lo vuelve a consultar.
+
+Esa es la **gentileza** del mecanismo y la diferencia con el método **deprecado** `Thread.stop()`: `stop()` mataba el hilo de inmediato, en cualquier punto de su ejecución, sin darle chance de liberar recursos, cerrar archivos o dejar datos en un estado consistente —por eso está deprecado desde Java 1.2—. Con `interrupt()`, la decisión de cómo y cuándo terminar queda en manos del código de la tarea.
 
 ## `join()`: esperar a que un hilo termine
 
@@ -2602,61 +2914,102 @@ Para esperar a que otro hilo termine antes de seguir —por ejemplo, un programa
 
 > Cuando un hilo llama a `hiloB.join()`, el hilo que llama **se suspende** hasta que `hiloB` termina su ejecución.
 
-###### **Ejemplo: mensajes de grupos en orden**
-Un programa que crea un hilo por grupo para imprimir sus mensajes, y necesita que los grupos impriman **en orden**, sin mezclarse:
+`join()` puede lanzar `InterruptedException` (si el hilo que espera es interrumpido mientras espera), así que va dentro de un `try/catch`, o el método que lo contiene declara `throws InterruptedException`.
+
+###### **Ejemplo 1: mensajes de grupos en orden**
+En una clase hay varios grupos; el programa crea un hilo por grupo para imprimir sus mensajes, y se quiere que se impriman **ordenados**: `main` debe esperar que cada grupo haya impreso todo antes de arrancar el siguiente.
+
+```java
+public class Grupo implements Runnable {
+    String mensaje;
+
+    public Grupo(String nombre) {
+        mensaje = "Hola, somos el grupo " + nombre + " y este es nuestro mensaje numero: ";
+    }
+
+    @Override
+    public void run() {
+        for (int i = 1; i < 100; i++) {
+            String msj = mensaje + i;
+            System.out.println(msj);
+        }
+    }
+}
+
+public class Main {
+    public static void main(String[] args) throws InterruptedException {
+        Thread teapots   = new Thread(new Grupo("Teapots"));
+        Thread venThread = new Thread(new Grupo("VenThread"));
+        Thread giA       = new Thread(new Grupo("GiA"));
+
+        teapots.start();
+        teapots.join();
+
+        venThread.start();
+        venThread.join();
+
+        giA.start();
+        giA.join();
+
+        //teapots.join();
+        //venThread.join();
+        //giA.join();
+
+        System.out.printf("Main: Se finalizo la impresion de mensajes %s\n", new Date());
+    }
+}
+```
+
+Como cada `start()` va seguido de su `join()`, en todo momento hay **un solo** hilo de grupo vivo: los 99 mensajes de Teapots, después los de VenThread, después los de GiA, y al final el mensaje de `main`.
+
+###### **Las tres preguntas de la filmina, respondidas**
+- **¿Qué pasa si se comenta el primer `join()`?** `main` arranca Teapots y sigue de largo a arrancar VenThread sin esperar: los mensajes de **Teapots y VenThread se mezclan** entre sí. GiA sí queda ordenado respecto de VenThread, porque `venThread.join()` sigue estando antes de `giA.start()`.
+- **¿Y si se comentan todos los `join()` y se los pone después de todos los `start()`?** (las tres líneas comentadas del código). Los tres hilos arrancan casi juntos y sus mensajes **se intercalan**: se pierde el orden entre grupos, que era el objetivo. Lo que sí se conserva es que `main` imprime su mensaje final **después** de que los tres terminaron, porque los tres `join()` siguen estando antes de esa línea. Conclusión: `join()` ordena **respecto de lo que viene después del `join`**, no fuerza nada sobre hilos que ya están corriendo.
+- **¿Y si no se pone ningún `join()`?** Los grupos se intercalan **y** el mensaje de `main` puede salir en cualquier punto —casi seguro al principio—, porque `main` no espera a nadie. El programa igual no termina hasta que los tres grupos terminen (son hilos no-daemon), pero nada garantiza ningún orden.
+
+###### **Ejemplo 2: cargar la configuración antes de seguir**
+El caso del cookbook: dos cargadores de recursos que corren **en paralelo**, y `main` que espera a ambos antes de declarar la configuración cargada.
 
 ```java
 public class DataSourcesLoader implements Runnable {
     @Override
     public void run() {
-        System.out.println("Cargando fuentes de datos...");
+        System.out.printf("Beginning data sources loading: %s\n", new Date());
         try {
             TimeUnit.SECONDS.sleep(4);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        System.out.println("Fuentes de datos cargadas.");
+        System.out.printf("Data sources loading has finished: %s\n", new Date());
     }
 }
+// NetworkConnectionsLoader: igual, con sleep(9) en el código de la filmina
+// (el enunciado dice 6 segundos).
 
-public class NetworkConnectionsLoader implements Runnable {
-    @Override
-    public void run() {
-        System.out.println("Cargando conexiones de red...");
+public class Main {
+    public static void main(String[] args) {
+        DataSourcesLoader dsLoader = new DataSourcesLoader();
+        Thread thread1 = new Thread(dsLoader, "DataSourceThread");
+        NetworkConnectionsLoader ntLoader = new NetworkConnectionsLoader();
+        Thread thread2 = new Thread(ntLoader, "NetworkConnectionsLoader Thread");
+
+        thread1.start();
+        thread2.start();
+
         try {
-            TimeUnit.SECONDS.sleep(6);
+            thread1.join();   // es lo mismo que hacer join sólo con el segundo
+            thread2.join();   // el main detiene su ejecución hasta que finalice
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        System.out.println("Conexiones de red cargadas.");
+        System.out.printf("Main: Configuration has been loaded: %s\n", new Date());
     }
 }
 ```
 
-```java
-public class Main {
-    public static void main(String[] args) throws InterruptedException {
-        Thread t1 = new Thread(new DataSourcesLoader());
-        Thread t2 = new Thread(new NetworkConnectionsLoader());
+Acá los dos `join()` van **después** de los dos `start()` a propósito: se quiere que las cargas sean **concurrentes** (tardan $\max(4, 9) = 9$ s, no $4 + 9 = 13$ s) y sólo sincronizar el final. En la salida de la filmina, las dos cargas empiezan a las 16:51:02, la de datos termina a las 16:51:06, la de red a las 16:51:11, y `main` imprime a las 16:51:11. El comentario del código lo dice bien: como el segundo tarda más, `thread1.join()` es en la práctica redundante, aunque conviene dejarlo porque no se puede **saber** de antemano cuál termina último.
 
-        t1.start();
-        t2.start();
-
-        t1.join();      // main espera a que t1 termine...
-        t2.join();      // ...y a que t2 termine
-
-        System.out.println("Fin del programa: todo listo.");
-    }
-}
-```
-
-###### **Las tres preguntas de la filmina, respondidas**
-
-- **¿Qué pasa si se comenta el primer `join()`?** El `main` no espera a `t1`: puede imprimir "Fin del programa" mientras `DataSourcesLoader` todavía está corriendo (o incluso antes de que arranque). El orden de los mensajes deja de estar garantizado.
-- **¿Y si se comentan todos los `join()` y se los pone después de ambos `start()`?** Es exactamente el código de arriba — y **funciona igual**, porque `join()` no exige que el hilo ya haya arrancado en un orden particular: sólo bloquea hasta que **ese** hilo puntual termine, sin importar cuándo se llamó. Lo que sí importa es que ambos `join()` estén **antes** de la línea que depende de que los dos hayan terminado.
-- **¿Y si no se pone ningún `join()`?** El `main` sigue de inmediato después de los `start()`. Con dos `sleep()` de 4 y 6 segundos, "Fin del programa" se imprime casi instantáneamente, **antes** de que ninguno de los dos loaders haya terminado. Es el mismo bug del ejercicio de `FileSearch`: sin sincronización de finalización, no hay ninguna garantía de orden entre hilos.
-
-`join()` puede lanzar `InterruptedException` (si el hilo que espera es interrumpido mientras espera), así que siempre va dentro de un `try/catch` — o el método que la contiene debe declarar `throws InterruptedException`, como en el ejemplo.
+Comparando los dos ejemplos: en `Grupo`, `start()` + `join()` intercalados **serializan** los hilos (se busca orden); en `DataSourcesLoader`, todos los `start()` primero y todos los `join()` después **paralelizan** el trabajo y sincronizan sólo el final (se busca velocidad).
 
 ## Cómo se relacionan los tres mecanismos
 
@@ -2666,7 +3019,7 @@ public class Main {
 | `sleep(t)` | Pausar la ejecución un tiempo | `TIMED_WAITING` |
 | `join()` | Esperar la finalización de otro hilo | El que llama pasa a `WAITING` (o `TIMED_WAITING` si se usa `join(ms)`) |
 
-Los tres reaparecen constantemente en el resto de la materia: `interrupt()` es la forma correcta de cancelar tareas (en vez de banderas propias o `stop()`), `sleep()` simula trabajo o espera en casi todos los ejemplos de la cátedra, y `join()` es el mecanismo de sincronización de finalización más simple — el que reemplaza al `while (!finish)` de sondeo activo que vimos en el ejercicio de `Calculator`.
+Los tres reaparecen constantemente en el resto de la materia: `interrupt()` es la forma correcta de cancelar tareas (en vez de banderas propias o `stop()`), `sleep()` simula trabajo o espera en casi todos los ejemplos de la cátedra, y `join()` es el mecanismo de sincronización de finalización más simple —el que reemplaza al `while (!finish)` de sondeo activo que vimos en el ejercicio de `Calculator`—.
 
 > [!question]- Actividad — Interrupción, sleep y join juntos
 > Escribí un programa con un hilo `Contador` que imprime un número cada 500 ms, indefinidamente, hasta que lo interrumpan.
@@ -2812,10 +3165,19 @@ public class Main {
 }
 ```
 
+El código de arriba es una versión simplificada. La del cookbook, que es la de la filmina y la de los diagramas UML de la carpeta (filmina 21), usa un `Deque<Event>` compartido, donde `Event` guarda una fecha y un texto:
+
+- **`WriterTask`** (implementa `Runnable`): en un bucle de 100 vueltas crea un `Event`, le pone la fecha y el texto, lo agrega al **principio** del deque (`addFirst`) y duerme 1 segundo. `Main` lanza **tantos `WriterTask` como procesadores** tenga la máquina (12 en la corrida de la filmina).
+- **`CleanerTask`** (extiende `Thread`, con `setDaemon(true)` en el constructor): en un bucle infinito toma la fecha actual y llama a `clean(date)`, que mira el **último** elemento del deque (el más viejo): si tiene más de 10 segundos (`diferencia > 10000` ms) lo saca con `removeLast` y repite; si borró algo, imprime el tamaño de la cola.
+
+El diagrama de clases lo resume: `Main` 1→1..* `WriterTask` (que realiza `Runnable`), `Main` 1→1 `CleanerTask` (que hereda de `Thread`), los dos asociados al mismo `Deque`, y el `Deque` compuesto por `Event`. El de secuencia muestra el `loop [3]` de creación de escritores, el `par` con el `loop [100]` de cada uno, y el `loop [infinito]` del limpiador con un `alt [d > 10000]` para el `removeLast`.
+
 **Cómo funciona la ejecución** (según el análisis de la filmina, con 12 hilos escritores creando un evento por segundo cada uno):
 
 - Durante los primeros 10 segundos, **nadie borra nada** (todavía ningún evento tiene más de 10 segundos), así que la cola crece: con 12 escritores, llega a **120 eventos** justo al pasar el umbral.
-- A partir de ahí, el *cleaner* empieza a encontrar eventos viejos para borrar. En régimen estable, borra **12 por segundo** —los que se crearon 10 segundos atrás— mientras los 12 escritores crean **1 cada uno** por segundo: la cola **mantiene su tamaño**, oscilando en un rango (108–119 en la corrida de ejemplo, en vez de un número fijo, por la falta de sincronía exacta entre escritura y limpieza).
+- A partir de ahí, el *cleaner* empieza a encontrar eventos viejos para borrar. En régimen estable, borra **12 por segundo** —los que se crearon 10 segundos atrás— mientras los 12 escritores crean **1 cada uno** por segundo: la cola **mantiene su tamaño**, oscilando en un rango (108–119 en la corrida de ejemplo, en vez de un número fijo, por la falta de sincronía exacta entre escritura y limpieza). La filmina menciona además un pico de **139** eventos al principio, sin explicarlo; la lectura más razonable es que corresponde al momento en que los escritores ya superaron los 10 segundos pero el limpiador —que tiene muy baja prioridad— todavía no había tenido CPU para ponerse al día.
+
+La filmina deja propuesto jugar con el tiempo de antigüedad para borrar: con un umbral de $t$ segundos y $n$ escritores, el tamaño en régimen ronda $n \cdot t$.
 
 Dos detalles de la API:
 
@@ -2985,6 +3347,296 @@ public class Main {
 >
 > *Pista para (c): un `finally` que llame a `countDown()` incondicionalmente, tanto si el módulo inicializó bien como si lanzó una excepción, es el patrón seguro.*
 
+# Thread Factory y Executors
+
+*(Programación Concurrente 2024, Ventre y Ludemann. Ejemplos del Java 9 Concurrency Cookbook: cap. 1, recipe 10 —ThreadFactory— y cap. 4, recipe 1 —Executor—. El código es el de las capturas de la filmina.)*
+
+Hasta acá cada ejemplo crea sus hilos a mano con `new Thread(...)` y los arranca con `start()`. Este capítulo presenta las dos formas que da Java de **sacar la creación y la gestión de hilos del código de la aplicación**: centralizarla en una fábrica (`ThreadFactory`), o directamente delegarla en un administrador de hilos (`Executor`).
+
+## El patrón Factory
+
+El **Factory** es uno de los patrones más usados en programación orientada a objetos. Es un patrón **creacional**: provee una interfaz para crear una familia de objetos **sin especificar la clase concreta**, y abstrae al usuario de los tipos concretos que existen. Para crear una instancia se le pide al Factory, en lugar de usar `new`.
+
+Centralizar la creación tiene ventajas concretas:
+
+- Es fácil **cambiar** la clase de los objetos creados, o la manera en que se crean.
+- Es fácil **limitar** la creación de objetos de recursos limitados (por ejemplo, permitir sólo $n$ objetos de una clase).
+- Es fácil generar **información estadística** sobre la creación de objetos.
+
+###### **Ejemplo: facturas**
+Una clase abstracta `Factura` (con `id`, `importe` y el método abstracto `getImporteIva()`) y dos concretas que calculan el IVA distinto:
+
+```java
+public abstract class Factura {
+    protected int id;
+    protected double importe;
+
+    public abstract double getImporteIva();
+
+    public Factura(int id, double importe) {
+        this.id = id;
+        this.importe = importe;
+    }
+    public int getId() { return id; }
+}
+
+public class FacturaA extends Factura {
+    public FacturaA(int id, double importe) { super(id, importe); }
+    @Override
+    public double getImporteIva() { return this.importe * 1.07; }
+}
+
+public class FacturaB extends Factura {
+    public FacturaB(int id, double importe) { super(id, importe); }
+    @Override
+    public double getImporteIva() { return this.importe * 1.21; }
+}
+```
+
+```java
+public class FacturasFactory {
+    private int facturasContador;
+
+    public FacturasFactory() { this.facturasContador = 1; }
+
+    public Factura getFactura(String tipoCliente, double importe) {
+        Factura factura;
+        if (tipoCliente.equals("monotributista") || tipoCliente.equals("responsable inscripto")) {
+            factura = new FacturaA(facturasContador, importe);
+        } else {
+            factura = new FacturaB(facturasContador, importe);
+        }
+        this.facturasContador++;
+        return factura;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        FacturasFactory facturasFactory = new FacturasFactory();
+        Factura f1 = facturasFactory.getFactura("monotributista", 1000);
+        Factura f2 = facturasFactory.getFactura("comun", 1000);
+        System.out.println(String.format("ID de f1: %d. Importe IVA: %.2f", f1.getId(), f1.getImporteIva()));
+        System.out.println(String.format("ID de f2: %d. Importe IVA: %.2f", f2.getId(), f2.getImporteIva()));
+    }
+}
+// Salida:  ID de f1: 1. Importe IVA: 1070.00
+//          ID de f2: 2. Importe IVA: 1210.00
+```
+
+Las responsabilidades del Factory, según la filmina: conocer los tipos de factura que existen; crear la factura que corresponde según el cliente; llevar la cuenta y asignar los identificadores; y **abstraer** a las demás clases, que sólo usan `Factura` sin saber cuál es la concreta. Centraliza, encapsula y simplifica la creación.
+
+## `ThreadFactory`: crear hilos con una fábrica
+
+Java trae una interfaz para aplicar este patrón a la creación de hilos: **`java.util.concurrent.ThreadFactory`**. Tiene **un solo método**:
+
+```java
+Thread newThread(Runnable r);
+```
+
+que recibe el `Runnable` y devuelve el `Thread` que lo va a ejecutar. Muchas fábricas son de una línea (`return new Thread(r);`), pero el punto es la flexibilidad: crear hilos **personalizados** (nombre, prioridad, daemon, *handler* de excepciones), **guardar estadísticas**, o **validar** la cantidad de hilos creados con algún criterio.
+
+###### **Ejemplo: fábrica que lleva estadísticas**
+
+```java
+public class MyThreadFactory implements ThreadFactory {
+    private int counter;
+    private String name;
+    private List<String> stats;
+
+    public MyThreadFactory(String name) {
+        counter = 0;
+        this.name = name;
+        stats = new ArrayList<String>();
+    }
+
+    @Override
+    public Thread newThread(Runnable r) {
+        Thread t = new Thread(r, name + "-Thread_" + counter);    // crea el hilo con un nombre propio
+        counter++;
+        stats.add(String.format("Created thread %d with name %s on %s\n",
+            t.getId(), t.getName(), new Date()));                 // registra la creación
+        return t;
+    }
+
+    public List<String> getStats() { return stats; }
+}
+
+public class Task implements Runnable {
+    @Override
+    public void run() {
+        try {
+            TimeUnit.SECONDS.sleep(1);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        MyThreadFactory factory = new MyThreadFactory("MyThreadFactory");
+        Task task = new Task();
+        Thread thread;
+
+        System.out.printf("Starting the Threads\n");
+        for (int i = 0; i < 10; i++) {
+            thread = factory.newThread(task);
+            thread.start();
+        }
+
+        System.out.printf("Factory stats:\n");
+        List<String> stats = factory.getStats();
+        stats.forEach(System.out::println);
+    }
+}
+```
+
+La salida lista diez líneas `Created thread 10 with name MyThreadFactory-Thread_0 on ...` hasta `Thread_9`. La advertencia de la filmina: si se usa un Factory, hay que asegurarse de que **todos** los hilos del programa se creen de la misma manera —si algunos se crean con `new Thread` por fuera, las estadísticas y las políticas de la fábrica dejan de valer—.
+
+Notar que `stats` es una `ArrayList` común: funciona porque `newThread` sólo se llama desde `main`. Si varios hilos pidieran hilos a la misma fábrica, `newThread` tendría que ser `synchronized` (o usar contadores y listas concurrentes).
+
+## Executors: un pool de hilos administrado
+
+En una aplicación concurrente "a mano" hay que implementar **todo** el código de creación y manejo de hilos, y crear **un hilo por tarea**; con muchas tareas, eso afecta el rendimiento —crear un hilo es caro, y miles de hilos compiten por pocos núcleos—. Java resuelve esto con el **Executor framework** y la clase **`ThreadPoolExecutor`**:
+
+- El programador sólo se ocupa de crear los objetos **`Runnable`** (las tareas) y **enviarlos** al executor.
+- El executor es responsable de la **ejecución**: crea, reutiliza y administra los hilos necesarios.
+- Mejora la performance con un **pool** de hilos: cuando llega una tarea, intenta ejecutarla con un hilo **ocioso** del pool, en vez de crear uno nuevo.
+
+El ciclo de uso:
+
+1. **Crear** el executor. La clase `Executors` tiene métodos de fábrica para distintos tipos; el del ejemplo es **`Executors.newFixedThreadPool(n)`**, que crea y **reutiliza como máximo $n$ hilos**: la ventaja de reutilizar es ahorrarse el tiempo de creación.
+2. **Enviar** tareas con `execute(Runnable)`. Si todos los hilos del pool están ocupados, la tarea espera en una cola interna.
+3. Opcionalmente, asignarle un **handler** para las tareas que el executor **no puede** ejecutar.
+4. **Finalizar** el executor. Es obligatorio: un executor sin tareas **sigue esperando** que lleguen nuevas, y sus hilos (no-daemon) impiden que el programa termine.
+
+| Método | Qué devuelve / hace |
+|---|---|
+| `getPoolSize()` | Cantidad actual de hilos en el pool |
+| `getActiveCount()` | Cantidad de hilos que están efectivamente ejecutando una tarea |
+| `getTaskCount()` | Cantidad de tareas que alguna vez fueron enviadas para ejecutarse |
+| `getCompletedTaskCount()` | Cantidad de tareas que el executor ya terminó |
+| `shutdown()` | Deja de **aceptar** tareas nuevas; termina las que ya tiene (las en ejecución **y** las encoladas) y después se cierra |
+| `shutdownNow()` | Finaliza **de inmediato**: no ejecuta las pendientes y las **devuelve** en una lista; a las que están corriendo las **interrumpe** (terminan sólo si su código responde a la interrupción) |
+| `isTerminating()` / `isTerminated()` | Si está en proceso de cierre / si ya cerró del todo |
+
+###### **Ejemplo: un servidor que recibe 100 pedidos**
+
+```java
+public class Server {
+    private final ThreadPoolExecutor executor;
+
+    public Server() {
+        executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(
+            Runtime.getRuntime().availableProcessors());
+        RejectedTaskController controller = new RejectedTaskController();
+        executor.setRejectedExecutionHandler(controller);     // handler para tareas rechazadas
+    }
+
+    public void executeTask(Task task) {
+        System.out.printf("Server: A new task has arrived\n");
+        executor.execute(task);
+        System.out.printf("Server: Pool Size: %d\n", executor.getPoolSize());
+        System.out.printf("Server: Active Count: %d\n", executor.getActiveCount());
+        System.out.printf("Server: Task Count: %d\n", executor.getTaskCount());
+        System.out.printf("Server: Completed Tasks: %d\n", executor.getCompletedTaskCount());
+    }
+
+    public void endServer() { executor.shutdown(); }
+}
+```
+
+```java
+public class Task implements Runnable {
+    private final Date initDate;
+    private final String name;
+
+    public Task(String name) {
+        initDate = new Date();
+        this.name = name;
+    }
+
+    @Override
+    public void run() {
+        System.out.printf("%s: Task %s: Created on: %s\n", Thread.currentThread().getName(), name, initDate);
+        System.out.printf("%s: Task %s: Started on: %s\n", Thread.currentThread().getName(), name, new Date());
+        try {
+            Long duration = (long) (Math.random() * 10);
+            System.out.printf("%s: Task %s: Doing a task during %d seconds\n",
+                Thread.currentThread().getName(), name, duration);
+            TimeUnit.SECONDS.sleep(duration);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.printf("%s: Task %s: Finished on: %s\n", Thread.currentThread().getName(), new Date(), name);
+    }
+}
+```
+
+```java
+public class RejectedTaskController implements RejectedExecutionHandler {
+    @Override
+    public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+        System.out.printf("RejectedTaskController: The task %s has been rejected\n", r.toString());
+        System.out.printf("RejectedTaskController: %s\n", executor.toString());
+        System.out.printf("RejectedTaskController: Terminating: %s\n", executor.isTerminating());
+        System.out.printf("RejectedTaskController: Terminated: %s\n", executor.isTerminated());
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Server server = new Server();
+
+        System.out.printf("Main: Starting.\n");
+        for (int i = 0; i < 100; i++) {
+            Task task = new Task("Task " + i);
+            server.executeTask(task);
+        }
+
+        System.out.printf("Main: Shuting down the Executor.\n");
+        server.endServer();
+
+        System.out.printf("Main: Sending another Task.\n");
+        Task task = new Task("Rejected task");
+        server.executeTask(task);                   // el executor ya está apagado
+
+        System.out.printf("Main: End.\n");
+    }
+}
+```
+
+**Qué muestra la salida**:
+
+- Las tareas corren en hilos con nombres `pool-1-thread-1`, `pool-1-thread-2`, … —los crea el executor, no el programador—. `Pool Size` crece de a uno con las primeras tareas hasta el tamaño fijo, y a partir de ahí **se mantiene**: las tareas siguientes reutilizan los mismos hilos.
+- `Task Count` cuenta las tareas **enviadas** (incluidas las que esperan en cola), no las que están corriendo; por eso puede ser mucho mayor que `Active Count`.
+- Después de `shutdown()`, la tarea "Rejected task" **no se ejecuta**: el executor la rechaza y llama al `rejectedExecution()` del handler, que informa `Terminating: true` y `Terminated: false` —el executor está cerrándose, pero todavía tiene tareas en curso—.
+- Detalle del código de la filmina: en el último `printf` de `Task` los argumentos están **invertidos** (`new Date(), name`), por eso la salida dice `Task Sat May 16 21:38:06 ART 2020: Finished on: Task 1`.
+- `Main: End.` se imprime **antes** de que terminen las tareas: `shutdown()` no bloquea. Si `main` necesitara esperar, el método es `awaitTermination(timeout, unidad)`.
+
+###### **Executor vs hilos a mano**
+
+| | `new Thread(r).start()` por tarea | `ThreadPoolExecutor` |
+|---|---|---|
+| Creación de hilos | Uno por tarea, siempre | Un pool acotado, reutilizado |
+| Cantidad de hilos vivos | Sin límite | Como máximo el tamaño del pool |
+| Qué pasa si no hay hilo libre | Se crea otro | La tarea espera en la cola del executor |
+| Finalización | El programa termina cuando terminan los hilos | Hay que llamar a `shutdown()` explícitamente |
+| Qué escribe el programador | Tareas **y** gestión de hilos | Sólo las tareas |
+
+El executor es, en el fondo, otra aplicación del Factory: internamente usa una `ThreadFactory` para crear los hilos del pool, y se le puede pasar una propia —por ejemplo `MyThreadFactory`— para que esos hilos tengan nombres o estadísticas a medida.
+
+> [!question]- Actividad — Pool fijo y tareas rechazadas
+> Con el ejemplo del servidor, en una máquina de 4 núcleos:
+>
+> a) ¿Cuánto vale `Pool Size` después de la tarea 10? ¿Y después de la 100?
+> b) Justo después de enviar la tarea 100, ¿puede `Active Count` ser mayor que 4? ¿Y `Task Count`?
+> c) Si en `endServer()` se usa `shutdownNow()` en lugar de `shutdown()`, ¿qué cambia en la salida? ¿Las tareas que estaban en `sleep` terminan su mensaje de *Finished*?
+> d) Modificá `Server` para que use `MyThreadFactory` (hay un `newFixedThreadPool(n, threadFactory)`) y explicá qué cambia en los nombres de los hilos.
+>
+> *Pista para (c): `shutdownNow()` interrumpe a los hilos activos, y el `catch` de `Task` sólo imprime el stack trace y sigue.*
+
 # Redes de Petri
 
 *(Clase 4. El cuerpo de las filminas son imágenes; el texto sale de las notas del orador, y la teoría está completada con el libro de la cátedra —Diaz (ed.), Petri Nets, cap. 1 y 3— y con David & Alla, de donde viene la terminología de redes autónomas y no autónomas. Las figuras están redibujadas.)*
@@ -3098,6 +3750,41 @@ Recordatorio de la terminología de grafos que usa esa demostración:
 - **Seudociclo**: cadena donde los extremos coinciden pero una misma arista puede figurar más de una vez, incluso consecutivamente.
 - **Circuito elemental**: camino *dirigido* en el que sólo el primer y el último vértice son idénticos.
 
+## Clases de redes ordinarias
+
+Los grafos de estado y de eventos son las dos primeras **estructuras particulares** de RdP. La filmina presenta varias más: se obtienen **restringiendo la estructura** del grafo, y la idea es que, a cambio de modelar menos casos, cada restricción permite demostrar más propiedades. Todas se definen sobre la red **no marcada**, con la notación $p^\bullet$ (transiciones de salida del lugar $p$) y $^\bullet t$ (lugares de entrada de $t$).
+
+| Clase | Condición | Lo que se puede encontrar | Lo que **no** |
+|---|---|---|---|
+| **Grafo de estado** (máquina de estado, SM) | $\forall t:\ \lvert{}^\bullet t\rvert = \lvert t^\bullet\rvert = 1$ | Conflictos | Sincronizaciones (una transición con dos entradas) |
+| **Grafo de eventos** (grafo marcado, GM) | $\forall p:\ \lvert{}^\bullet p\rvert = \lvert p^\bullet\rvert = 1$ | Sincronizaciones | Conflictos |
+| **Libre de conflicto** | Cada lugar tiene **como máximo una** transición de salida | Un lugar con varias entradas | Un lugar con dos transiciones de salida |
+| **Libre elección** (*free choice*, FC) | $p_1 \ne p_2,\ p_1^\bullet \cap p_2^\bullet \ne \varnothing \Rightarrow \lvert p_1^\bullet\rvert = \lvert p_2^\bullet\rvert = 1$ | Conflictos, si el lugar del conflicto es la **única** entrada de las transiciones en conflicto | Una transición en conflicto que además tenga otra entrada |
+| **Libre elección extendida** (EFC) | $p_1^\bullet \cap p_2^\bullet \ne \varnothing \Rightarrow p_1^\bullet = p_2^\bullet$ | Transiciones en conflicto con **el mismo conjunto** de lugares de entrada | Transiciones en conflicto con entradas distintas |
+| **Simple** | $p \ne p',\ p^\bullet \cap p'^\bullet \ne \varnothing \Rightarrow \lvert p^\bullet\rvert \le 1 \ \text{o}\ \lvert p'^\bullet\rvert \le 1$ | Cada transición involucrada en **a lo sumo un** conflicto | Una transición que pertenezca a dos conflictos distintos |
+| **Simple extendida** | $p^\bullet \cap p'^\bullet \ne \varnothing \Rightarrow p^\bullet \subseteq p'^\bullet \ \text{o}\ p'^\bullet \subseteq p^\bullet$ | Conjuntos de salida anidados | Conjuntos de salida que se cruzan sin incluirse |
+
+Lo que hay que entender de cada una:
+
+- **Libre de conflicto**: para tener un conflicto estructural hace falta un lugar con al menos dos transiciones de salida —un conflicto se caracteriza por el par (lugar, conjunto de transiciones de salida de ese lugar)—; si no hay tal lugar, no hay conflictos. En estas redes la **vivacidad y la accesibilidad son decidibles**, y el número máximo de fichas que puede recibir un lugar es ilimitado o está acotado **linealmente** por el tamaño del marcado inicial: existe una constante $c$ tal que, para un marcado inicial arbitrario con $k$ fichas, la marca máxima de cada lugar acotado es a lo sumo $c \cdot k$. El algoritmo para decidir si una red libre de conflicto está acotada es exponencial.
+- **Libre elección**: en un conflicto $\langle P_1, \{T_1, T_2, \dots\}\rangle$, ninguna de las transiciones tiene otra entrada que no sea $P_1$. En la **extendida**, si $T_1$ tiene como entradas a $P_1$ y $P_2$, entonces $T_2$ también. La consecuencia práctica, común a las dos: **si se habilita una de las transiciones del conflicto, se habilitan todas**. La elección es "libre" porque no depende de otra parte del marcado: es exactamente la clase donde se aplica el teorema de Commoner.
+- **Simple**: si existe una transición $T_1$ y dos conflictos $\langle P_1, \{T_1, T_2, \dots\}\rangle$ y $\langle P_2, \{T_1, T_3, \dots\}\rangle$, la red **no** es simple.
+
+###### **Relaciones entre las clases**
+Son subconjuntos anidados del conjunto de RdP ordinarias:
+
+$$\text{Grafos de eventos} \subset \text{Libres de conflicto} \subset \text{Libre elección} \subset \text{Simples} \subset \text{Ordinarias}$$
+$$\text{Grafos de estado} \subset \text{Libre elección}$$
+
+(y cada clase "extendida" contiene a la suya). En un grafo de estado **puede** haber conflictos pero no sincronizaciones; en un grafo de eventos puede haber sincronizaciones pero no conflictos. La barbería de la cátedra, para tener una referencia, **no** es grafo de estado, ni grafo marcado, ni de libre elección (ni extendida): es **simple** (y simple extendida).
+
+###### **Red pura**
+Un par $(P_i, T_j)$ es un **auto-loop** (bucle propio) si $P_i$ es a la vez lugar de entrada y de salida de $T_j$. Una red es **pura** si **no tiene auto-loops**.
+
+> **Propiedad 1.1**: toda RdP impura se puede convertir en una pura.
+
+La conversión consiste en "partir" la transición del bucle en dos con un lugar intermedio: $T_j$ se reemplaza por $T_j'$ (que consume de $P_i$ y deposita en un lugar nuevo) y $T_j''$ (que consume del lugar nuevo y devuelve a $P_i$). La pureza importa porque, en una red pura, **la matriz de incidencia $C$ alcanza para reconstruir la red**: con un auto-loop, $Pre(P_i,T_j) = Post(P_i,T_j)$ y la columna de $C$ da 0, así que el arco desaparece de la matriz.
+
 ## Invariantes: verificar sin recorrer
 
 Un **P-invariante** (o P-semiflow) es un vector $y$ de pesos sobre los lugares tal que
@@ -3116,7 +3803,7 @@ Es exactamente lo que ya usamos en la red de exclusión mutua de la sección de 
 El **co-begin** (arranque paralelo) es una transición con un lugar de entrada y **varios** de salida: un solo disparo pone fichas en todas las ramas, que a partir de ahí evolucionan de forma independiente. El **co-end** (terminación sincronizada) es la simétrica: varios lugares de entrada y uno de salida, y sólo dispara cuando **todas** las ramas depositaron su ficha. Es una **barrera**.
 
 ###### **Sincronización por señal**
-Un lugar compartido "señal" que una rama produce y la otra consume. La transición del proceso que espera tiene **dos** entradas: su propio lugar de control y la señal. Mientras la señal no tenga ficha, esa transición no está sensibilizada, por más que el proceso esté listo. Es la contracara exacta del semáforo inicializado en 0 de la sección anterior.
+Un lugar compartido "señal" que una rama produce y la otra consume. La transición del proceso que espera tiene **dos** entradas: su propio lugar de control y la señal. Mientras la señal no tenga ficha, esa transición no está sensibilizada, por más que el proceso esté listo. Es la contracara exacta del semáforo inicializado en 0 del capítulo de semáforos.
 
 ![[pn-mutex-buffer.svg]]
 
@@ -3126,12 +3813,55 @@ Un lugar "recursos" compartido por las dos ramas, del que cada una toma una fich
 - Con **una** ficha: exclusión mutua estricta. Es el patrón que modela dos partes de un programa que usan el mismo recurso, por ejemplo una memoria común.
 - En el caso general puede haber **varios recursos idénticos** (varias fichas en el lugar). Entonces cada parte puede usar varios recursos simultáneamente: con tres fichas, en algún momento la parte izquierda puede estar usando dos recursos mientras la derecha usa uno — o los tres pueden estar tomados por la misma parte.
 
-Y esto es, ficha por ficha, **el semáforo de la sección anterior**: `new Semaphore(3)` es el lugar con tres fichas, `acquire()` es la transición de entrada y `release()` la de salida. El invariante $M(\text{SC}_1) + M(\text{SC}_2) + M(\text{recursos}) = 3$ es la prueba de que el semáforo hace lo que promete.
+Y esto es, ficha por ficha, **el semáforo de 3 impresoras del capítulo de semáforos**: `new Semaphore(3)` es el lugar con tres fichas, `acquire()` es la transición de entrada y `release()` la de salida. El invariante $M(\text{SC}_1) + M(\text{SC}_2) + M(\text{recursos}) = 3$ es la prueba de que el semáforo hace lo que promete.
 
 ###### **Buffer acotado**
 Dos lugares complementarios, "libres" y "ocupados", cuya suma es constante e igual a la capacidad. La transición *producir* tiene a "libres" como entrada, así que no puede disparar si el buffer está lleno; la transición *consumir* tiene a "ocupados" como entrada, así que no puede disparar si está vacío. El bloqueo del productor y del consumidor sale **solo**, del propio modelo, sin escribir una línea de control.
 
 El libro de la cátedra desarrolla estos tres casos —exclusión mutua (§1.5.3), lectores/escritores (§1.5.4) y buffers acotados (§1.5.5)— más el co-begin/co-end y la sincronización por señal (§1.5.1 y §1.5.2).
+
+## Conceptos modelados con RdP
+
+La filmina recorre, figura por figura, los fenómenos elementales que se modelan con lugares, transiciones y fichas. Los modelos básicos de la sección anterior son combinaciones de éstos.
+
+| Concepto | Estructura | Qué hay que observar |
+|---|---|---|
+| **Secuencia** | $P_1 \to T_1 \to P_2 \to T_2 \to P_3$ | Es obvio: varias cosas suceden en orden |
+| **Conflicto** | Un lugar marcado con **varias** transiciones de salida | No es tan obvio: la ficha de $P_4$ habilita tres transiciones, pero cuando una dispara, la ficha se va y las otras quedan deshabilitadas. Salvo que se controle el tiempo de disparo, **no sabemos cómo se resuelve** |
+| **Concurrencia** (bifurcación, *fork*) | Una transición con varios lugares de salida | Muchas actividades concurrentes, cada una con su ficha |
+| **Sincronización** (*join*) | Una transición con varios lugares de entrada | Cuando terminan los procesos que llevan a $P_8$, $P_9$ y $P_{10}$, los tres se sincronizan disparando la transición que pone ficha en $P_{11}$ |
+| **Sincronización con proceso en espera** | La transición del proceso que espera tiene una entrada extra que pone el otro | Un proceso espera hasta que otro le indique que puede continuar |
+| **Sincronización con reconocimiento** | Ida y vuelta de señales | El proceso espera la señal, y cuando el destinatario la recibió y hizo lo que se le pedía, le devuelve una señal de reconocimiento: recién ahí el primero se desbloquea |
+| **Confusión simétrica** | $t_1$ y $t_3$ concurrentes, y las dos en conflicto con una $t_2$ que comparte un lugar con cada una | Mezcla de conflicto y concurrencia: si dispara $t_1$, $t_2$ deja de estar habilitada aunque $t_1$ y $t_3$ "no tenían nada que ver"; disparar $t_1$ o $t_3$ decide el conflicto del otro lado |
+| **Confusión asimétrica** | $t_1$ concurrente con $t_2$, y $t_2$ en conflicto con $t_3$ sólo si $t_1$ dispara antes | El **orden** entre dos transiciones concurrentes cambia qué conflictos aparecen |
+| **Paralelismo** | Después de $T_1$ hay dos evoluciones concurrentes, $P_1 \to P_3$ por un lado y $P_2 \to P_4$ por el otro | Lo mismo que la concurrencia, leído como dos procesos |
+| **Recurso compartido / exclusión mutua** | Un lugar $P_1$ marcado, entrada de las dos regiones críticas y salida de sus finales | $P_1$ es la disponibilidad del recurso; con una ficha, exclusión mutua; con $k$ fichas, $k$ recursos idénticos |
+| **Rendez-vous** (reunión) | Una transición común con una entrada de cada proceso | Sincronización **recíproca**: el que llega primero espera al otro; $T_1$ dispara sólo cuando **los dos** lugares tienen marca |
+| **Semáforo** (señal) | Una evolución deposita una ficha en $P_2$, que es entrada de $T_2$ en la otra | Sincronización **en un solo sentido**: la parte izquierda evoluciona independiente; la derecha espera la autorización. Si $T_1$ disparó cuando la derecha todavía no llegó, $P_2$ **memoriza** la autorización |
+| **Memoria de un disparo** | Un lugar que recibe ficha cuando dispara $T_1$ y es entrada de $T_2$ | El lugar recuerda que $T_1$ ya disparó y autoriza el futuro disparo de $T_2$ (es el caso anterior visto como memoria) |
+| **Memoria de múltiples disparos** | Varias fichas en el lugar | Se memoriza un **número**: por ejemplo, la cantidad de piezas en un buffer (5 fichas = 5 piezas) |
+| **Capacidad limitada** | Un lugar complementario, entrada de la transición que llena | Cada disparo de $T_1$ consume de $P_1$; el número de fichas en $P_1$ es la capacidad restante. Con 0, $T_1$ no puede dispararse |
+| **Presencia** (lectura) | Un arco de ida y vuelta entre $P_1$ y $T_1$ | $T_1$ necesita que haya ficha en $P_1$ para dispararse, pero no la consume: el disparo no cambia el marcado de $P_1$. Es un **test de presencia**, y es un auto-loop (la red deja de ser pura) |
+
+Dos detalles que vale la pena retener. El primero: el **conflicto** es el punto donde una red deja de ser determinista, y por eso todo lo que sigue —prioridades, tiempo, políticas del monitor— son maneras de **resolver** conflictos. El segundo: la **confusión** es lo que hace difícil razonar sobre concurrencia y conflicto por separado, porque el orden de dos eventos "independientes" cambia qué elecciones quedan disponibles.
+
+## La cena de los filósofos
+
+El problema que propuso Dijkstra (1971) para ilustrar el interbloqueo, y el ejemplo de modelado con que cierra la filmina:
+
+> Cinco filósofos se sientan a comer alrededor de una mesa redonda. Cada uno tiene un plato y entre cada par de platos hay **un** tenedor, así que hay cinco tenedores. Para comer, un filósofo necesita **los dos** tenedores que tiene a sus lados. Cada filósofo alterna entre **pensar** y **comer**: cuando tiene hambre intenta tomar los dos tenedores; si lo consigue come un rato, los deja y vuelve a pensar. El problema consiste en diseñar un algoritmo (un protocolo) que permita que los filósofos coman sin bloquearse, y sin que ninguno se muera de hambre.
+
+Con una RdP, para cada filósofo $i$ (con $i$ módulo 5):
+
+- Lugares $Pensando_i$ (marca inicial 1) y $Comiendo_i$ (0), y un lugar $Tenedor_i$ por tenedor (marca inicial 1).
+
+**Versión ingenua — tomar los tenedores de a uno**: una transición $TomaIzq_i$ (consume $Pensando_i$ y $Tenedor_i$, deposita en $ConUno_i$) y otra $TomaDer_i$ (consume $ConUno_i$ y $Tenedor_{i+1}$, deposita en $Comiendo_i$). Si los cinco disparan $TomaIzq$ antes que cualquier $TomaDer$, el marcado queda con cinco fichas en los $ConUno$ y **ningún tenedor libre**: ninguna transición está habilitada. Es un **deadlock** alcanzable, y el grafo de marcados lo encuentra.
+
+**Versión correcta — tomar los dos a la vez**: una sola transición $Toma_i$ con **tres** entradas ($Pensando_i$, $Tenedor_i$, $Tenedor_{i+1}$) y salida $Comiendo_i$, y $Suelta_i$ que devuelve todo. Como el disparo es atómico, nadie se queda con un tenedor a medias. Los P-invariantes prueban la seguridad sin construir el grafo:
+
+$$M(Pensando_i) + M(Comiendo_i) = 1 \qquad M(Tenedor_i) + M(Comiendo_i) + M(Comiendo_{i-1}) = 1$$
+
+El segundo dice que dos filósofos **vecinos nunca comen a la vez** (comparten el tenedor $i$). La red no tiene deadlock: en cualquier marcado, o alguien está comiendo (y puede soltar), o todos piensan (y cualquiera puede tomar). Lo que **no** garantiza es la ausencia de inanición: dos vecinos de un filósofo pueden turnarse para siempre de modo que él nunca encuentre sus dos tenedores libres. Para eso hace falta una **política** que resuelva los conflictos (prioridades, turnos, un monitor), que es justamente el tema de los capítulos finales.
 
 ## Redes de Petri coloreadas
 
@@ -3152,9 +3882,51 @@ En el caso general un color puede ser una **n-tupla**, y las funciones asociadas
 
 Un lugar (o una transición) de una red coloreada corresponde **siempre** a un conjunto de lugares (o transiciones) de una red ordinaria, y el **despliegue completo** de una red coloreada da como resultado una **única** red ordinaria. Es decir: las redes coloreadas no agregan poder expresivo, agregan **compacidad**.
 
+## Abreviaturas y extensiones
+
+La filmina distingue dos tipos de agregados al modelo ordinario:
+
+- Las **abreviaturas** (redes generalizadas, coloreadas) **no** agregan poder de modelado: sólo permiten escribir lo mismo de forma más compacta. Todas las propiedades de las redes ordinarias **se mantienen**, con algunas adaptaciones.
+- Las **extensiones** son reglas nuevas que **sí** enriquecen la capacidad de modelado, para tratar una mayor diversidad de casos. A cambio, **no todas** las propiedades de las redes ordinarias se mantienen.
+
+###### **Redes generalizadas: arcos con peso**
+Una RdP **generalizada** admite pesos enteros $\ge 1$ en los arcos (son las que venimos usando desde la definición con $Pre$ y $Post$ en $\mathbb{N}$). La red **ordinaria** es el caso particular con todos los pesos en 1.
+
+> **Propiedad**: toda RdP generalizada se puede transformar en una RdP ordinaria equivalente.
+
+La transformación existe pero es **sumamente compleja**: hay que desdoblar cada lugar con arcos de peso $k$ en varios lugares y transiciones que "cuenten" de a una ficha. Por eso, en la práctica, se trabaja con pesos y se usa la propiedad sólo para saber que la teoría de redes ordinarias sigue valiendo. La filmina lo dibuja con el ejemplo de un recurso: un arco de peso 2 que representa "se necesitan dos unidades del recurso".
+
+Las coloreadas, de la sección anterior, también son una abreviatura: **toda RdP coloreada con un número finito de colores se puede convertir en una ordinaria** (el despliegue).
+
+###### **Redes extendidas: arcos inhibidores y de prueba**
+El ejemplo de la filmina es una administración con una **puerta de entrada**:
+
+- **Caso a**: la administración deja entrar a los clientes y **cierra la puerta** antes de empezar a trabajar. Una vez servidos, los clientes salen por otra puerta. La puerta de entrada se vuelve a abrir sólo cuando **todos** los que entraron se fueron.
+- **Caso b**: una variante en la que, cerrada la puerta, se puede **reabrir** sólo si hay **no más de dos** clientes esperando o siendo atendidos.
+
+"Abrir la puerta cuando el lugar *clientes adentro* está **vacío**" es un **test a cero**, y una red ordinaria **no puede** expresarlo: una transición se habilita por la **presencia** de fichas, nunca por su ausencia. Para eso está el **arco inhibidor**: un arco de un lugar a una transición, dibujado con un **círculo** en la punta en lugar de una flecha, que habilita la transición **sólo si el lugar tiene 0 fichas** (o menos que el peso del arco). Con un arco inhibidor de peso 3, el caso b se puede modelar directamente: la puerta puede abrirse mientras haya menos de 3 clientes adentro.
+
+El precio de la extensión es grande: con arcos inhibidores las RdP alcanzan el poder de una **máquina de Turing**, y propiedades como la acotación o la alcanzabilidad dejan de ser decidibles en general. Los arcos inhibidores, los **arcos lectores** (habilitan si hay fichas, sin consumirlas) y los **arcos reset** (vacían el lugar al disparar) se desarrollan con la ecuación de estado generalizada en el capítulo de RdP con tiempo. La **barbería** de la cátedra los usa.
+
+###### **Redes con prioridades**
+Se usan cuando, entre varias transiciones habilitadas, se quiere **elegir** cuál dispara. Una RdP con prioridades está formada por:
+
+1. una red de Petri, y
+2. una **relación de orden parcial** sobre las transiciones de la red.
+
+En el ejemplo de la filmina hay dos conflictos estructurales, $\langle P_1, \{T_1, T_2\}\rangle$ y $\langle P_2, \{T_2, T_3, T_4\}\rangle$, y se asigna un orden estricto en cada uno: $T_2 < T_1$ y $T_4 < T_2 < T_3$. Cuando están habilitadas varias transiciones de un mismo conflicto, dispara la de **mayor** prioridad. Es la razón de que el capítulo repase los órdenes parciales: la prioridad no tiene por qué comparar transiciones que nunca compiten.
+
+El segundo ejemplo es un **puente de una sola mano**: los autos que van de izquierda a derecha (como B y C) y los que van en sentido contrario (A, D y E) tienen que cruzar un puente donde entra como máximo un auto (entre los puntos L y R). Si hay autos esperando en los dos extremos, se da **prioridad a los que esperan en L**, es decir, a los que van de izquierda a derecha. En la red, el lugar "puente libre" es un recurso compartido con un conflicto entre "entra desde L" y "entra desde R", y la prioridad entre esas dos transiciones lo resuelve. La filmina dibuja al lado una red **equivalente sin prioridades**, que logra el mismo efecto agregando lugares y arcos de control: en este caso puntual la prioridad es sólo una forma más compacta de escribirlo. En general, en cambio, las prioridades —igual que los inhibidores— sí aumentan el poder de modelado.
+
+###### **Redes no autónomas**
+Son las **sincronizadas** (disparo condicionado por eventos externos) y/o **temporizadas** (disparo condicionado por el tiempo), ya presentadas en la sección de redes autónomas y no autónomas. Esta categoría es importante desde el punto de vista práctico, porque es la que se implementa. Y queda claro que **una RdP no autónoma no puede convertirse en una ordinaria**: el evento o el reloj externos no se pueden representar con fichas.
+
+###### **Redes continuas e híbridas**
+En una RdP **continua** el marcado de un lugar es un **número real** (positivo), no un entero. Sirve cuando el sistema tiene un **flujo** continuo, o cuando la cantidad de fichas es tan grande que no tiene sentido contarlas de a una: se modela el sistema ignorando el número entero exacto y se trabaja con cantidades fraccionarias. Una RdP **híbrida** combina una parte **discreta** (marcado entero) y una **continua**. En el libro de David y Alla ocupan los capítulos 4 y 5. Algunas propiedades —por ejemplo, ser segura— no se aplican a las continuas, justamente porque el marcado no es entero.
+
 ## Órdenes parciales y semántica del paralelismo
 
-La filmina cierra con un repaso de conjuntos parcialmente ordenados, y no es un adorno: es la base de la otra semántica posible para la concurrencia.
+La filmina repasa los conjuntos parcialmente ordenados en las notas de las redes con prioridades (la prioridad **es** un orden parcial sobre las transiciones), y no es un adorno: también es la base de la otra semántica posible para la concurrencia.
 
 > Una relación $\preceq$ sobre un conjunto $A$ es un **orden parcial** si es
 > - **reflexiva**: $\forall a,\ a \preceq a$
@@ -3181,7 +3953,20 @@ Hasta ahora vimos **cómo construir** una red y **cómo dispara**. Esta sección
 ###### **Notación**
 El marcado se escribe como vector fila, en la forma $m = (m_1, m_2, \dots, m_n)$, donde $m_i$ es la cantidad de fichas del lugar $P_i$. Dada una marca inicial $m_0$, el conjunto de marcas alcanzables por **alguna** secuencia finita de disparos se denota $M(m_0)$. Una cadena como $T_1T_2$ es una **secuencia de disparo** si $T_1$ dispara desde $m_0$ y $T_2$ desde el marcado resultante; si en algún punto la transición que sigue en la cadena no está habilitada, esa cadena **no** es una secuencia de disparo válida.
 
-Para comparar marcados: $z_1 \ge z_2$ si cada componente de $z_1$ es mayor o igual a la de $z_2$; $z_1 > z_2$ si además **alguna** componente es estrictamente mayor.
+Para comparar marcados (Notación 2.1 de la filmina), con $z_j(i)$ la componente $i$ del vector $z_j$:
+
+- $z_1 \ge z_2$ si $z_1(i) \ge z_2(i)$ para **cada** componente $i$;
+- $z_1 > z_2$ (mayor) si además $z_1(i) > z_2(i)$ para **al menos una** componente;
+- $z_1 \gg z_2$ (estrictamente mayor) si $z_1(i) > z_2(i)$ para **todas** las componentes.
+
+El ejemplo con que arranca la filmina es el **buffer acotado con exclusión mutua**: dos tipos de procesos (productores y consumidores), inicialmente inactivos, que pueden intentar entrar a la zona de exclusión mutua de a uno —el productor sólo si hay huecos, el consumidor sólo si hay productos—. La pregunta que ordena todo el capítulo: ¿cuáles son las propiedades de esta red, y cómo se relacionan con el software que la implementa?
+
+###### **Secuencias infinitas, terminación y estado inevitable**
+Un primer problema es saber si el comportamiento del sistema **termina** o no.
+
+> **Secuencia de disparos infinita**: existe una secuencia infinita $\sigma$ tal que **cualquier prefijo** finito de $\sigma$ es una secuencia de disparo desde $m_0$.
+
+En el buffer acotado, la repetición de (*poniendo*, *consumiendo*) es una secuencia infinita. Una red **sin** secuencias infinitas cumple la propiedad de **terminación**. Para un sistema transformacional eso es lo deseable; para uno **reactivo** es al revés: un sistema operativo **nunca** debe detenerse, sea cual sea el comportamiento de sus usuarios, es decir, desde **cualquier** marca alcanzable al menos una transición tiene que poder dispararse (es la ausencia de deadlock de más abajo). Y se habla de un **estado inevitable** cuando existe un marcado que no se puede evitar: la red pasa necesariamente por él, lo que implica que tiene que **reinicializarse**.
 
 ## Acotación y seguridad
 
@@ -3194,6 +3979,8 @@ Dos observaciones que valen para el parcial:
 - La acotación es una propiedad que depende de $m_0$: la misma red puede estar acotada con un marcado inicial y no estarlo con otro. Si una transición sólo **agrega** fichas a un lugar y nunca las saca (por ejemplo, si le falta el arco de vuelta), ese lugar crece sin límite y la red **no** está acotada.
 - Una red es **estructuralmente acotada** si está acotada para **cualquier** marcado inicial finito — es una propiedad más fuerte, independiente de $m_0$.
 - Si una red no está acotada para $m_0$, tampoco lo está para ningún $m_1 \ge m_0$: agregar fichas nunca arregla una falta de acotación.
+- La seguridad también depende de $m_0$: basta con que algún lugar arranque con 2 fichas para que la red no sea segura. Y al revés, una red puede estar acotada sólo porque su marcado inicial deja una transición muerta: en el ejemplo de la filmina, si $m_0 = (0, N)$ la única transición nunca se habilita, y $M(m_0) = \{m_0\}$ para cualquier $N \ge 0$.
+- La acotación se aplica a todas las redes y extensiones; la seguridad también, salvo a las **continuas**, cuyas marcas no son enteras. Una red **generalizada** que es segura **degenera** en una ordinaria: si nunca hay más de una ficha por lugar, un arco de peso 2 de entrada nunca puede habilitar su transición (en el ejemplo, $T_3$ necesita dos fichas en $P_1$ y no se habilita nunca), y la red se comporta como la ordinaria que resulta de borrar esa transición; si en cambio un arco de **salida** tiene peso 2 (como $T_4$, que agregaría 2 fichas a $P_2$), la red deja de ser segura.
 
 ## Vivacidad y punto muerto
 
@@ -3254,11 +4041,14 @@ Estos dos conceptos son **estructurales** (no dependen del marcado) y sirven par
 >
 > **Trampa**: la propiedad dual, $P'^{\bullet} \subseteq {}^{\bullet}P'$ — toda transición que le saca fichas a $P'$ también es una que se las **da**.
 
+Un conjunto de lugares es **deficiente** para un marcado cuando ninguna de sus transiciones de entrada o salida puede activarse por el marcado de esos lugares. En una red **ordinaria**, un lugar es **no deficiente** si y sólo si está **marcado**, y un conjunto es no deficiente si **al menos uno** de sus lugares lo es. En una red generalizada hay que afinar: un lugar es no deficiente si está marcado y, además, o bien no tiene transiciones de salida, o bien tiene fichas suficientes para habilitar al menos una de ellas. Para las generalizadas la definición de sifón no cambia, pero la de trampa se complica para garantizar la no deficiencia.
+
 La consecuencia práctica de cada una:
 
 - Un sifón **sólo puede perder fichas**, nunca ganarlas desde afuera de sí mismo. Si en algún momento el sifón queda **vacío** (todos sus lugares en 0), se queda vacío **para siempre** — ninguna de sus transiciones de salida puede volver a habilitarse, porque cualquier camino para recuperar fichas también pasa por una transición de salida del propio sifón. Un sifón vacío es un problema de diseño **permanente**.
 - Una trampa **sólo puede ganar fichas**. Si en algún momento tiene **al menos una** ficha, la conserva para siempre, sin importar la evolución futura.
 - La unión de dos sifones es un sifón; la unión de dos trampas es una trampa. Se pueden buscar los sifones y trampas **mínimos**, que son la base a partir de la cual se arman los demás.
+- Los ejemplos de la filmina: en la figura a, $P' = \{P_1, P_2\}$ es un sifón porque $^\bullet P' = \{T_1, T_2\} \subseteq P'^\bullet = \{T_1, T_2, T_3\}$: una ficha circula entre $P_1$ y $P_2$, y si cuando está en $P_2$ se dispara $T_3$, el sifón queda vacío y ninguna de sus salidas vuelve a habilitarse. En la figura b, $\{P_1, P_2\}$ es una trampa ($P'^\bullet = \{T_2, T_3\} \subseteq {}^\bullet P' = \{T_1, T_2, T_3\}$): tiene una ficha en $P_1$ y no se vacía nunca; y si arrancara vacía, apenas se dispara $T_1$ queda marcada para siempre. En la figura c, $\{P_1, P_2\}$ es un sifón, $\{P_4, P_5, P_6\}$ una trampa, y $m = (0, 0, 1, 0, 0, 0)$ es un punto muerto: sifón y trampa son **estructurales**, el punto muerto depende de $m_0$.
 
 ###### **Teorema de Commoner**
 > Una red de libre elección extendida ordinaria es **viva** si **cada sifón contiene una trampa no deficiente** para el marcado inicial.
@@ -3283,98 +4073,355 @@ $$x^{T} \cdot C = 0$$
 
 Por la ecuación fundamental, esto implica $x^T \cdot m_k = x^T \cdot m_0$ para **toda** marca alcanzable: la combinación pesada de fichas $\sum q_i \cdot m_i$ es **constante**, dispare lo que dispare. Al conjunto de lugares con $q_i > 0$ se lo llama **soporte** del invariante, y se dice que $P(x)$ es un **componente conservador**. Es exactamente lo que ya usamos para probar la exclusión mutua: $q=(1,1,1)$ sobre $\{P_2, P_4, mutex\}$ daba $M(P_2)+M(P_4)+M(mutex)=1$.
 
-Propiedades que conviene saber: ser componente conservador es una propiedad **estructural** (no depende de $m_0$, sólo de que exista **algún** $x>0$ con $x^TC=0$); si además $x^TC \ge 0$ (no necesariamente cero), la red es **estructuralmente acotada**. Existen invariantes **mínimos** —de soporte mínimo— a partir de los cuales se construyen todos los demás por combinación.
+Propiedades que conviene saber: ser componente conservador es una propiedad **estructural** (no depende de $m_0$, sólo de que exista **algún** $x$ con $x^TC=0$); la **constante** del invariante sí depende de $m_0$ (si $m_0(P_2) + m_0(P_2') = N$, entonces $m(P_2) + m(P_2') = N$ en toda marca alcanzable). Todos los lugares de un componente conservador están acotados. Una red no marcada es **conservadora** si y sólo si existe un invariante $x > 0$ (todas las componentes positivas) con $x^TC = 0$; y si existe $x > 0$ con $x^TC \le 0$ —la suma pesada puede bajar pero nunca subir—, la red es **estructuralmente acotada**. Existen invariantes **mínimos** —de soporte mínimo— a partir de los cuales se construyen todos los demás por combinación.
+
+Los ejemplos de la filmina: en el **ciclo estacional**, $m_1 + m_2 + m_3 + m_4 = 1$ (en todo momento se está en una y sólo una estación); con un lugar complementario $P_2'$ que garantiza que nunca haya más de 2 fichas en $P_2$, $m_2 + m_2' = 2$; y en una red con dos ramas, $m_1 + m_2 + m_3 = 1$ y $m_1 + m_4 + m_5 = 1$, cuya suma $2m_1 + m_2 + m_3 + m_4 + m_5 = 2$ también es invariante (pero no mínimo). En general un componente conservador tiene un **significado físico**: el sistema está en un solo estado a la vez, o se conserva una cantidad de entidades.
 
 ###### **T-invariantes y componentes repetitivos**
 La contraparte para las **transiciones**: un vector $y$ tal que $C \cdot y = 0$ es un **T-invariante**. Si $D$ es el conjunto de transiciones con $y_j>0$, y existe una secuencia de disparo cuyo vector característico es (un múltiplo de) $y$, a $D$ se lo llama **componente repetitivo**: dispararlo completo devuelve la red **a la misma marca** de la que partió.
 
 Una **secuencia repetitiva** es la que vuelve al estado inicial (o a uno mayor o igual, en el caso *creciente*); es **mínima** si ninguno de sus prefijos propios ya es repetitivo, y es **completa** si contiene **todas** las transiciones de la red al menos una vez. Que exista una secuencia repetitiva completa y estacionaria es una condición necesaria para que la red sea **consistente**: que cada transición pueda formar parte de un ciclo que vuelve al punto de partida. La existencia de un T-invariante es una condición **necesaria** (no suficiente) para esto — el cálculo algebraico ayuda a **buscar** candidatos, pero hay que verificar después que correspondan a una secuencia real.
 
+###### **Avance sincrónico**
+Las secuencias repetitivas describen el comportamiento **cíclico** de una red. Una información complementaria es cuánto puede **adelantarse** una transición respecto de otra. Si $N_k(T_j)$ es la cantidad de disparos de $T_j$ en una secuencia $S_k$, el **avance sincrónico** de $T_1$ sobre $T_2$ es el máximo de $N_k(T_1) - N_k(T_2)$ sobre todas las secuencias de disparo posibles.
+
+En el ejemplo de la filmina, $T_1$ y $T_2$ forman un ciclo con dos lugares: $P_1$ (entrada de $T_1$) con **una** ficha y $P_2$ (entrada de $T_2$) con **tres**. Entonces $T_1$ puede dispararse como máximo **una** vez antes de que dispare $T_2$, y $T_2$ como máximo **tres** veces antes de que dispare $T_1$. Para cualquier secuencia:
+
+$$N_k(T_1) - N_k(T_2) \le 1 \qquad\qquad N_k(T_2) - N_k(T_1) \le 3$$
+
+El avance sincrónico es una medida de **cuánto se pueden desacoplar** dos actividades: con un buffer de capacidad 3 entre productor y consumidor, el productor puede adelantarse a lo sumo 3 productos.
+
 ## Grafo de marcas y árbol de cobertura
 
-El **grafo de marcas** (o de accesibilidad, ya visto) es exacto pero sólo se puede construir cuando la red es **acotada** —si no, tiene infinitos nodos—. Para redes potencialmente **no acotadas**, se usa el **árbol raíz de cobertura** (*coverability tree*): en vez de marcar cada componente con un número exacto, se introduce el símbolo $\omega$ ("infinito") en cualquier componente que, al repetir un ciclo de disparos, **siga creciendo sin límite**.
+Son los dos métodos **enumerativos** de análisis: el método básico, que se complementa después con el álgebra lineal y los métodos de reducción.
 
-El árbol de cobertura **siempre tiene un número finito de vértices**, incluso cuando la red no está acotada — es precisamente lo que lo hace útil como método de análisis algorítmico. El precio es que **pierde información**: dos marcas distintas que ambas "cubren" el mismo nodo del árbol pueden no ser realmente equivalentes, así que ciertas preguntas (¿es alcanzable exactamente esta marca?) no siempre se pueden responder con el árbol. Para una red **acotada**, en cambio, el árbol de cobertura contiene **todas** las marcas alcanzables — coincide con el grafo de marcas.
+###### **Grafo de marcas**
+El **grafo de marcas** (o de alcanzabilidad, o de accesibilidad) tiene un vértice por cada **marca alcanzable** y un arco por cada **disparo** de una transición entre dos marcas. Ejemplo de la filmina: una red de dos lugares con $m_0 = (2, 0)$. Desde $m_0$ sólo puede dispararse $T_1$, que lleva a $m_1 = (1,1)$. En $m_1$ están habilitadas las dos: $T_1$ lleva a $m_2 = (0,2)$ y $T_2$ a $m_3 = (0,1)$. Tanto $m_2$ como $m_3$ son **puntos muertos**. El grafo tiene esas cuatro marcas y esos tres arcos, y de él se leen **todas** las propiedades de la red: acotada (y no segura: hay un 2), con deadlock, no viva.
+
+En el segundo ejemplo de la filmina, del grafo se lee que la red es **segura, viva y reversible**, que $T_1T_2T_3$ y $T_1T_4T_5$ son **secuencias repetitivas** (vuelven a $m_0$), y que $S = T_1T_2T_3T_1T_4T_5$ es una secuencia **completa** que cumple $m_0 \xrightarrow{S} m_0$: la red es **consistente**.
+
+El límite es obvio: el grafo de marcas sólo es finito si la red es **acotada**. Una red como la de la filmina —donde cada disparo de $T_1$ agrega una ficha a $P_1$— tiene infinitas marcas alcanzables, y el grafo no se puede construir.
+
+###### **Árbol de cobertura**
+Para redes potencialmente **no acotadas** se construye el **árbol raíz de cobertura** (*coverability root tree*). Su idea es el símbolo $\omega$: cuando una secuencia lleva de una marca $m$ a otra $m' \ge m$ (y distinta), esa secuencia **se puede repetir** tantas veces como se quiera, y los lugares que crecieron pueden alcanzar cualquier valor. En esas componentes se escribe $\omega$, con
+
+$$\forall n \in \mathbb{N}: \quad \omega > n, \qquad \omega \pm n = \omega, \qquad \omega \ge \omega$$
+
+A una marca con $\omega$ se la llama **macro-marca**, porque representa un **conjunto** (infinito) de marcas.
+
+**Algoritmo de construcción** (cada vértice es una marca o una macro-marca):
+
+- **Paso 1.** Desde la marca inicial $m_0$, se indican todas las transiciones habilitadas y las marcas sucesoras. Si alguna de esas marcas es **mayor** que $m_0$, se pone $\omega$ en cada componente que sea mayor que la de $m_0$.
+- **Paso 2.** Para cada vértice nuevo $m_i$ del árbol se aplica 2.1 o 2.2:
+  - **2.1.** Si en el camino de $m_0$ a $m_i$ (sin contar $m_i$) hay un vértice $m_j = m_i$, entonces $m_i$ **no tiene sucesores** (ya se exploró).
+  - **2.2.** Si no, el árbol se amplía con todos los sucesores de $m_i$. Para cada sucesor $m_k$: (1) una componente $\omega$ de $m_i$ sigue siendo $\omega$ en $m_k$; (2) si en el camino de $m_0$ a $m_k$ hay un vértice $m_j$ con $m_k > m_j$, se pone $\omega$ en cada componente de $m_k$ mayor que la de $m_j$.
+
+**Ejemplo de la filmina.** Tres lugares, $m_0 = (1,0,0)$, y cuatro transiciones: $T_1$ pasa la ficha de $P_1$ a $P_2$; $T_2$ es un bucle sobre $P_1$ que además deposita **2** fichas en $P_3$; $T_3$ consume la ficha de $P_1$ y no produce nada; $T_4$ es un bucle sobre $P_2$ que deposita **3** fichas en $P_3$.
+
+| Vértice | Marca | Cómo se obtiene |
+|---|---|---|
+| a | $m_0 = (1,0,0)$ | Raíz |
+| b | $m_1 = (0,1,0)$ | $T_1$ desde a |
+| c | $(1,0,\omega)$ | $T_2$ desde a da $(1,0,2) > (1,0,0)$ → $\omega$ en $P_3$ |
+| d | $m_2 = (0,0,0)$ | $T_3$ desde a: **punto muerto** |
+| e | $(0,1,\omega)$ | $T_4$ desde b da $(0,1,3) > (0,1,0)$ → $\omega$ |
+| f | $(0,1,\omega)$ | $T_1$ desde c |
+| g | $(1,0,\omega)$ | $T_2$ desde c: ya está en el camino (c) → sin sucesores (2.1) |
+| h | $(0,0,\omega)$ | $T_3$ desde c: **punto muerto** |
+| i, j | $(0,1,\omega)$ | $T_4$ desde e y desde f: ya están en el camino → sin sucesores |
+
+De ahí: $P_1$ y $P_2$ están acotados, $P_3$ **no**; hay una **infinidad de interbloqueos** ($m_2$ y todas las $(0,0,k)$ que cubre $h$); y la red es **quasi-viva** (cada transición aparece en algún arco).
+
+###### **Lo que el árbol no puede responder**
+El árbol de cobertura **siempre tiene un número finito de vértices**, y toda marca alcanzable está **cubierta** por alguna marca del árbol. Pero **pierde información**, porque $\omega$ representa "un número no acotado", no "cualquier número":
+
+- En el nodo e, $m(P_3)$ es en realidad $3N$ (sólo disparó $T_4$); en el nodo f es un número **par** (sólo disparó $T_2$).
+- La secuencia $T_2 T_1 T_4^7$ es disparable desde $m_0$ y da $(0, 1, 2 + 21) = (0,1,23)$: está cubierta por la macro-marca $(0,1,\omega)$ del nodo j.
+- ¿Es alcanzable $(1, 0, 23)$? **No**: si $m(P_1) = 1$, no se disparó ni $T_1$ ni $T_4$, sólo $T_2$, así que $m(P_3)$ es **par**. Pero el árbol tiene el nodo $(1,0,\omega)$, que "cubre" a $(1,0,23)$: esa información **no se puede obtener del árbol**.
+
+Por eso, para redes no acotadas, ni el **problema de alcanzabilidad** (¿es alcanzable esta marca?) ni el de **vivacidad** se pueden resolver sólo con el árbol de cobertura. Para una red **acotada**, en cambio, el árbol contiene todas las marcas alcanzables —se lo llama **árbol de alcanzabilidad**— y, fusionando los vértices iguales, se obtiene el grafo de marcas. Aun así, el árbol puede ser enorme incluso para redes chicas.
+
+## Propiedades estructurales
+
+Las propiedades vistas hasta acá dependen de $m_0$. Las **estructurales** dependen sólo de la red no marcada, y se deciden con álgebra lineal sobre $C$. Ésta es la tabla de la filmina, con los signos corregidos:
+
+| Propiedad | Definición | Criterio algebraico | Consecuencia |
+|---|---|---|---|
+| **Estructuralmente acotada** | Acotada para **cualquier** $M_0$ | $\exists X > 0:\ X^T C \le 0$ | $(N, M_0)$ es acotada para todo $M_0$ |
+| **Conservadora** | $\exists X > 0$ tal que $X^T M = X^T M_0$ para todo $M$ alcanzable y todo $M_0$ | $\exists X > 0:\ X^T C = 0$ | Es acotada. Una red es conservadora si **todos** sus lugares están cubiertos por algún P-invariante |
+| **Repetitiva** | Existe $M_0$ y una secuencia disparable en la que **cada** transición aparece infinitas veces | $\exists Y > 0:\ C Y \ge 0$ | Toda red **viva** es repetitiva |
+| **Consistente** | Existe $M_0$ y una secuencia $s$ con $\vec{s} > 0$ tal que $M_0 \xrightarrow{s} M_0$ | $\exists Y > 0:\ C Y = 0$ | Toda red **viva con un home state** es consistente; toda red **viva y acotada** es consistente |
+
+(Acá $X > 0$ e $Y > 0$ significan **todas** las componentes estrictamente positivas.)
+
+La intuición de los criterios sale de la ecuación fundamental $M = M_0 + C\vec{s}$:
+
+- Si $X^TC \le 0$, entonces $X^T M = X^T M_0 + X^T C \vec{s} \le X^T M_0$: una suma pesada de fichas, con **todos** los pesos positivos, nunca crece. Cada lugar queda acotado por $X^T M_0 / x_i$.
+- Si $CY \ge 0$, disparar la secuencia de vector $Y$ no le quita fichas a ningún lugar, así que puede repetirse; si $CY = 0$, además vuelve **exactamente** a la marca de partida.
+
+Y un resultado que combina las dos familias: una red **viva y estructuralmente acotada** es **conservadora** y **consistente**.
+
+## Cálculo de P-invariantes y T-invariantes
+
+Hay un algoritmo para encontrar los **P-invariantes mínimos** (y, aplicándolo a $C^T$, los T-invariantes). Es la eliminación de Farkas, la que muestra la filmina:
+
+1. Se arma la matriz $[\,I_n \mid C\,]$: a la izquierda la identidad de $n \times n$ (una fila por lugar, que lleva la cuenta de qué combinación de lugares es cada fila), a la derecha la matriz de incidencia.
+2. Para **cada columna** de $C$ (cada transición), se toman todos los **pares de filas** que tienen en esa columna valores de **signo opuesto**, y se agrega una fila nueva que es la combinación lineal **positiva** de las dos que anula esa columna.
+3. Se **eliminan** todas las filas que tienen un valor distinto de cero en esa columna.
+4. Cuando se procesaron todas las columnas, la parte derecha es toda cero: cada fila que queda tiene en la parte **izquierda** un P-invariante. Se descartan los que no son de soporte mínimo.
+
+En el ejemplo de la filmina, con 4 lugares y 3 transiciones, quedan dos filas: $P_1 + P_2$ y $P_3 + 2P_4$, es decir los invariantes $m_1 + m_2 = \text{cte}$ y $m_3 + 2m_4 = \text{cte}$.
+
+Sobre los invariantes, la filmina enuncia (Propiedad 2.5 y teoremas):
+
+- Si $x_1$ y $x_2$ son P-invariantes y $\alpha, \beta$ son enteros no negativos, $\alpha x_1 + \beta x_2$ es un P-invariante; si $\alpha, \beta > 0$, su soporte es la unión de los soportes. Si $x_1 - x_2 \ge 0$, también es un P-invariante.
+- **Todo P-invariante es combinación lineal no negativa de P-invariantes mínimos**: los mínimos son una base.
+- En modelos de sistemas reales, cada P-invariante mínimo suele tener un **significado físico** claro —un recurso, una estrategia de control— y muchas veces se lo encuentra **a ojo**, inspeccionando recursos y procesos.
+- Para los T-invariantes vale lo mismo: $Y \ge 0$ entero con $CY = 0$; el soporte $\|Y\|$; todo T-invariante es combinación no negativa de mínimos; y si una secuencia $\sigma$ cumple $M_0 \xrightarrow{\sigma} M_0$, su vector de conteo es un T-invariante. En general, **un T-invariante mínimo corresponde a un proceso que puede repetirse para siempre**, y se los identifica ignorando los recursos.
+
+La existencia de un T-invariante cuya secuencia sea disparable desde $m$ es **condición necesaria** para que la red sea **reversible**. Y la consistencia es estructural: una red no marcada es consistente si hay un T-invariante $y > 0$ con $Cy = 0$; si hay $y > 0$ con $Cy \ge 0$, es estructuralmente repetitiva.
+
+## Métodos de reducción
+
+El grafo de marcas es eficiente para redes chicas, pero se vuelve largo y tedioso con muchas marcas; el álgebra lineal también se complica cuando la red crece. Los **métodos de reducción** transforman la red en otra **más simple** que **conserva algunas propiedades** de la original (vivacidad, acotación, home state). La advertencia de la filmina: las redes simplificadas **no son "equivalentes"**, no hay que buscarles semántica.
+
+Las dos reducciones del ejemplo:
+
+- **Sustitución de un lugar**: se elimina un lugar $P_2$ "de paso", fusionando su transición de entrada con la de salida. Es posible porque se cumplen ciertas condiciones; la principal, que la **transición de salida de $P_2$ no tenga otro lugar de entrada**: si se deposita una ficha en $P_2$, tarde o temprano se dispara $T_2$ y la ficha pasa a $P_3$, así que $P_2$ no agrega comportamiento.
+- **Lugar implícito**: un lugar cuya marca **nunca** es un obstáculo para el disparo de sus transiciones de salida, y que además se puede **deducir** del marcado de los otros lugares. En el ejemplo, $m_5 = 1$ implica $m_3 = 1$, y $m_3 = m_4 + m_5$: $P_3$ es implícito y se elimina.
+
+Aplicando sustituciones sucesivas se llega a una red trivial que es viva, acotada y con home state, y como esas reducciones **preservan** esas tres propiedades, la red original también las tiene.
+
+## Grafos de eventos fuertemente conexos
+
+Una red es **fuertemente conexa** si entre cualquier par de nodos hay un camino dirigido. Para un **grafo de eventos** (cada lugar con exactamente una transición de entrada y una de salida) fuertemente conexo, con transiciones $T = \{T_1, \dots, T_m\}$ y circuitos elementales $\{C_1, \dots, C_k, \dots\}$:
+
+- **a)** A cada circuito elemental $C_k$ le corresponde un **P-invariante mínimo**: si $P(C_k) = \{P_1, \dots, P_r\}$ son sus lugares, $m(P_1) + \dots + m(P_r) = m_0(P_1) + \dots + m_0(P_r) = m_0(C_k)$. (Vale también para circuitos de grafos de eventos no fuertemente conexos.)
+- **b)** El **único T-invariante mínimo** es $Y = (1, 1, \dots, 1)$: si hay varias secuencias repetitivas mínimas, **cada una contiene cada transición la misma cantidad de veces**.
+- **c)** La red es **viva si y sólo si cada circuito elemental contiene al menos una ficha**: $m_0(C_k) \ge 1$ para todo $k$.
+
+En el ejemplo de la filmina hay dos circuitos, $P_1T_1P_2T_2P_3T_4P_1$ y $P_1T_1P_4T_3P_5T_4P_1$, con invariantes $m_1 + m_2 + m_3 = 1$ y $m_1 + m_4 + m_5 = 1$, y dos secuencias repetitivas mínimas, $T_1T_2T_3T_4$ y $T_1T_3T_2T_4$, que corresponden al mismo T-invariante $(1,1,1,1)$. La propiedad c se ve directo: si el circuito $P_1T_1P_2T_2P_3T_4P_1$ se quedara sin fichas, $T_1$, $T_2$ y $T_4$ no se habilitarían nunca.
+
+Estos grafos corresponden a clases de redes **sin conflictos**, lo que los hace importantes en la práctica (sistemas de producción, *pipelines*). Los **grafos de estado** fuertemente conexos tienen las propiedades **duales**: un T-invariante mínimo por cada circuito elemental, un **único** P-invariante mínimo para toda la red ($Y = (1,\dots,1)$ sobre los lugares: la cantidad total de fichas es constante), y la red es viva si tiene al menos una ficha.
 
 ## Vivacidad y "buen comportamiento"
 
-Cerrando el capítulo, dos resultados que conectan todo lo anterior:
+Cerrando el capítulo, los resultados que conectan todo lo anterior:
 
-- Una red **persistente** es viva **si y sólo si** hay un marcado alcanzable con una secuencia repetitiva completa aplicable desde ahí. La persistencia por sí sola no garantiza vivacidad; hace falta además que exista ese ciclo que toca todas las transiciones.
-- La vivacidad casi siempre se pide **junto con** la acotación (una red *well-behaved*), porque un modelo que no está acotado no corresponde a un sistema real implementable, y uno que no es vivo puede perder funcionalidad de forma irreversible — dos maneras distintas de decir "este diseño tiene un bug".
+- **Commoner** (sección de sifones y trampas): una red de libre elección extendida es viva si cada sifón contiene una trampa no deficiente.
+- Una red **persistente** es viva **si y sólo si** hay un marcado alcanzable desde el cual es aplicable una secuencia repetitiva **completa** (estacionaria o creciente). La persistencia por sí sola no garantiza vivacidad.
+- En general la vivacidad **no** se hereda al agregar fichas, pero para algunas clases sí: en las redes **libres de conflicto** (y sus extendidas), si $\langle Q, m_0 \rangle$ es viva, $\langle Q, m_0' \rangle$ es viva para cualquier $m_0' \ge m_0$.
+- La vivacidad casi siempre se pide **junto con** la acotación, porque un modelo no acotado no corresponde a un sistema implementable, y uno que no es vivo puede perder funcionalidad de forma irreversible. Una red marcada $\langle Q, m_0\rangle$ que es **viva y acotada** se dice que **se comporta bien** (*well-behaved*), y una red **no marcada** $Q$ está **bien formada** si **existe** algún $m_0$ con el que se comporta bien.
+
+## Estructuración: refinamiento y composición
+
+Modelar un sistema real complejo con una sola red de Petri "de un tirón" produce una red tan grande que se vuelve inutilizable. Por eso hace falta **estructurar** la especificación, y analizar en cada etapa garantizando que los resultados valgan para el modelo completo. Hay dos enfoques:
+
+###### **Refinamiento sucesivo (descendente)**
+Se describe primero el comportamiento del sistema con una red **simple**, donde cada transición representa una operación compleja, y se la analiza. Después se **refina** reemplazando cada transición por una porción de red llamada **bloque bien formado**, que **preserva** acotación, vivacidad, etc. Se pueden encadenar varios niveles de descripción, y el modelo final hereda las propiedades conservadas por los bloques.
+
+En el ejemplo de la filmina, la red básica es un ciclo de dos lugares y dos transiciones ($P_1$ con ficha, $T_1$, $P_2$, $T_2$), viva y segura. $T_1$ se reemplaza por un bloque **"secuencia"** ($T_{in}(1) \to P_\alpha \to T_{out}(1)$) y $T_2$ por un bloque **"si-entonces-si no"** (desde $T_{in}(2)$, un lugar con dos alternativas $T_a$ / $T_b$ que se reúnen antes de $T_{out}(2)$). La red resultante sigue siendo **viva y segura**.
+
+###### **Composición (por especificaciones parciales)**
+Cuando no se puede refinar de arriba hacia abajo, se dan **especificaciones parciales** del sistema y la red global se obtiene **componiendo** las subredes. Dos mecanismos:
+
+- **Por lugares compartidos**: los subsistemas tienen lugares en común (típicamente recursos), que aparecen en cada subred; el modelo general se arma **fusionando** esos lugares. Según la filmina, este enfoque mantiene la vivacidad.
+- **Por *rendez-vous* (encuentro)**: los subsistemas tienen una o más **transiciones comunes** que los sincronizan; el modelo global se obtiene **fusionando** las transiciones comunes. En el ejemplo, la subred 1 ($P_1$, $P_2$, $T_1$, $T_2$) y la subred 2 ($P_3$, $P_4$, $T_2$, $T_3$) comparten $T_2$, que en la red global queda con entradas y salidas de las dos. Según la filmina, este enfoque mantiene la vivacidad y la acotación.
+
+En los dos casos la preservación de propiedades vale bajo las condiciones que da el libro de David y Alla; la idea de fondo es poder verificar cada pieza por separado.
+
+## Software de análisis y otras herramientas
+
+El análisis de una red —llamado **validación**— comprueba las propiedades principales (acotada, viva, reversible…) y propiedades específicas como la exclusión mutua o los límites de recursos. Un software de análisis tiene dos partes: la **edición** del modelo (textual o gráfica; la gráfica es más cómoda pero sólo viable para modelos chicos) y el **análisis** propiamente dicho, con los métodos del capítulo: grafo de marcas (o árbol de cobertura), álgebra lineal y reducción. Suelen incluir también una **biblioteca** de modelos básicos ya diseñados para armar el modelo general.
+
+La cátedra usa **PIPE** (*Platform Independent Petri net Editor*): de ahí salen el modelo de la barbería, la clasificación (*state machine*, *marked graph*, *free choice*…), el análisis del espacio de estados (*bounded*, *safe*, *deadlock*) y el análisis de invariantes que se usa en el capítulo de expresiones regulares. La filmina remite a la base de herramientas de redes de Petri de la Universidad de Aarhus (`www.daimi.au.dk/PetriNets/tools`).
+
+###### **Grafos de eventos para simulación (no confundir)**
+La parte final de la filmina presenta otro uso de la expresión "grafo de eventos": el de la **simulación de eventos discretos** (Schruben, 1992-1995). **No** es la subclase de RdP de este capítulo.
+
+- Es una forma de representar la **lista de eventos futuros** de un modelo de eventos discretos. Cada **nodo** es un evento (una transición de estado) y cada **arco** representa la **programación** de otro evento, con una **condición** booleana y/o un **retardo** de tiempo opcionales: "la ocurrencia de A programa B dentro de $t$, si la condición es verdadera".
+- Es un paradigma minimalista —nodos de evento y arcos de programación— con el que se puede representar **cualquier** modelo de eventos discretos. El precio es una abstracción mayor: el grafo representa la relación de **programación** entre eventos, no el movimiento físico de los clientes.
+- Para arrancar la simulación hace falta al menos un evento programado: un evento **Run** que inicializa las variables (por ejemplo, el contador de llegadas $N = 0$) y programa el primer arribo.
+- Los **eventos simultáneos** (dos eventos programados para el mismo instante) son el problema central: según el orden, pueden aparecer trayectorias de estado inválidas. La metodología permite **priorizar arcos** de programación para fijar el orden.
+- Ejemplos: el **proceso de llegada** (un solo evento, `Arrival`, que incrementa $N$ y se reprograma), la **cola con $k$ servidores** (parámetros: tiempos entre arribos $\{t_A\}$, de servicio $\{t_S\}$ y $k$; variables de estado: $Q$ clientes en cola y $S$ servidores libres; eventos `Arrival`, `StartService`, `EndService`) y la **cola en tándem** (dos estaciones; tras la primera, el cliente pasa a la segunda con probabilidad $p$ o se va con $1-p$).
+
+## Elementos de teoría de grafos
+
+El repaso que la filmina usa en las demostraciones de este capítulo. Un grafo es un par $G = (X, U)$ de **vértices** (nodos) $X$ y **arcos** $U$.
+
+| Concepto | Definición |
+|---|---|
+| Sucesores / predecesores de $x$ | $\Gamma^+(x)$ / $\Gamma^-(x)$ |
+| Vértices adyacentes | Son los extremos de un mismo arco |
+| Arcos adyacentes | Tienen un extremo en común |
+| **Cadena** de longitud $L$ | Secuencia de $L$ arcos, cada uno con un extremo común con el anterior y el otro con el siguiente (**sin** importar la orientación) |
+| **Camino** | Cadena en la que el extremo **terminal** de cada arco es el **inicial** del siguiente (respeta la orientación) |
+| **Ciclo** | Cadena cuyo extremo inicial coincide con el final |
+| **Circuito** | Camino cuyo extremo inicial coincide con el final (todo circuito es un ciclo; no al revés) |
+| **Elemental** | Que no repite vértices (salvo el primero = último) |
+| **Conexo** | Para todo par $(x, y)$ hay una **cadena** entre ellos |
+| **Fuertemente conexo** | Para todo par $(x, y)$ hay un **camino** de $x$ a $y$ |
+
+Un grafo es fuertemente conexo si y sólo si existe un circuito que pasa por todos los vértices. Y para un grafo conexo, el número de **circuitos (ciclos) elementales independientes** es
+
+$$|U| - |X| + 1$$
+
+(el número ciclomático): forman una **base** a partir de la cual se obtienen los demás. En el ejemplo de la filmina, con 7 arcos y 5 vértices, hay $7 - 5 + 1 = 3$: $adeba$, $bcdeb$ y $aeba$.
 
 ## El problema de la barbería
 
-*(Redes de Petri Case #2. La filmina muestra el modelo hecho con la herramienta PIPE, pero el diagrama en sí es una imagen; la red de acá está construida desde el enunciado y usa el vocabulario de la sección anterior para analizarla — no es necesariamente idéntica a la de la cátedra, pero modela las mismas reglas.)*
+*(Redes de Petri Case #2. El modelo es el de la filmina, hecho con PIPE; la red se reconstruyó arco por arco desde la captura, y los resultados de clasificación y de espacio de estados son los que muestra PIPE en la misma filmina.)*
 
 ###### **Enunciado**
-En una barbería hay $n$ barberos, cada uno con su sillón, y una sala de espera con $m$ bancos. Reglas de funcionamiento:
+Implementar el problema de la barbería, para ver cómo funciona un problema típico de concurrencia. En una barbería hay $n$ barberos, cada uno con su sillón, y una sala de espera con $m$ bancos donde los clientes esperan su turno. Reglas de funcionamiento:
 
 - Si no hay clientes que atender, el barbero espera.
-- Los clientes entran de a uno.
-- Si hay clientes esperando y algún barbero atiende a un cliente, lo llama.
-- Si llega un cliente mientras todos los barberos están ocupados, se sienta en un banco de la sala de espera.
-- Si llega un cliente y **todos** los barberos y **todos** los bancos están ocupados, se va **sin ser atendido**.
-- Los clientes se atienden **sobre demanda**: no necesariamente en el orden de llegada.
-- Para cobrar hay **una sola caja**, y tiene que atenderla un barbero — mientras cobra, ese barbero **no puede cortar el pelo**.
+- Los clientes entran de a uno a la barbería.
+- Si hay clientes en espera y algún barbero está libre, atiende a un cliente.
+- Si llega un cliente mientras los barberos están ocupados, se sienta en un banco de espera.
+- Si llega un cliente y **todos** los barberos y **todos** los bancos están ocupados, se va sin ser atendido.
+- Los clientes se atienden **sobre demanda**: no se respeta necesariamente el orden de entrada.
+- Para cobrar hay **una sola caja**, y tiene que atenderla un barbero; mientras cobra, ese barbero **no puede cortar el pelo**.
 
-Es el ejercicio de concurrencia clásico (*the sleeping barber problem*, Dijkstra) con una complicación extra de la cátedra: la caja única, que introduce un **segundo** recurso compartido entre los barberos, además de los sillones.
+El plano de la filmina tiene **dos barberos** y una caja, con puerta de entrada, sala de espera, los dos sillones, la caja y puerta de salida. Es el ejercicio clásico de concurrencia (*the sleeping barber problem*, Dijkstra), con una complicación extra de la cátedra: la caja única, que es un **segundo** recurso compartido entre los barberos.
 
-![[pn-barberia.svg]]
+###### **El modelo de la cátedra**
+La red tiene **14 lugares** ($P_0 \dots P_{13}$) y **10 transiciones** ($T_0 \dots T_9$), con $n = 2$ barberos, $m = 5$ bancos y una población de 17 clientes. Todos los arcos tienen peso 1, y **cuatro** son **inhibidores** (en la captura se dibujan con un círculo en la punta).
 
-###### **El modelo**
-Cinco lugares principales y un recurso compartido más:
-
-| Lugar | Significado | Marcado inicial |
+| Lugar | Significado | $M_0$ |
 |---|---|---|
-| `bancos` | Bancos libres en la sala de espera | $m$ |
-| `esperando` | Clientes sentados, esperando turno | 0 |
-| `barberos libres` | Barberos sin cliente asignado | $n$ |
-| `cortando` | Barberos cortando pelo | 0 |
-| `a pagar` | Clientes ya cortados, esperando pagar | 0 |
-| `barbero en caja` | El barbero que está cobrando | 0 |
-| `caja libre` | Si la caja está disponible | 1 |
+| $P_0$ | Clientes afuera (población) | 17 |
+| $P_{12}$ | Puerta de entrada libre (se entra de a uno) | 1 |
+| $P_1$ | Cliente pasando por la puerta | 0 |
+| $P_3$ | Bancos libres en la sala de espera | 5 |
+| $P_2$ | Clientes en la sala de espera | 0 |
+| $P_4$ / $P_6$ | Peluquero 1 / peluquero 2 libre | 0 / 0 |
+| $P_7$ / $P_5$ | Peluquero 1 / peluquero 2 atendiendo un cliente | 1 / 1 |
+| $P_9$ | Caja libre | 1 |
+| $P_8$ | Cobrando (un peluquero en la caja con su cliente) | 0 |
+| $P_{13}$ | Cobro terminado: hay un peluquero para devolver a su sillón | 0 |
+| $P_{11}$ | Puerta de salida libre | 1 |
+| $P_{10}$ | Cliente saliendo | 0 |
 
-Y las transiciones que conectan todo:
+| Transición | Consume de | Produce en | Significado |
+|---|---|---|---|
+| $T_0$ | $P_0$, $P_{12}$, $P_3$ | $P_1$ | Un cliente entra: toma la puerta y reserva un banco |
+| $T_1$ | $P_1$ | $P_2$, $P_{12}$ | Pasa a la sala de espera y libera la puerta |
+| $T_2$ | $P_2$, $P_4$ | $P_7$, $P_3$ | El peluquero 1 toma un cliente; se libera el banco |
+| $T_3$ | $P_2$, $P_6$ | $P_5$, $P_3$ | Ídem con el peluquero 2 |
+| $T_4$ | $P_7$, $P_9$; **inhibidor** desde $P_{13}$ | $P_8$ | El peluquero 1 va a la caja a cobrar |
+| $T_5$ | $P_5$, $P_9$; **inhibidor** desde $P_{13}$ | $P_8$ | Ídem con el peluquero 2 |
+| $T_6$ | $P_8$, $P_{11}$ | $P_{10}$, $P_9$, $P_{13}$ | Termina el cobro: el cliente sale, se libera la caja, se avisa |
+| $T_7$ | $P_{10}$ | $P_0$, $P_{11}$ | El cliente se va (vuelve a la población) |
+| $T_8$ | $P_{13}$; **inhibidor** desde $P_4$ | $P_4$ | El peluquero vuelve al sillón 1, si está vacío |
+| $T_9$ | $P_{13}$; **inhibidor** desde $P_6$ | $P_6$ | El peluquero vuelve al sillón 2, si está vacío |
 
-- **`llega`**: un cliente pasa de "fuera" a `bancos` (consume un banco libre).
-- **`se va` (lleno)**: si `bancos` está en 0 cuando llega alguien, el cliente se va sin atenderse — es un disparo **alternativo** al de sentarse, y ambos compiten por el mismo evento de llegada.
-- **`se sienta`**: un cliente de `bancos` pasa a `esperando`. (En una versión más fina se separan "llega" y "se sienta" en dos pasos; acá se simplifica.)
-- **`llama al siguiente`**: consume una ficha de `esperando` **y** una de `barberos libres` a la vez — es una transición con **dos entradas**, la misma estructura que la sincronización por señal de la sección de modelos básicos. Sin las dos fichas juntas, no dispara.
-- **`termina de cortar`**: el barbero pasa de `cortando` a estar disponible para cobrar, y el cliente pasa a `a pagar`.
-- **`cobra`**: consume una ficha de `a pagar` y una de `caja libre` — otra sincronización de dos entradas.
-- **`termina de cobrar`**: el barbero vuelve a `barberos libres`, la caja vuelve a `caja libre`, y el cliente se va contento.
+```mermaid
+flowchart LR
+    P0(("P0 afuera<br/>17")) --> T0[T0]
+    P12(("P12 puerta<br/>●")) --> T0
+    P3(("P3 bancos<br/>●●●●●")) --> T0
+    T0 --> P1((P1))
+    P1 --> T1[T1]
+    T1 --> P12
+    T1 --> P2(("P2 sala"))
+    P2 --> T2[T2]
+    P2 --> T3[T3]
+    P4(("P4 pelu 1 libre")) --> T2
+    P6(("P6 pelu 2 libre")) --> T3
+    T2 --> P7(("P7 pelu 1 corta<br/>●"))
+    T3 --> P5(("P5 pelu 2 corta<br/>●"))
+    T2 --> P3
+    T3 --> P3
+    P7 --> T4[T4]
+    P5 --> T5[T5]
+    P9(("P9 caja<br/>●")) --> T4
+    P9 --> T5
+    T4 --> P8(("P8 cobrando"))
+    T5 --> P8
+    P8 --> T6[T6]
+    P11(("P11 salida<br/>●")) --> T6
+    T6 --> P9
+    T6 --> P10((P10))
+    T6 --> P13(("P13 cobro<br/>terminado"))
+    P10 --> T7[T7]
+    T7 --> P0
+    T7 --> P11
+    P13 --> T8[T8]
+    P13 --> T9[T9]
+    T8 --> P4
+    T9 --> P6
+    P13 --o T4
+    P13 --o T5
+    P4 --o T8
+    P6 --o T9
+```
 
-###### **Los dos invariantes de recursos**
-Exactamente como en el semáforo de tres impresoras y en el ejemplo de exclusión mutua, esta red tiene **componentes conservadores** que se leen directo del dibujo:
+(En el diagrama, las aristas que terminan en `o` son los arcos **inhibidores**.)
 
-$$M(\text{bancos}) + M(\text{esperando}) = m$$
-$$M(\text{barberos libres}) + M(\text{cortando}) + M(\text{barbero en caja}) = n$$
+Tres decisiones de modelado que conviene leer en la red:
 
-El primero prueba, **por construcción**, que nunca hay más de $m$ clientes esperando — la regla de "si no hay banco, se va" no es un `if` en el código, es una consecuencia estructural del modelo: si `bancos` está en 0, la transición `se sienta` **no puede dispararse**, y sólo queda habilitada `se va`. El segundo prueba que nunca hay más de $n$ barberos "activos" en total, contando tanto a los que cortan como al que está cobrando — que es justamente la regla de que cobrar le saca un barbero a la tarea de cortar.
+- **"Si no hay banco, se va"** se modela haciendo que $T_0$ **necesite** un banco libre ($P_3$): con los 5 bancos reservados, ningún cliente más puede entrar, y queda en $P_0$. Como $P_0$ es la población de clientes "afuera", quedarse afuera y irse son lo mismo para el modelo. No hace falta testear que $P_3$ esté en cero.
+- **La caja le saca el peluquero al sillón**: un peluquero que cobra pasa de $P_7$ (o $P_5$) a $P_8$, así que mientras está en la caja **no** está ni en "libre" ni en "atendiendo": no puede tomar otro cliente. Recién cuando termina de cobrar ($T_6$) se deposita una ficha en $P_{13}$, y $T_8$ o $T_9$ lo devuelven a un sillón.
+- **Los arcos inhibidores** resuelven dos tests a cero que una red ordinaria no puede expresar. Los de $P_4 \multimap T_8$ y $P_6 \multimap T_9$ dicen "devolvé el peluquero al sillón **sólo si está vacío**": garantizan que nunca haya dos peluqueros en el mismo sillón. Los de $P_{13} \multimap T_4$ y $P_{13} \multimap T_5$ dicen "no empieces otro cobro mientras haya un peluquero pendiente de volver": ordenan la devolución antes del próximo cobro. Como la ficha de $P_{13}$ no recuerda **qué** peluquero cobró, el modelo trata a los peluqueros como **intercambiables**: lo que se conserva es que haya uno por sillón.
 
-###### **Leyendo la red con el vocabulario de la sección anterior**
+El marcado inicial tiene una particularidad: los dos peluqueros arrancan en $P_7$ y $P_5$, es decir **atendiendo**, como si la barbería abriera con dos clientes ya sentados en los sillones. Por eso, en total circulan $17 + 2 = 19$ fichas de cliente.
 
-- **Conflicto estructural (y efectivo cuando corresponde)**: `llega` y `se va` compiten por el mismo evento de llegada según el marcado de `bancos` — es el conflicto que decide si el cliente entra o se retira, y es efectivo exactamente cuando `bancos = 0`.
-- **Sincronización = transición con dos lugares de entrada**: tanto `llama al siguiente` como `cobra` necesitan **dos** fichas de dos lugares distintos a la vez. Es la misma estructura que el co-end de la sección de modelos básicos, aplicada a pares en vez de a todos los procesos.
-- **Acotación**: la red es acotada porque los dos invariantes de arriba fijan una cota superior ($m$ y $n$ respectivamente) para cada grupo de lugares — no hace falta construir el grafo de marcas para saberlo.
-- **Vivacidad**: con $n \ge 1$ y $m \ge 0$, cada transición puede volver a dispararse indefinidamente (un barbero que termina un corte vuelve a `barberos libres`, listo para el próximo ciclo) — la red es *well-behaved*: viva y acotada.
-- **¿Hay sifón?** El conjunto $\{$`barberos libres`, `cortando`, `barbero en caja`$\}$ es un sifón **y** una trampa a la vez (todo lo que entra, sale, y viceversa) — es exactamente la firma de un **componente conservador con soporte constante**: nunca se vacía porque nunca **puede** vaciarse, la suma es siempre $n>0$.
-- **¿Qué pasaría sin la restricción de la caja?** Sacar el lugar `caja libre` (dejar que cualquier barbero cobre sin restricción) elimina una sincronización, pero **no cambia** el invariante de barberos — sólo cambia **cuándo** se puede disparar `cobra`. Es un buen ejercicio para ver que agregar o quitar un recurso compartido no siempre cambia la acotación, pero sí cambia el grado de paralelismo real disponible.
-
-###### **Por qué esto es más que un ejercicio de RdP**
-El problema de la barbería es la versión "de enunciado" de algo que ya se resolvió en código en la sección de sincronización: `bancos`/`esperando` es un semáforo de $m$ permisos (la sala de espera), `barberos libres`/`cortando` es un semáforo de $n$ permisos (los sillones), y `caja libre` es un semáforo **binario** clásico. La regla "si no hay banco, se va" en Java se escribiría con `tryAcquire()` en vez de `acquire()` — exactamente el método que **no bloquea** y devuelve `false` si no hay permiso disponible, que ya vimos en la sección de semáforos.
+###### **Invariantes**
+De la tabla de pre y post se leen seis componentes conservadores, uno por cada recurso o población:
 
 $$
 \begin{aligned}
-\text{sala de espera} &\longrightarrow \texttt{new Semaphore(m)}\\
-\text{sillones} &\longrightarrow \texttt{new Semaphore(n)}\\
-\text{caja} &\longrightarrow \texttt{new Semaphore(1)}\\
-\text{cliente rechazado} &\longrightarrow \texttt{if (!salaDeEspera.tryAcquire()) \{ irse(); return; \}}
+M(P_{12}) + M(P_1) &= 1 && \text{puerta de entrada: de a uno}\\
+M(P_3) + M(P_1) + M(P_2) &= 5 && \text{bancos: reservado al entrar, liberado al ser atendido}\\
+M(P_4) + M(P_6) + M(P_7) + M(P_5) + M(P_8) + M(P_{13}) &= 2 && \text{peluqueros: libre, atendiendo, cobrando o volviendo}\\
+M(P_9) + M(P_8) &= 1 && \text{caja: un solo cobro a la vez}\\
+M(P_{11}) + M(P_{10}) &= 1 && \text{puerta de salida}\\
+M(P_0) + M(P_1) + M(P_2) + M(P_7) + M(P_5) + M(P_8) + M(P_{10}) &= 19 && \text{clientes}
 \end{aligned}
 $$
 
-Es el mismo patrón de todo el apunte: el modelo formal (red de Petri) y el código concurrente (semáforos de Java) son **dos representaciones del mismo objeto matemático** — por eso se pueden verificar propiedades sobre uno (con invariantes, sin ejecutar nada) y tener la garantía de que valen para el otro.
+Cada uno **prueba** una regla del enunciado sin construir el grafo de marcas: nunca hay más de un cliente en la puerta, nunca hay más de 5 clientes reservando banco o esperando, nunca hay más de 2 peluqueros "activos" sumando los que cortan, los que cobran y los que vuelven —la caja le resta un peluquero a los sillones—, y nunca hay dos cobros a la vez. Además **todos** los lugares están cubiertos por algún P-invariante, así que la red es **conservadora** y, por lo tanto, **acotada** (aun con los inhibidores, porque cada marca alcanzable cumple los seis invariantes).
+
+###### **Lo que dice PIPE**
+La filmina muestra los dos análisis automáticos de PIPE:
+
+| Clasificación | | Espacio de estados | |
+|---|---|---|---|
+| State Machine | false | **Bounded** | **true** |
+| Marked Graph | false | **Safe** | **false** |
+| Free Choice Net | false | **Deadlock** | **false** |
+| Extended Free Choice Net | false | | |
+| Simple Net | **true** | | |
+| Extended Simple Net | **true** | | |
+
+Cómo se explica cada resultado con lo visto:
+
+- **No es máquina de estados**: hay transiciones con varias entradas ($T_0$ tiene tres) o varias salidas ($T_6$ tiene tres).
+- **No es grafo marcado**: hay lugares con dos transiciones de salida ($P_2$ alimenta a $T_2$ y a $T_3$; $P_9$ a $T_4$ y $T_5$; $P_{13}$ a $T_8$ y $T_9$).
+- **No es de libre elección (ni extendida)**: en el conflicto de $P_2$ entre $T_2$ y $T_3$, cada transición tiene **otra** entrada distinta ($P_4$ y $P_6$). Qué peluquero atiende depende de cuál está libre, no de una elección libre. Lo mismo con $P_9$, $T_4$ y $T_5$.
+- **Es simple**: cada transición participa de **un solo** conflicto ($T_2$ y $T_3$ del de $P_2$, $T_4$ y $T_5$ del de $P_9$, $T_8$ y $T_9$ del de $P_{13}$; $T_2$ también sale de $P_4$, pero $P_4$ tiene una sola transición de salida).
+- **Acotada pero no segura**: los invariantes la acotan, pero $P_0$ arranca con 17 fichas y $P_3$ con 5.
+- **Sin deadlock**: siempre hay algo que hacer —si nadie está adentro, puede entrar un cliente; si hay clientes esperando y un sillón libre, se los atiende; si hay alguien atendido, puede ir a la caja—. Es lo que se espera de un sistema **reactivo**.
+
+###### **Leyendo la red con el vocabulario del capítulo**
+- **Conflicto**: $T_2$ y $T_3$ compiten por los clientes de $P_2$; es **efectivo** cuando hay un solo cliente esperando y los dos peluqueros libres. El enunciado lo deja abierto a propósito ("sobre demanda": no se respeta el orden de llegada), así que la red **no** lo resuelve: lo resuelve el scheduler —o, en la implementación con monitor, la **política**—.
+- **Sincronización**: $T_2$/$T_3$ (cliente + peluquero libre), $T_4$/$T_5$ (peluquero + caja) y $T_6$ (cobro + puerta de salida) son transiciones con varias entradas: el mismo patrón que el *join* y el *rendez-vous*.
+- **Recursos compartidos**: puerta, bancos, caja y puerta de salida son lugares-recurso con su invariante, exactamente el patrón de exclusión mutua con $N$ recursos de los modelos básicos.
+
+###### **De la red al código**
+El problema de la barbería es la versión "de enunciado" de lo que se resolvió en código en la sección de sincronización: cada componente conservador es un **semáforo** —la puerta de entrada y la caja, binarios; los bancos, de 5 permisos—, y cada transición con varias entradas es un punto donde un hilo tiene que adquirir varios recursos. Si se quisiera que el cliente **se vaya** en vez de esperar afuera, en Java se usaría `tryAcquire()` sobre el semáforo de los bancos: el método que **no bloquea** y devuelve `false` si no hay permiso.
+
+$$
+\begin{aligned}
+\text{puerta de entrada} &\longrightarrow \texttt{new Semaphore(1)}\\
+\text{bancos} &\longrightarrow \texttt{new Semaphore(5)}\\
+\text{caja} &\longrightarrow \texttt{new Semaphore(1)}\\
+\text{cliente rechazado} &\longrightarrow \texttt{if (!bancos.tryAcquire()) \{ irse(); return; \}}
+\end{aligned}
+$$
+
+Pero los **inhibidores** no tienen un semáforo equivalente directo (un semáforo bloquea cuando **no** hay permisos, no cuando **sí** los hay), y el conflicto entre peluqueros necesita una política. Por eso, en el trabajo práctico, la red no se traduce a mano: se ejecuta **la red misma** dentro de un **monitor**, que calcula qué transiciones están sensibilizadas —con la ecuación de estado generalizada, que incluye los arcos inhibidores— y decide a qué hilo despertar. Es el tema de los dos capítulos siguientes. El modelo formal y el código concurrente son **dos representaciones del mismo objeto**: por eso se pueden verificar propiedades sobre uno (con invariantes, sin ejecutar nada) y tener la garantía de que valen para el otro.
 
 ## Ejercicios Propuestos
 
@@ -3384,7 +4431,7 @@ Es el mismo patrón de todo el apunte: el modelo formal (red de Petri) y el cód
    b) Si $M_0 = (1, 2, 0)$, calculá $M_1$ tras disparar $T_1$ usando $M' = M + C(\cdot,T_1)$.
    c) ¿Está $T_1$ sensibilizada en $M_1$? ¿Y si $M_0$ fuera $(2, 5, 0)$, cuántas veces podría dispararse seguido?
 
-2. Modelá con una red de Petri el semáforo de 3 impresoras de la sección anterior (`new Semaphore(3)` + `freePrinters` + `lockPrinters`).
+2. Modelá con una red de Petri el semáforo de 3 impresoras del capítulo de semáforos (`new Semaphore(3)` + `freePrinters` + `lockPrinters`).
 
    a) Dibujá la red con 10 hilos y 3 recursos.
    b) Escribí el P-invariante que prueba que nunca hay más de 3 hilos imprimiendo.
@@ -3426,13 +4473,14 @@ Es el mismo patrón de todo el apunte: el modelo formal (red de Petri) y el cód
 
    a) Dibujá la red (mirá §1.5.4 del libro de la cátedra si te trabás).
    b) Escribí el invariante que garantiza que no hay lectores mientras escribe alguien.
-   c) Relacioná cada lugar y transición con el código del `ReentrantReadWriteLock` de la sección anterior.
+   c) Relacioná cada lugar y transición con el código del `ReentrantReadWriteLock` del capítulo de locks.
 
-9. Para la red del **problema de la barbería** con $n=2$ barberos y $m=3$ bancos:
+9. Para la red de la **barbería** de la cátedra (14 lugares, 10 transiciones):
 
-   a) Escribí el marcado inicial completo $M_0$ de los 7 lugares.
-   b) ¿Es un sifón el conjunto $\{$`bancos`, `esperando`$\}$? Justificá con la definición de $^{\bullet}P' \subseteq P'^{\bullet}$.
-   c) Si se agregan 2 barberos más ($n=4$) sin tocar $m$, ¿cambia el invariante de bancos? ¿Y el de barberos?
+   a) Escribí las columnas de $Pre$ y $Post$ de $T_0$, $T_2$ y $T_6$, y verificá con $C$ que el vector de pesos del invariante de peluqueros cumple $x^T C = 0$ en esas tres columnas.
+   b) ¿Es un sifón el conjunto $\{P_9, P_8\}$ (caja)? ¿Es una trampa? Justificá con las definiciones de $^{\bullet}P'$ y $P'^{\bullet}$.
+   c) Si se cambian los bancos a $m = 3$ y se agrega un tercer peluquero, ¿qué lugares y transiciones hay que agregar? ¿Qué invariantes cambian de constante y cuáles de forma?
+   d) Sacá el arco inhibidor $P_4 \multimap T_8$. Mostrá una secuencia de disparos que lleve a $M(P_4) = 2$, y explicá qué regla del enunciado se rompe.
 
 10. Para la red de exclusión mutua de dos procesos con un lugar `mutex` (sección de Introducción):
 
@@ -3445,6 +4493,603 @@ Es el mismo patrón de todo el apunte: el modelo formal (red de Petri) y el cód
     a) ¿Es persistente? Es decir: ¿puede una transición dejar de estar habilitada por el disparo de otra?
     b) ¿"producir" y "consumir" están en conflicto estructural? ¿Y en conflicto efectivo?
     c) Construí el árbol de cobertura si se **elimina** el lugar "libres" (dejando que "producir" dispare sin límite). ¿Aparece algún $\omega$?
+
+12. Clasificá cada red como grafo de estado, grafo de eventos, libre de conflicto, libre elección, libre elección extendida, simple, o ninguna, y justificá con la condición de la tabla de clases:
+
+    a) La red de exclusión mutua con lugar `mutex`.
+    b) El buffer acotado con exclusión mutua (productor/consumidor con `mutex`, `huecos` y `productos`).
+    c) La cena de los filósofos en la versión que toma los dos tenedores a la vez.
+
+13. Para la cena de los filósofos con **tres** filósofos:
+
+    a) Construí el grafo de marcas de la versión ingenua (tomar de a un tenedor) y señalá el deadlock.
+    b) Para la versión atómica, escribí los P-invariantes y demostrá con ellos que dos vecinos no comen a la vez.
+    c) ¿Hay sifones que puedan vaciarse en la versión ingenua? Relacionalo con el deadlock.
+
+14. Una red tiene $m_0 = (1, 0)$, una transición $T_1$ que es un bucle sobre $P_1$ y deposita una ficha en $P_2$, y una transición $T_2$ que consume de $P_1$ y no produce nada.
+
+    a) Construí el árbol de cobertura paso a paso, indicando qué regla (1, 2.1 o 2.2) aplicás en cada vértice.
+    b) ¿Qué lugares están acotados? ¿Hay deadlocks? ¿Cuántos?
+    c) Verificá con el criterio algebraico que la red **no** es estructuralmente acotada.
+
+# Redes de Petri con tiempo y ecuación de estado generalizada
+
+*(Basado en las filminas "Modelado e implementación de sistemas de tiempo real mediante redes de Petri con tiempo" —F. J. García Izquierdo— y en el paper de la cátedra "Ecuación de estado generalizada para redes de Petri no autónomas con distintos tipos de arcos y semánticas temporales", Micolini, Cebollada y Verdaguer, Eschoyez, Ventre y Schild, LAC-FCEFyN-UNC.)*
+
+Las redes autónomas dicen **qué** puede pasar, no **cuándo** ni **cuál** de varias cosas posibles. Para implementar un sistema real —y en particular uno de **tiempo real**— hay que reducir ese indeterminismo. Este capítulo junta las dos herramientas que usa la materia para eso: el **tiempo** asociado a las transiciones, y la **ecuación de estado generalizada**, que permite ejecutar una red con eventos, guardas, distintos tipos de arcos y tiempo con una sola fórmula, y que es la base del monitor del trabajo práctico.
+
+## Por qué redes de Petri para tiempo real
+
+Las redes de Petri tienen una gran base matemática que permite verificar propiedades de **vivacidad** (las cosas pasan) y de **corrección** (pasan de manera adecuada). Estudiarlas permite validar los requisitos **funcionales y temporales** del sistema en etapas tempranas, teniendo en cuenta la asignación de prioridades de la planificación: los comportamientos erróneos se detectan antes de la puesta a punto. Además, la red permite incluir en el modelo **elementos redundantes** que comprueben, en ejecución, el comportamiento del sistema, lo que facilita el mantenimiento y la prueba.
+
+###### **Formalismo e interpretación**
+Hay una familia de formalismos de RdP, de alto a bajo nivel. El formalismo matemático solo **no asocia significado** a los objetos: un lugar no tiene por qué ser un dato o un estado. La conexión con la realidad la da la **interpretación**. Las RdP autónomas son **semi-interpretadas**: los lugares describen variables de estado, las transiciones los transformadores de esos estados, y la regla de sensibilización/disparo describe el comportamiento dinámico.
+
+Las interpretaciones agregan restricciones, y con ellas **restringen** el comportamiento del modelo:
+
+- Si una transición modela la **finalización de una actividad**, puede haber restricciones temporales para su disparo una vez sensibilizada.
+- Si dos o más transiciones están en **conflicto**, su política puede indicar cómo resolverlo.
+
+## Grado de sensibilización y prioridad
+
+- **Grado de sensibilización** $E(t)$: el número de veces que una transición puede dispararse **concurrentemente** con el marcado actual (el grado de habilitación del capítulo de propiedades). Da lugar a dos semánticas: **servidor único** (aunque el grado sea mayor, la transición dispara de a una vez) o **servidor múltiple**.
+- **Redes con prioridad**: se asocia un entero positivo $\pi(t)$ a cada transición. Entre las transiciones que cumplen la condición de sensibilización, **sólo** se dispara la de mayor prioridad. La prioridad sirve para resolver conflictos.
+
+## Interpretaciones con tiempo
+
+Una red autónoma tiene dos fuentes de **indeterminismo**: no especifica **cuándo** se disparará una transición sensibilizada (ni siquiera si se disparará), y no especifica **cuál** de un grupo de transiciones en conflicto lo hará. Las interpretaciones con tiempo atacan la primera de distintas formas:
+
+- Las **estocásticas** (*Stochastic PN*) introducen una estimación probabilística del instante de disparo. No son admisibles para tiempo real, donde hace falta **garantizar** plazos, no promediarlos.
+- Las **temporizadas** (*Timed PN*) asocian un tiempo fijo.
+- Las *fuzzy-timing PN* acotan los instantes en que la transición puede o debe dispararse.
+
+###### **Tiempo de sensibilización vs tiempo de disparo**
+El parámetro temporal de una transición se puede interpretar de dos maneras, según se mantenga o no la **atomicidad** del disparo:
+
+| | Tiempo de **sensibilización** (*enabling time*) | Tiempo de **disparo** (*firing time*) |
+|---|---|---|
+| Qué mide | Lo que debe transcurrir desde que la transición queda sensibilizada **hasta** que dispara | Lo que transcurre entre la **retirada** de las fichas de entrada y la **colocación** de las de salida |
+| Disparo | **Atómico** e instantáneo: retirar y colocar se hace a la vez | **No atómico**: tres fases (retirar, disparar, colocar); el disparo tiene una "duración" (**semántica de duración**) |
+| Dónde esperan las fichas | En los lugares de entrada | "Adentro" de la transición |
+
+La segunda es un caso particular de la primera: se simula con *disparo inmediato de comienzo* + *lugar de actividad en curso* + *disparo de fin después de $n$ unidades*. Pero la semántica de tiempo de disparo **no permite modelar actividades interrumpibles** —una vez retiradas las fichas, nada puede abortar el disparo—, lo que la descalifica para tiempo real. Por eso se elige la semántica de **tiempo de sensibilización**.
+
+###### **Formas de especificar el tiempo**
+- **Redes con *delay***: el tiempo asociado al disparo representa la **duración** de la actividad que la transición finaliza; se puede hacer depender de *timestamps* o de colores de las fichas.
+- **Redes con tiempo**: se asocia a cada transición un **intervalo** que abarca todas las duraciones posibles de la actividad. Permite el análisis del **peor caso** y el cálculo de límites de tiempo de ejecución.
+
+###### **Semántica fuerte y débil**
+- **Fuerte** (*strong time semantics*): se indica en qué momento y con qué condiciones **se debe** disparar. Es la apropiada para tiempo real.
+- **Débil** (*weak time semantics*): la transición **no está obligada** a disparar, pero si lo hace, tiene que ser dentro del intervalo. Sirve para acciones que pueden ocurrir sólo durante un período pero que no necesariamente ocurren. Igualmente, eso se puede modelar con semántica fuerte agregando una transición **en conflicto** que aborte la posibilidad de ejecución, y esa alternativa es más clara.
+
+## Redes de Petri con Tiempo (RdPT)
+
+> **Definición**: una Red de Petri con Tiempo es una tupla $N = \langle P, T, Pre, Post, M_0, CIS \rangle$, donde $P$ y $T$ son conjuntos finitos y no vacíos de lugares y transiciones, $Pre, Post: P \times T \to \mathbb{N}$ son las funciones de incidencia, $M_0: P \to \mathbb{N}$ es el marcado inicial, y $CIS: T \to \mathbb{Q}^+ \times (\mathbb{Q}^+ \cup \{\infty\})$ es la **correspondencia de intervalos estáticos**, que asocia a cada transición un par $CIS(t_i) = [\alpha_i, \beta_i]$ con $0 \le \alpha_i \le \beta_i$.
+
+($\mathbb{Q}^+$ son los racionales positivos más el cero.)
+
+###### **Regla de disparo**
+Si la transición $t_i$ empieza a estar sensibilizada en el instante $\tau_i$ y **continúa** sensibilizada, su disparo se producirá **no antes** de $\tau_i + \alpha_i$ y **no más tarde** de $\tau_i + \beta_i$. El intervalo de disparos válidos es
+
+$$[\,\tau_i + \alpha_i,\ \tau_i + \beta_i\,]$$
+
+Las fichas permanecen en los lugares de entrada durante el tiempo necesario, y una vez que se produce el disparo, éste **no consume tiempo**: es instantáneo.
+
+###### **Casos particulares**
+- $\alpha_i$ es el **instante de disparo más cercano** (EFT, *earliest firing time*) y $\beta_i$ el **más lejano** (LFT, *latest firing time*).
+- **Intervalo puntual** $[\alpha, \alpha]$: transición con tiempo de sensibilización **fijo**.
+- **Intervalo sin restricción** $[0, \infty)$: es el formalismo **autónomo**. Por conveniencia, no suele dibujarse.
+
+###### **Estado de una RdPT**
+Para decidir si una transición puede dispararse ya no alcanza con el marcado: hace falta saber **cuánto tiempo** lleva sensibilizada. Por eso el estado es un par
+
+$$E = (M, I)$$
+
+con $M$ el marcado e $I$ el vector de intervalos de disparo posibles de **todas** las transiciones sensibilizadas por $M$.
+
+###### **Otros formalismos**
+- **TER** (*Time Environment/Relationship nets*): de alto nivel, parecidos a las coloreadas, más generales que las RdPT. Las fichas llevan un *timestamp* (variable `chronos`); el disparo está condicionado por el `chronos` de las fichas de entrada y produce el de las de salida según una expresión de la transición (todas las fichas producidas con el mismo valor, nunca menor que el mayor de las entradas).
+- **TB** (*Time Basic nets*): caso particular de las TER en el que lo único que guardan las fichas es `chronos`.
+
+El formalismo elegido es el de **RdPT**: es simple, adecuado para tiempo real, y otros formalismos temporales se pueden modelar con él (no alcanza para lo que requiere redes coloreadas). Para reducir todavía más el indeterminismo se le agregan **predicados** asociados a las transiciones (que dependen de datos del sistema no representados en la red) y **prioridades** para resolver conflictos; a las transiciones sin intervalo explícito se les supone $[0, \infty)$ (en algunos casos, $[0, 0]$).
+
+## Modelado de sistemas de tiempo real con RdPT
+
+En un sistema de tiempo real hay que representar sin ambigüedad: los **eventos** (internos y externos) a los que responde el sistema; sus **patrones temporales** (periodicidad o aperiodicidad); las **acciones** que disparan y sus características temporales (tiempo de cómputo en el mejor y peor caso); y las **interacciones** entre acciones (sincronización, comunicación, precedencia).
+
+###### **Tres tipos de transiciones**
+| Tipo | Representa | Etiqueta | Prioridad |
+|---|---|---|---|
+| **CODE** | La ejecución de un código o actividad, que comienza en el momento en que la transición se sensibiliza | $[\alpha, \beta]$: menor y mayor tiempo de ejecución | Relacionada con la **planificación** del sistema |
+| **TIME** | Una actividad temporal: un *timeout*, la activación periódica de un proceso | El intervalo en que se producirá el evento después de sensibilizarse; provoca acciones de **control** | Se usa para resolver conflictos |
+| **SYCO** | El resto: sin significado temporal explícito; sincronizaciones, eventos no temporales, excepciones | Implícita $[0, 0]$: disparo **inmediato** | Se usa para resolver conflictos |
+
+###### **Situaciones habituales**
+- **Ejecución de código secuencial**: una transición CODE con sus lugares de entrada, caracterizada por los tiempos mínimo y máximo. Ojo: **la ejecución de todos los elementos en su peor caso no equivale al peor caso del sistema completo**. En el ejemplo de la filmina, si la transición $T$ tarda su peor caso (10 u.t.) la red completa tarda 20 u.t., pero si tarda su mejor caso (4 u.t.) la red tarda **24** u.t.: un componente más rápido cambia qué otra rama termina siendo la crítica.
+- **Eventos de activación**: de **entorno** (vienen del exterior, por ejemplo interrupciones), **internos** (cambios de estado del propio sistema) y **temporales** (el paso del tiempo). Los temporales se caracterizan por su patrón de llegada: **periódico** (período $T$), irregular, **acotado** (separación mínima entre ocurrencias), en ráfaga, o no acotado.
+- **Activación periódica** y **aperiódica**: modelables con todas las interpretaciones temporales.
+- **Suspensión o aborto de una actividad**: *timeout* en ejecución (se abandona si no termina antes de un instante), **transferencia asíncrona de control** (se abandona si ocurre un evento) y *timeout* en una comunicación (para evitar una espera infinita). Las tres se modelan con una transición TIME **en conflicto** con la CODE de la actividad: la que dispare primero gana. Las tres **sólo** se pueden modelar con semántica de **tiempo de sensibilización**: con tiempo de disparo, la actividad no es interrumpible.
+
+###### **Restricciones del modelo**
+La filmina fija qué se admite: pesos de arco unitarios o enteros; arco inhibidor (sí o no); lugares limitados; que toda transición pueda dispararse al menos una vez (todas las partes del sistema ejecutables; las condiciones iniciales se modelan con un lugar en 1 y las de finalización con un lugar limitado en 1); el **grado de sensibilización** (1 para sistemas secuenciales sin código reentrante, 2 o más para código reentrante en paralelo); transiciones sin lugares de entrada que introducen fichas; y que cada lugar tenga **una sola** transición CODE de salida —un sistema no ejecuta simultáneamente dos códigos distintos— aunque puede tener varias TIME y SYCO.
+
+###### **Ejemplos**
+- **Fragmento de un sistema de tiempo real**: un proceso **periódico** ($T = 100$ u.t.) que adquiere un recurso para ejecutar un código CODE con *timeout* T.O.1 $= 75$ u.t., lo libera, y después se comunica con un segundo proceso sincronizándose en un *entry* A, con *timeout* T.O.2 $= 5$ u.t. La red se arma con tres "cajas": activación periódica, código y comunicación síncrona con *timeout*.
+- **Caso de estudio: la bomba de la mina.** Un sistema que bombea a la superficie el agua del sumidero de una mina, con el requisito de seguridad de que **la bomba no funcione si el nivel de metano es alto** (riesgo de explosión).
+  - **Requisitos funcionales**: accionamiento de la bomba (encender si el agua llega al nivel superior o lo pide el operador, y sólo si el metano está bajo el valor crítico; apagar en el nivel inferior), monitorización del entorno (metano, monóxido de carbono y flujo de aire, con alarma ante valores críticos), interacción con el operador (consola en superficie) y registro de todos los eventos.
+  - **Requisitos de tiempo** (período / plazo, en ms): sensor de CH₄ 80 / 30; sensor de CO 100 / 60; flujo de aire 100 / 100; flujo de agua 1000 / 40; detector de nivel de agua, esporádico, separación mínima 6000 / plazo 200. El sensor de flujo de agua confirma el estado real de la bomba con dos lecturas a los 960 y 1040 ms de apagarla. El plazo de parada ante metano es de 200 ms desde que supera el umbral. Al operador se le informa cada 1 s de CO y metano altos, y cada 2 s de flujo de aire bajo.
+  - La filmina muestra dos RdPT: la del **controlador de la bomba** (encendida, apagada, "no arrancar por gas", y deshabilitada mientras el metano esté alto, volviendo al estado anterior cuando baja) y la de la **lectura de sensores**, con los plazos de apagado y de información al operador, y un *timeout* que protege el acceso a cada dispositivo: si no responde, la lectura se suspende y se informa al operador.
+
+## Planificación, análisis e implementación
+
+- **Planificación**: el modelo teórico de concurrencia de las RdP supone **infinitos recursos** (todo lo que puede ejecutarse en paralelo, se ejecuta). La implementación tiene restricciones de **hardware** (procesadores, memoria), de **software** (*scheduling* del sistema operativo, primitivas de concurrencia y tiempo real del lenguaje) y de **prioridades** (hay que asignarlas para que se cumplan todos los requisitos de tiempo real). No se conocen trabajos de RdPT con prioridades dinámicas.
+- **Análisis**: ¿se cumplen todos los requisitos temporales? Los métodos se basan en técnicas **enumerativas** (el grafo de alcanzabilidad), pero con tiempo el número de estados (estado + instante) es enorme, e **infinito** en tiempo continuo. Se resuelve con **discretización** del tiempo o con el **grafo de clases de estados** (*State Class Graph*), que agrupa estados en clases.
+- **Implementación**: el software tiene que simular el disparo de las transiciones respetando la regla de evolución del marcado: determinar qué transiciones están sensibilizadas, disparar, y actualizar el marcado. Simplificaciones que se adoptan: **servidor único**, disparo **inmediato** de las SYCO, comienzo inmediato del código de las CODE, semántica de tiempo de sensibilización. Y una **política de resolución de conflictos**: primero las SYCO (instantáneas; entre varias, por prioridad); después CODE y TIME, disparando antes la que termina antes (tiempo de sensibilización menor), y ante igualdad, TIME es más prioritaria.
+- **Secuencial o concurrente**: la concurrencia en el disparo puede interpretarse como **entrelazado**, y entonces se puede implementar secuencialmente con procedimientos; pero en una implementación secuencial, el **orden** en que se disparan las transiciones concurrentes importa mucho para el comportamiento del modelo.
+
+## La ecuación de estado generalizada
+
+El paper de la cátedra parte de una observación: implementar sistemas concurrentes con semáforos penaliza el tiempo de ejecución y es difícil de verificar; en cambio, si el sistema está modelado con una RdP, se lo puede **ejecutar directamente**, en software o en hardware (un **procesador de Petri**, implementado como IP-Core en una FPGA). Para eso hace falta una forma **algebraica** de calcular el siguiente estado y las transiciones sensibilizadas que incluya **todo** lo que agrega semántica: eventos, guardas, arcos inhibidores, lectores y reset, y tiempo.
+
+###### **El punto de partida**
+La ecuación de estado de una red con $|P|$ plazas, $|T|$ transiciones y pesos enteros:
+
+$$m_{j+1} = m_j + I \cdot \sigma$$
+
+con $I = Post - Pre$ la matriz de incidencia ($|P| \times |T|$) y $\sigma$ el **vector de disparo** (un 1 en la transición que se dispara). Las transiciones **sensibilizadas** se calculan como un vector **binario** $E$ de dimensión $|T|$: para cada transición $t_j$ se calcula el estado que resultaría de dispararla, $m_j + I \cdot \sigma_j$ (la columna $j$ de $I$ sumada al marcado), y $E_j = 1$ si **ninguna** componente queda negativa, 0 si alguna lo hace. La matriz de incidencia se lee como una **evaluación conjuntiva**: cada columna (transición) contra las restricciones que imponen las filas (plazas).
+
+###### **Lo que se agrega**
+| Elemento | Semántica | Efecto sobre la sensibilización |
+|---|---|---|
+| **Arco inhibidor** $P_i \multimap T_j$ | $T_j$ **no** está sensibilizada si $P_i$ tiene fichas | Exige $m(P_i) = 0$ |
+| **Arco lector** | $T_j$ necesita fichas en $P_i$, pero su disparo **no las consume** | Exige $m(P_i) \ge 1$ |
+| **Arco reset** | El disparo de $T_j$ **pone en cero** a $P_i$ | No cambia la sensibilización; cambia el disparo |
+| **Guarda** | Variable lógica asociada a $T_j$, que comunica la red con el medio | Exige que la guarda sea verdadera |
+| **Evento** | Una **cola** (un contador) asociada a $T_j$, que se incrementa cuando llega un evento y se decrementa cuando $T_j$ dispara | Exige al menos un evento en la cola |
+| **Tiempo** | Un intervalo $[\alpha_j, \beta_j]$ y un cronómetro implícito que mide el tiempo desde que $T_j$ se sensibilizó | Exige que el cronómetro esté dentro del intervalo |
+
+Los arcos inhibidores y lectores, además, permiten modelar **prioridades**. Las guardas y los eventos son lo que hacen a la red **no autónoma**. Y como política de selección del disparo, el paper usa la de **servidor único**: se calcula el nuevo estado considerando un solo disparo; si hacen falta varios, se hace una secuencia. Si la elección entre sensibilizadas fuera aleatoria el sistema sería no determinista; para hacerlo determinista se usan prioridades, probabilidades, arcos inhibidores o lectores.
+
+###### **El vector de sensibilizado extendido**
+La idea central: todas las ampliaciones sólo cambian **cuáles transiciones están sensibilizadas**. Una vez elegida la transición, el disparo se hace con la ecuación original (salvo el reset). Así que se calcula un vector binario por cada tipo de restricción, con un 0 en las transiciones que esa restricción **des-sensibiliza** y un 1 en las demás:
+
+- $B$ (**inhibidores**): con $H$ la matriz binaria que indica qué plaza está unida a qué transición por un arco inhibidor, y $Q$ el vector con $q_i = 1$ si $m_i \ne 0$, $B$ tiene un 0 en cada transición con algún inhibidor desde una plaza marcada. En notación booleana, $B = \lnot(H^T \cdot Q)$.
+- $L$ (**lectores**): con $H_L$ la matriz binaria de arcos lectores y el vector $W$ con $w_i = 1$ si $m_i = 0$, $L$ tiene un 0 en cada transición que lee una plaza vacía: $L = \lnot(H_L^T \cdot W)$.
+- $G$ (**guardas**): directamente el valor de las guardas.
+- $V$ (**eventos**): 1 si la cola de la transición tiene al menos un evento.
+- $Z$ (**tiempo**): 1 si el contador de la transición está dentro de su intervalo. El contador arranca cuando la transición queda sensibilizada (y se pone en cero si no lo está), y avanza un paso por cada pulso de la base de tiempo; los límites inferior y superior de cada ventana están en una matriz de intervalos.
+
+El **vector de sensibilizado extendido** es la **conjunción lógica** de todos:
+
+$$E_x = E \wedge B \wedge L \wedge G \wedge V \wedge Z$$
+
+y la **ecuación de estado extendida** dispara con él, multiplicando elemento a elemento (#) por un vector $A$ que, para los arcos reset, convierte un disparo en tantos disparos como fichas haya que sacar de la plaza a resetear:
+
+$$m_{j+1} = m_j + I \cdot \big( (\sigma \wedge E_x) \;\#\; A \big)$$
+
+Su importancia práctica: es **lógica conjuntiva** pura, sin variables dentro de las matrices, así que se implementa directamente como un **circuito combinacional** en una FPGA (y, en software, como unas pocas operaciones vectoriales). Además es **modular**: cada tipo de arco, evento, guarda o tiempo es un vector más que se agrega a la conjunción.
+
+###### **Caso de aplicación del paper**
+Una máquina procesa tres tipos de trabajo, J1, J2 y J3. **J1 tiene prioridad** sobre J2 y J3, y para procesar un J3 tiene que haberse procesado **al menos un J2**. En la red: $t_0$, $t_1$, $t_2$ son las llegadas de pedidos (fichas en $p_0$, $p_1$, $p_2$); una ficha en $p_3$, $p_4$ o $p_5$ indica que el trabajo correspondiente se está haciendo; $t_6$, $t_7$, $t_8$ tienen etiqueta de **tiempo** (la duración de cada trabajo) y su disparo es la finalización; $p_6$ es la **máquina**; $p_7$ totaliza los trabajos hechos, y $t_9$, con un **arco reset** desde $p_7$, lo pone en cero. Según el paper, la **prioridad** de J1 se modela con **arcos inhibidores** y la **secuencia** entre J2 y J3 con **arcos lectores**. La implementación de la ecuación para este modelo necesita **seis** matrices; para redes grandes, la cátedra propone **dividir** la red según su localidad estructural para trabajar con matrices más chicas.
+
+## Del modelo al monitor
+
+El diagrama de secuencia "monitor con tiempo" de la carpeta (filminas 18 y PNG) muestra cómo se usa todo esto dentro del monitor del trabajo práctico. Cuando un hilo llama a `disparar()` sobre la red:
+
+1. La red pregunta `estaSensibilizado()` (con el vector de sensibilizadas) y, si la transición es temporal, `testVentanaTiempo()`: compara $\alpha < (\text{ahora} - \text{timeStamp}) < \beta$.
+2. **Dentro de la ventana y sin nadie esperando**: se puede disparar ($k = \text{true}$). Si ya hay un hilo esperando esa transición, $k = \text{false}$.
+3. **Antes de la ventana**: el hilo **libera el mutex** (`release()`), se marca como esperando, **duerme** `sleep(timeStamp + α − ahora)` —exactamente lo que falta para que se abra la ventana— y vuelve a intentar.
+4. **Después de la ventana**: $k = \text{false}$, no se dispara.
+5. Si $k$ es verdadero, se calcula el nuevo **vector de estado** con la ecuación de estado (estado $=$ estado $+$ columna de la matriz de incidencia), se recalculan las sensibilizadas y se actualizan los **timestamps** de las transiciones que acaban de sensibilizarse.
+
+El paso 3 es la clave de la semántica de tiempo de sensibilización: un hilo que llega **antes** del instante $\alpha$ no consume CPU ni bloquea a los demás —soltó el mutex— y no pierde su lugar: se despierta justo a tiempo.
+
+# Monitores
+
+*(Filminas "Programación Concurrente — Monitores" y diagramas de secuencia del monitor con red de Petri —filminas 18 y 19 de la carpeta y los dos PNG "monitor sin tiempo / con tiempo"—. Bibliografía de la filmina: M. del Mar Gallardo Melgarejo, "Comunicación y Sincronización con Monitores", Universidad de Málaga, 2002.)*
+
+> La noción de **monitor** fue presentada inicialmente por **Dijkstra** (1971), después por **Brinch Hansen** (1973), y refinada por **Hoare** (1974).
+
+Es el mecanismo que cierra la línea que empezó con el semáforo: el problema de los filósofos (1971) mostró lo difícil que es sincronizar bien con primitivas de bajo nivel, y eso llevó a buscar mecanismos de **alto nivel**.
+
+## Por qué no alcanza con semáforos
+
+Los semáforos son primitivas con las que es difícil expresar la solución de problemas de concurrencia grandes, y su presencia **aumenta** la ya existente dificultad para probar que los programas son correctos. Sus debilidades:
+
+- **La omisión de una sola primitiva** puede corromper la operación de todo el sistema concurrente: un `release()` olvidado, o un `acquire()` de más.
+- El control de la concurrencia es **responsabilidad del programador**.
+- Las primitivas de control están **esparcidas por todo el sistema**.
+
+Y en consecuencia:
+
+- Llevan fácilmente a **errores transitorios**, los que aparecen sólo en ciertos interleavings.
+- Cada sección crítica tiene que **empezar** con `wait()` y **terminar** con `signal()` (en Java, `acquire()`/`release()`), pero nada **restringe el tipo de operación** que se hace sobre el recurso entre medio.
+- Hay que acordarse de incluir **todas** las sentencias críticas dentro de la sección crítica.
+- La **exclusión mutua** y la **sincronización por condición** se implementan con las **mismas** primitivas, así que después cuesta distinguir cuál es cuál.
+- Los programas son difíciles de **mantener**: el código de sincronización está repartido entre los distintos procesos.
+
+###### **El ejemplo de la filmina: buffer acotado con semáforos**
+El productor/consumidor de la filmina usa los **tres semáforos** clásicos, y muestra al lado la red de Petri que modela (lugares *Productores*, *Consumidores*, *Buffer-Huecos*, *Buffer-Producto* y un *Mutex*):
+
+```java
+public interface BufferI {
+    public abstract void insert(Object item);   // inserta un ítem; puede ser bloqueante o no
+    public abstract Object remove();            // saca un ítem; puede ser bloqueante o no
+}
+
+public class Buffer implements BufferI {
+    private static final int BUFFER_SIZE = 3;   // tamaño máximo del arreglo
+    private int count;                           // cantidad de ítems en el buffer
+    private int in;                              // próxima posición libre
+    private int out;                             // primera posición ocupada
+    private Object[] buffer;
+    private Semaphore mutex;                     // acceso exclusivo al buffer
+    private Semaphore empty;                     // cuenta los lugares VACÍOS
+    private Semaphore full;                      // cuenta los lugares LLENOS
+
+    public Buffer() {
+        count = 0; in = 0; out = 0;
+        buffer = new Object[BUFFER_SIZE];
+        mutex = new Semaphore(1);                // 1 para exclusión mutua
+        empty = new Semaphore(BUFFER_SIZE);      // arranca con todos los lugares vacíos
+        full = new Semaphore(0);                 // arranca sin elementos
+    }
+
+    public void insert(Object item) {
+        try {
+            empty.acquire();     // ¿hay lugar? si no, el productor se bloquea
+            mutex.acquire();     // exclusión mutua sobre el arreglo
+        } catch (InterruptedException e) {
+            System.out.println("ERROR in insert(): " + e);
+        }
+        ++count;
+        buffer[in] = item;
+        in = (in + 1) % BUFFER_SIZE;             // buffer circular
+        System.out.println("Producer inserted \"" + item + "\" count=" + count
+            + ", in=" + in + ", out=" + out);
+        mutex.release();
+        full.release();          // hay un elemento más; despierta a un consumidor
+    }
+
+    public Object remove() {
+        Object item = null;
+        try {
+            full.acquire();      // ¿hay elementos? si no, el consumidor se bloquea
+            mutex.acquire();
+        } catch (InterruptedException e) {
+            System.out.println("ERROR in remove(): " + e);
+        }
+        --count;
+        item = buffer[out];
+        out = (out + 1) % BUFFER_SIZE;
+        System.out.println("Consumer removed \"" + item + "\" count=" + count
+            + ", in=" + in + ", out=" + out);
+        mutex.release();
+        empty.release();         // hay un lugar libre más; despierta a un productor
+        return item;
+    }
+}
+```
+
+```java
+public class Productor implements Runnable {
+    private Buffer buffer;
+    public Productor(Buffer b) { buffer = b; }
+
+    public void run() {
+        Date message;
+        while (true) {
+            System.out.println("Producer napping");
+            SleepUtilities.nap();
+            message = new Date();                       // produce un ítem
+            System.out.println("Producer produced \"" + message + "\"");
+            buffer.insert(message);
+        }
+    }
+}
+// Consumidor: simétrico, con message = (Date) buffer.remove();
+// SleepUtilities.nap(): duerme un tiempo aleatorio entre 0 y NAP_TIME = 5 segundos.
+// ThreadApp2: crea el Buffer compartido, un Productor y un Consumidor, y los arranca.
+```
+
+Funciona, y la correspondencia con la red es exacta: `empty` es el lugar *Huecos*, `full` es *Producto*, `mutex` es el lugar de exclusión mutua. Pero ilustra todos los problemas de la lista: el **orden** de los `acquire` importa (si se invierte `empty.acquire()` con `mutex.acquire()`, un productor puede bloquearse **con el mutex tomado** y el sistema entra en deadlock), y nada en el código distingue cuál semáforo es de exclusión mutua y cuál de sincronización por condición.
+
+## Qué buscamos: recursos compartidos
+
+La alternativa es razonar en términos de **recursos compartidos** especificados. Especificar un recurso compartido permite:
+
+- Definir la **interacción** entre procesos independientemente del lenguaje o técnica de programación.
+- Que la **comunicación** entre procesos se haga mediante las **operaciones** sobre el recurso compartido.
+- Que la **exclusión mutua** se produzca entre **todas** las operaciones del recurso.
+- Que la **sincronización por condición** se defina a través de las **precondiciones** (CPRE) de las operaciones del recurso: una operación sólo puede ejecutarse si su precondición se cumple.
+
+¿Cómo se implementa un recurso compartido especificado? Con métodos `synchronized`, con **monitores**, o con **paso de mensajes**.
+
+## Definición
+
+> Un **monitor** es un mecanismo de software, de **alto nivel**, para el control de concurrencia, que contiene los **datos** y los **procedimientos** necesarios para realizar la asignación de un determinado recurso, o grupo de recursos compartidos, reutilizables en serie.
+
+Un monitor contiene **variables** que representan el estado del recurso y **procedimientos** que implementan las operaciones sobre él. Se usa para manejar **todas** las funciones de concurrencia: la comunicación entre procesos y la localización física de los recursos en una región crítica. Dicho en términos de objetos: **un monitor es una instancia de una clase que puede ser usada de forma segura por múltiples hilos**.
+
+El monitor puede verse como una **aduana**: permite o no el acceso a un recurso compartido, o hace esperar por un trámite. Su código tiene dos partes lógicas: el **algoritmo** de manipulación del recurso y de sincronización, y el **mecanismo** que asigna el orden en que los procesos comparten el recurso o se sincronizan. Desde el punto de vista de los procesos activos, el monitor ofrece un conjunto de procedimientos para usar recursos compartidos y sincronizar actividades. Y se cumple que:
+
+- **Todos los métodos del monitor se ejecutan en exclusión mutua.**
+- Cada método tiene definida su **sincronización por condición**: **bloquear** a los procesos hasta que se cumplan las condiciones para ejecutar, y **notificar** (señalizar) a un proceso bloqueado que puede continuar cuando se cumplen sus condiciones.
+
+Una regla de diseño importante: para asegurar que un proceso obtenga el recurso que está esperando, el monitor tiene que darle **prioridad sobre los procesos nuevos** que piden entrar. Si no, los nuevos se llevan el recurso antes que el que esperaba, que puede quedar en **postergación indefinida** (inanición).
+
+###### **Elementos que lo componen**
+```
+Monitor nombre_monitor
+    var variables_locales;               // permanentes: el estado interno del recurso
+    export procedimientos_exportados;    // los que pueden llamar los procesos activos
+
+    procedure proc1(parametros)
+        var variables locales;
+    begin
+        // código del procedimiento
+    end
+
+    procedure proc2(parametros) ...
+
+begin
+    // código de inicialización (el constructor)
+end
+```
+
+- Un conjunto de **variables locales permanentes**, que almacenan el estado interno del recurso.
+- El **código de inicialización** (constructor).
+- Un conjunto de **procedimientos internos** que manejan las variables permanentes.
+- La **declaración** de los procedimientos **exportados**, los únicos que pueden invocar los procesos activos.
+
+###### **Gestión del acceso exclusivo**
+La exclusión mutua se basa en la **cola de entrada** del monitor:
+
+- Si un proceso está ejecutando un procedimiento del monitor (está "adentro") y otro proceso intenta ejecutar el mismo u otro procedimiento, el código de acceso **bloquea** la llamada y lo manda a la **cola**.
+- Cuando un proceso abandona el monitor, éste toma al proceso que está al frente de la cola y lo desbloquea.
+- Si la cola está vacía, el monitor queda **libre**.
+
+El responsable de garantizar la exclusión mutua es **el monitor**, no el programador: es la diferencia de fondo con los semáforos.
+
+## Variables de condición
+
+Cada proceso puede requerir una sincronización **distinta**, así que hay que programar cada caso: para eso están las **variables de condición**. Una variable de condición es un **contenedor de hilos** que esperan una determinada condición sobre el estado del monitor. El monitor permite que un hilo **ceda temporalmente** el acceso exclusivo mientras espera que se cumpla una condición, y lo **recupere** antes de seguir con su tarea.
+
+- **`wait`** sobre una condición: el proceso que la ejecuta queda **dormido** y pasa a la **cola asociada** a esa variable, esperando ser despertado. Al dormirse, **libera** el monitor.
+- **`signal`** sobre una condición:
+  - si la cola de la condición está **vacía**, no pasa nada y el proceso que señalizó sigue; al terminar, el monitor queda disponible para otro;
+  - si **no** está vacía, el primer proceso de la cola se **despierta** (se saca de la cola) pero **no avanza todavía**: qué pasa a continuación con el que señalizó y con el despertado **depende de la política** implementada.
+
+Es la diferencia con `wait`/`notify` de Java: en Java hay **una sola** condición implícita por objeto (su *wait set*), por eso hace falta `notifyAll()` y re-chequear con `while`. Un monitor con varias variables de condición —en Java, un `Lock` con varias `Condition`— puede despertar **exactamente** al tipo de proceso que corresponde.
+
+## Clasificación y políticas de señalización
+
+Los monitores se clasifican por la operación de señal:
+
+- **Señal explícita**: el monitor declara explícitamente las variables de señal (condición).
+- **Señal implícita**: monitor de señal **automática**, sin ninguna declaración: el propio monitor reevalúa las condiciones.
+
+Y, dentro de eso, por las **prioridades relativas** de las tres colas que intervienen: la **cola de entrada** (procesos que quieren entrar), la **cola de espera** de cada condición, y la **cola de señalización** o "de cortesía" (procesos que señalizaron y quedaron esperando). Las políticas que interesan:
+
+| Política | Qué pasa con el que **señaliza** | Qué pasa con el **despertado** |
+|---|---|---|
+| **Signal and Continue** (SC) | **Mantiene** el mutex y sigue ejecutando | Debe **competir** por el mutex: se mueve a la cola de entrada (no hace falta cola de cortesía) |
+| **Signal and Wait** (SW) | Se **bloquea**, y debe competir de nuevo por el mutex (va a la cola de entrada, por orden de llegada) | **Adquiere** el mutex y continúa de inmediato |
+| **Signal and Urgent Wait** (SU) | Se bloquea, pero en una cola especial (*s*) con **prioridad** sobre la de entrada: será el **primero** en recuperar el mutex cuando el despertado lo libere | Adquiere el mutex y continúa de inmediato |
+| **Signal and Exit** (SX) | **Sale** del método (el `signal` es lo último que hace) | Toma **directamente** el mutex y ejecuta |
+| **Wait and Notify** (la de Java) | Sigue (como SC) | Pasa a competir por el mutex |
+
+En SC, la filmina remarca que la cola de entrada tiene que dar **más prioridad** a los procesos que vienen desde una cola de condición que a los que esperan entrar por primera vez —la regla anti-inanición de la definición—. En SU hay entonces dos colas por monitor, $e$ (entrada) y $s$ (los que señalizaron), más una cola $c.q$ por cada variable de condición $c$; la variante **SW** es la misma sin cola $s$: el que señaliza espera en la de entrada.
+
+¿Por qué importa? Porque cambia **qué** puede suponer el despertado. Con **SW/SU/SX**, el despertado entra **inmediatamente** después del `signal`, así que la condición por la que esperaba **sigue siendo verdadera**: alcanza con un `if`. Con **SC** (y con Java), entre el `signal` y el momento en que el despertado consigue el mutex pueden entrar otros y cambiar el estado: hay que volver a chequear con `while`.
+
+## El monitor de la materia: un monitor guiado por una red de Petri
+
+El objetivo de la cátedra es resolver problemas de concurrencia que serían **muy difíciles con semáforos**, con un monitor que facilite identificar, separar y gestionar:
+
+- la **lógica** del sistema,
+- la **política** del sistema —que emerge de la relación entre las colas de entrada, de condición y de cortesía, y de las propias colas de condición—, y
+- las **acciones** que se ejecutan.
+
+Concretamente, hay que decidir: (1) una **estructura general** para los métodos que implementan acciones sobre el recurso compartido, (2) qué **condición** en las colas se requiere para los bloqueos, y (3) una **estrategia** para efectuar los desbloqueos cuando hay varios hilos candidatos.
+
+La solución es separar esas tres cosas en objetos distintos:
+
+| Componente | Responsabilidad |
+|---|---|
+| **Mutex** | La exclusión mutua de entrada al monitor (un semáforo binario) |
+| **Red de Petri** | La **lógica**: el estado (marcado), qué transiciones están sensibilizadas, y el disparo con la ecuación de estado |
+| **Colas** | Una **cola de condición por transición**: los hilos que quisieron disparar una transición no sensibilizada esperan ahí |
+| **Política** | La **estrategia**: cuando hay varios hilos que se pueden despertar, elige cuál |
+| **Monitor** (gestor) | Coordina a los demás; es el único punto de entrada para los hilos |
+
+Cada hilo del sistema ejecuta su tarea como una secuencia de **disparos de transiciones** (típicamente, la secuencia de un T-invariante), y cada disparo pasa por el monitor.
+
+###### **El algoritmo de `dispararTransicion` (monitor sin tiempo)**
+Es el diagrama de secuencia de la carpeta (filmina 19 y PNG "monitor sin tiempo"):
+
+1. El hilo llama a `dispararTransicion(t)` y el monitor hace `acquire()` sobre el **mutex**.
+2. Mientras el hilo intenta disparar (**loop**):
+   - El monitor pide a la red `intentarDisparo(t)`: si $t$ está sensibilizada, la red dispara y **actualiza el marcado**; si no, devuelve `false`.
+   - **Si el disparo fue exitoso**: el monitor obtiene de la red las **transiciones sensibilizadas** ($V_s$) y de las colas los **hilos esperando** ($V_c$, un vector con 1 en cada transición que tiene hilos en su cola). Calcula los **despertables**: $m = V_s \wedge V_c$.
+     - Si hay alguno ($m \ne 0$), le pide a la **política** que `seleccionarHilo(m)` (en el diagrama original, `cual()`), y **despierta** a ese hilo en su cola. El hilo actual **sale del monitor sin liberar el mutex**: el despertado **continúa con el control**. Es la política **Signal and Exit**: el mutex pasa "de mano en mano", y nadie de la cola de entrada puede colarse.
+     - Si no hay ninguno, el monitor hace `release()` del mutex: nadie que esté esperando puede continuar.
+   - **Si el disparo no fue exitoso** (la transición no estaba sensibilizada): el monitor libera el mutex y el hilo queda **bloqueado en la cola asociada a su transición** (`esperar(t)`). Cuando otro hilo lo despierte, vuelve al loop **ya con el mutex** (se lo pasaron) e intenta de nuevo.
+3. Cuando el disparo fue exitoso, el hilo sale del monitor y sigue con su tarea.
+
+```java
+// Esquema del monitor (estructura, no implementación completa)
+public boolean dispararTransicion(int t) throws InterruptedException {
+    mutex.acquire();
+    while (true) {
+        if (red.intentarDisparo(t)) {                        // dispara y actualiza el marcado
+            boolean[] despertables = and(red.sensibilizadas(), colas.quienesEstan());
+            if (hayAlguno(despertables)) {
+                int elegida = politica.cual(despertables);   // la política resuelve el conflicto
+                colas.despertar(elegida);                    // pasa el mutex: NO hago release
+            } else {
+                mutex.release();
+            }
+            return true;
+        } else {
+            mutex.release();
+            colas.esperar(t);   // bloquea en la cola de t; al despertar ya tiene el mutex
+        }
+    }
+}
+```
+
+Lo que se gana con esta estructura: la **corrección** de la sincronización queda en la red —que se puede **verificar** con invariantes, sifones, vivacidad, antes de escribir código—; la **política** queda aislada en un objeto, y se puede cambiar (prioridades, alternancia, equidad) sin tocar ni la red ni los hilos; y los hilos sólo saben **qué transiciones disparan**, nunca cómo se sincronizan. Es la respuesta a la lista de inconvenientes de los semáforos: la sincronización no está esparcida, no se puede omitir una primitiva, y la exclusión mutua es responsabilidad del monitor.
+
+Con **tiempo**, el monitor es el mismo, pero `intentarDisparo` también verifica la **ventana temporal** de la transición, y un hilo que llega antes de $\alpha$ suelta el mutex y duerme lo que falta: es el diagrama "monitor con tiempo", desarrollado al final del capítulo de RdP con tiempo.
+
+> [!question]- Actividad — Del buffer con semáforos al monitor
+> a) En el `Buffer` con semáforos, intercambiá el orden de `empty.acquire()` y `mutex.acquire()` en `insert`. Construí un escenario (con `BUFFER_SIZE = 3`) que lleve a deadlock, y señalá en la red de Petri equivalente qué cambió.
+> b) Modelá el mismo productor/consumidor como red para el monitor: ¿qué transiciones dispara el productor? ¿y el consumidor? ¿Cuál es el T-invariante de cada uno?
+> c) Si hay 2 productores y 2 consumidores, y en un momento hay un productor y un consumidor esperando y ambas transiciones quedan sensibilizadas, ¿quién decide a cuál se despierta? Proponé dos políticas distintas y explicá qué propiedad favorece cada una.
+> d) ¿Por qué en el esquema el hilo que despierta a otro **no** hace `release()`? ¿Qué podría pasar si lo hiciera?
+>
+> *Pista para (d): pensá en un tercer hilo que esté esperando en la cola de entrada del mutex, y en si la transición del despertado sigue sensibilizada cuando por fin le toca.*
+
+# Expresiones regulares en la práctica: verificar T-invariantes
+
+*(Filmina "Expresiones Regulares", Programación Concurrente 2021, Ventre. Los scripts y las corridas de ejemplo son propios y están verificados con Python 3.)*
+
+El capítulo de lenguajes formales presentó las expresiones regulares como **metalenguaje** para los lenguajes de tipo 3. Este capítulo es su uso práctico en la materia: como herramienta para **analizar el log** de una ejecución y comprobar que una red de Petri implementada con hilos cumplió con sus **T-invariantes**.
+
+## Expresiones regulares como herramienta
+
+> Una expresión regular es una **descripción compacta** que representa un lenguaje regular. En la práctica se usan para expresar **patrones de búsqueda** —combinaciones de caracteres— dentro de cadenas.
+
+Los lenguajes de programación (Python, Java, JavaScript) usan una sintaxis más rica que la de JFLAP, aunque describen los mismos lenguajes. Los **metacaracteres** son los que **no** se interpretan literalmente:
+
+$$[\ ]\quad \hat{}\quad \{\ \}\quad .\quad |\quad ?\quad *\quad +\quad (\ )\quad \backslash\quad \$$$
+
+| Metacarácter | Significado | Ejemplos |
+|---|---|---|
+| `[ ]` | Lista de caracteres posibles **en una posición** | `[abc]` alguno de `a`, `b`, `c`; `[a-z]` cualquiera entre `a` y `z`; `7[Pp][Mm]` → `7pm`, `7PM`, `7pM`… |
+| `[^ ]` | Un carácter que **no** esté en la lista | `[^ab]` cualquier carácter que no sea `a` ni `b` |
+| `{n}` / `{n,}` / `{n,m}` | Repetición: exactamente $n$ / al menos $n$ / entre $n$ y $m$ veces | `a{4}` → `aaaa` |
+| `.` | Cualquier carácter, **salvo** el salto de línea (comodín) | `T.` → `T0`, `T1`, `Tx`… |
+| `\|` | Alternativa (el "o"; en JFLAP era `+`) | `T1\|T2` |
+| `( )` | Agrupa (y **captura** lo que coincidió) | `(abc)+` |
+| `\` | Escapa un metacarácter para usarlo literal | `\.` un punto |
+| `^` / `$` | Comienzo / fin de la cadena (o de la línea) | `^T0` |
+
+###### **Cuantificadores**
+| Cuantificador | Coincide | Equivale a |
+|---|---|---|
+| `?` | Cero o una vez | `{0,1}` |
+| `*` | Cero o más veces | `{0,}` |
+| `+` | Una o más veces | `{1,}` |
+
+Por ejemplo, `(abc)+` es una o más veces la cadena `abc`, y `(a|b)*` es cero o más veces `a` o `b`. Ojo con el cambio de notación respecto de la teoría y de JFLAP: acá `+` es el **cierre positivo**, no la unión.
+
+###### **Codicioso vs perezoso (*greedy* vs *lazy*)**
+Los cuantificadores `*`, `+` y `?` son **codiciosos**: coinciden con la **mayor** cantidad de texto posible. Con el patrón `<.*>` sobre la cadena `<a>b<c>`, el resultado es **toda** la cadena, no `<a>`: el `.*` se come todo lo que puede y retrocede sólo lo necesario para que el `>` final coincida.
+
+Poniendo un `?` **después** de un cuantificador, su comportamiento pasa a ser **perezoso** (*lazy*, o mínimo): coincide con la **menor** cantidad posible. Con `<.*?>` sobre `<a>b<c>`, el resultado es `<a>`. Para analizar logs, esta diferencia es todo: un `.*` codicioso entre dos transiciones salta por encima de invariantes enteros.
+
+###### **Herramientas**
+- **Python**: el módulo `re` (https://docs.python.org/es/3/library/re.html). Funciones a conocer: `re.match` (coincidencia al **principio** de la cadena), `re.search` (la primera coincidencia en **cualquier** posición), `re.sub` (reemplaza todas las coincidencias) y `re.subn` (igual, pero devuelve también **cuántos** reemplazos hizo).
+- Para **ver** gráficamente una expresión como autómata: Debuggex (https://www.debuggex.com/), la herramienta de las capturas de la filmina.
+- Para probar expresiones: Regex101 (https://regex101.com/) y RegExr (https://regexr.com/). Sobre *greedy* y *lazy*: https://javascript.info/regexp-greedy-and-lazy
+
+## Expresiones regulares y redes de Petri
+
+###### **El problema**
+La filmina usa como ejemplo un **productor/consumidor con buffer acotado y múltiples agentes**: la red tiene lugares para los *Productores* y los *Consumidores* (con varias fichas cada uno: varios agentes), los *huecos* y los *productos* del buffer, y un *mutex*. Cada productor recorre $T_0 \to T_1 \to T_2$ (con $T_1$ depositando en *productos*) y cada consumidor $T_3 \to T_4 \to T_5$ (con $T_3$ tomando de *productos*). El análisis de invariantes de PIPE da un **único T-invariante**:
+
+| $T_0$ | $T_1$ | $T_2$ | $T_3$ | $T_4$ | $T_5$ |
+|---|---|---|---|---|---|
+| 1 | 1 | 1 | 1 | 1 | 1 |
+
+y PIPE agrega: *"The net is covered by positive T-Invariants, therefore it might be bounded and live"*. Es decir: un ciclo completo es un productor **y** un consumidor completando su trabajo —sólo el productor no devuelve la red al marcado de partida, porque pasó una ficha de *huecos* a *productos*—.
+
+La pregunta: si se implementa esa red con hilos (cada hilo dispara su secuencia de transiciones a través del monitor) y se registra en un **log** cada transición disparada, **¿cómo se puede asegurar que, después de $n$ disparos, la ejecución cumplió con los T-invariantes?** Por la ecuación fundamental, si el log se puede **descomponer** en invariantes completos, la red volvió al marcado inicial; si sobran transiciones, sobra un "pedazo" de invariante en curso —o hubo un disparo que no debería haber ocurrido—.
+
+###### **El método**
+Escribir un script (por ejemplo en Python) que lea el log —un archivo de texto con las transiciones, como `T0T1T3T0T4...`— y lo procese con una expresión regular que reconozca un invariante **completo**, aunque esté **intercalado** con transiciones de otros. Las transiciones intercaladas se capturan con `(.*?)` **perezosos** y se conservan; el invariante reconocido se borra; y se repite hasta que no haya más coincidencias.
+
+**Importante** (lo remarca la filmina): si la red tiene **más de un T-invariante**, hay que agruparlos en **una sola** expresión regular.
+
+###### **Por qué una sola expresión**
+Supongamos una red con dos invariantes que **comparten su transición inicial**: $T_0T_1T_2$ y $T_0T_2T_3$. Si se busca primero el invariante 1 con una regex y después el 2 con otra, se corre el riesgo de asignarle a un invariante transiciones que pertenecían al otro. La filmina lo plantea con el log sintético `T0T1T0T2T0T1T0T2T2T3T2T3`; un ejemplo más corto donde se ve el error:
+
+```python
+import re
+
+def quitar(patron, log):
+    """Borra invariantes completos hasta que no haya más; conserva lo intercalado."""
+    total = 0
+    while True:
+        log, n = patron.subn(lambda m: "".join(g for g in m.groups() if g), log)
+        if n == 0:
+            return log, total
+        total += n
+
+log = "T0T2T0T1T2T3"     # válido: T0 T2 ... T3 (inv. 2) con T0 T1 T2 (inv. 1) en el medio
+
+inv1 = re.compile(r"T0(.*?)T1(.*?)T2")
+inv2 = re.compile(r"T0(.*?)T2(.*?)T3")
+resto, a = quitar(inv1, log)
+resto, b = quitar(inv2, resto)
+print(a, b, resto)       # 1 0 'T2T0T3'  ->  ¡falso error!
+
+unica = re.compile(r"T0(.*?)(?:T1(.*?)T2|T2(.*?)T3)")
+print(quitar(unica, log))  # ('', 2)    ->  correcto
+```
+
+Con regex **separadas**, la del invariante 1 toma el primer `T0`, salta por encima del `T2` y del segundo `T0` hasta encontrar `T1`, y se lleva el `T2` siguiente: le "robó" el `T0` al invariante 2. Lo que queda, `T2T0T3`, ya no es un invariante, y el script informa un error que no existe. Con **una sola** expresión, el motor prueba las alternativas **a cada largo** del hueco perezoso: apenas después del primer `T0` encuentra un `T2`, así que reconoce primero el invariante 2 (con `T0T1T2` intercalado adentro), y la siguiente pasada reconoce el 1. La conclusión de la filmina: **una sola regex con todos los caminos posibles** (los invariantes o sus combinaciones).
+
+###### **Las combinaciones del mismo invariante**
+El segundo problema es que **un mismo** invariante puede aparecer en el log en **distinto orden**. En el productor/consumidor, el consumidor puede empezar en cuanto hay un producto, o sea después de $T_1$; así que el $T_2$ del productor puede quedar **antes**, **entre** o **después** de $T_3$, $T_4$ y $T_5$. La filmina lo construye en Debuggex por pasos ("¿es posible alguna otra combinación del mismo invariante?… ¡No de nuevo!"), agregando una alternativa cada vez, hasta cubrir todas:
+
+```python
+import re
+
+# T0 T1 y después: T2 T3 T4 T5 | T3 T2 T4 T5 | T3 T4 T2 T5 | T3 T4 T5 T2
+PATRON = re.compile(
+    r"T0(.*?)T1(.*?)"
+    r"(?:T2(.*?)T3(.*?)T4(.*?)T5"
+    r"|T3(.*?)(?:T2(.*?)T4(.*?)T5"
+    r"|T4(.*?)(?:T2(.*?)T5"
+    r"|T5(.*?)T2)))"
+)
+
+def quitar_invariantes(log):
+    total = 0
+    while True:
+        log, n = PATRON.subn(lambda m: "".join(g for g in m.groups() if g), log)
+        if n == 0:
+            return log, total
+        total += n
+
+with open("log.txt") as f:
+    resto, n = quitar_invariantes(f.read().strip())
+print(f"Invariantes completos: {n}")
+print(f"Transiciones sobrantes: '{resto}'")
+```
+
+Probado con algunos logs:
+
+| Log | Invariantes | Resto |
+|---|---|---|
+| `T0T1T2T3T4T5` | 1 | (vacío) |
+| `T0T1T3T4T5T2` | 1 | (vacío) |
+| `T0T1T0T3T2T1T4T3T5T2T4T5` (dos intercalados) | 2 | (vacío) |
+| `T0T1T3T4T5T2T0T1` (un ciclo en curso al cortar) | 1 | `T0T1` |
+
+Si el resto no está vacío, hay que poder explicarlo: transiciones de invariantes que quedaron **a medias** cuando se cortó la ejecución (como el `T0T1` del último caso), y nada más. Cualquier otra cosa indica que se disparó una transición fuera de lugar.
+
+Dos cuidados prácticos. Primero, la regex tiene que ser **perezosa** en todos los huecos: un `.*` codicioso se saltearía invariantes enteros. Segundo, con más de 10 transiciones, `T1` coincide también con el comienzo de `T10`, `T11`…: hay que usar un separador en el log (`T1-T10-…`) o anclar el número, por ejemplo `T1(?!\d)`.
+
+> [!question]- Actividad — Escribir la regex de un invariante
+> a) Para la red de exclusión mutua de la Introducción (dos procesos que entran y salen de la sección crítica con un `mutex`), ¿cuáles son los T-invariantes? Escribí **una sola** regex que los reconozca intercalados.
+> b) Probá el script con el log `T0T2T1T3` y con `T0T0T1T1`. ¿Qué resto queda en cada caso? ¿Alguno de los dos logs es imposible para la red? ¿Lo detecta el script?
+> c) Explicá por qué, en el productor/consumidor, no hace falta una alternativa con `T3` **antes** de `T1`.
+>
+> *Pista para (c): mirá qué lugar es la entrada de $T_3$ y qué transición le pone fichas.*
 
 # Bibliografía
 
@@ -3460,15 +5105,28 @@ Es el mismo patrón de todo el apunte: el modelo formal (red de Petri) y el cód
 - Cátedra — *Redes de Petri*, Case #1, Programación Concurrente, 2020/2026.
 - Cátedra — *Redes de Petri: Properties of Petri Nets (Case #2, con el problema de la barbería)*, Programación Concurrente.
 - Cátedra — *Java: Conceptos Básicos*, 2024.
+- Ventre, L. O.; Ludemann, M. — *Thread Factory, Executors*, Programación Concurrente, 2024.
+- Cátedra — *Monitores*, Programación Concurrente (con los diagramas de secuencia del monitor con red de Petri, con y sin tiempo).
+- Ventre, L. O. — *Expresiones Regulares*, Programación Concurrente, 2021.
+- García Izquierdo, F. J. — *Modelado e Implementación de Sistemas de Tiempo Real Mediante Redes de Petri con Tiempo* (filminas "Redes de Petri Temporales").
+- Diagramas de secuencia y de clases de la cátedra: monitor con red de Petri (sin y con tiempo), `Cinema`, `PrintQueue` con semáforo, y el ejemplo de hilos daemon (`WriterTask`/`CleanerTask`).
+
+> Las filminas están en `Filmimas/` como PDFs numerados. Hay duplicados: 3 = 8 (Ejercicio 1 / CreacionHilo), 4 = 7 (Java básico), 11 = 13 (Petri Case 1), 14 = 20 (Petri Case 2), y 2 / 6 son UML 2020 / 2025 (mismo contenido).
 
 ###### **Libros de referencia**
 - Stallings, W. — *Operating Systems: Internals and Design Principles*, 6.ª ed. — cap. 3 (Process Description and Control), cap. 4 (Threads, SMP and Microkernels), cap. 5 (Concurrency: Mutual Exclusion and Synchronization), cap. 6 (Concurrency: Deadlock and Starvation). Hay además la 5.ª ed. en español.
 - Palma Méndez, J. T. et al. — *Programación Concurrente*.
-- Fernández González, J. — *Java 7 Concurrency Cookbook* — cap. 1 (Thread Management), cap. 2 (Basic Thread Synchronization), cap. 3 (Thread Synchronization Utilities). También la 2.ª ed., *Java 9 Concurrency Cookbook*.
+- Fernández González, J. — *Java 7 Concurrency Cookbook* — cap. 1 (Thread Management, incluida la recipe 10 de `ThreadFactory`), cap. 2 (Basic Thread Synchronization), cap. 3 (Thread Synchronization Utilities), cap. 4 (Thread Executors). También la 2.ª ed., *Java 9 Concurrency Cookbook*, que es la de varias capturas.
 - Diaz, M. (ed.) — *Petri Nets: Fundamental Models, Verification and Applications* — cap. 1 (Basic Semantics; §1.5 modelos básicos), cap. 3 (Analysis Methods; §3.3 invariantes lineales, §3.5.2 máquinas de estado, §3.5.3 grafos de eventos).
 - David, R.; Alla, H. — *Discrete, Continuous and Hybrid Petri Nets* (de donde viene la terminología de redes autónomas / no autónomas, sincronizadas y temporizadas).
 - Ben-Ari, M. — *Principles of Concurrent and Distributed Programming*, 2.ª ed. (interleaving, sección crítica).
 - Dijkstra, E. W. — *Cooperating Sequential Processes*, 1968, y *A Discipline of Programming*, 1976; archivo EWD completo en http://www.cs.utexas.edu/users/EWD/
+- Micolini, O.; Cebollada y Verdaguer, M.; Eschoyez, M.; Ventre, L. O.; Schild, M. I. — *Ecuación de estado generalizada para redes de Petri no autónomas con distintos tipos de arcos y semánticas temporales*, Laboratorio de Arquitectura de Computadoras, FCEFyN-UNC (filmina 24 de la carpeta).
+- Gallardo Melgarejo, M. del M. — *Comunicación y Sincronización con Monitores*, notas de clase de Programación Concurrente, Universidad de Málaga, 2002.
+- Hoare, C. A. R. — *Monitors: An Operating System Structuring Concept*, Communications of the ACM, 1974.
+- Merlin, P. M. — *A Study of the Recoverability of Computing Systems*, University of California, 1974 (origen de las redes de Petri con tiempo por intervalos).
+- Schruben, L. — *Event Graph Modeling* (grafos de eventos para simulación de eventos discretos).
+- PIPE — *Platform Independent Petri net Editor*, la herramienta de análisis que usa la cátedra.
 
 ###### **Lenguajes formales y autómatas**
 - Jurado Málaga, E. — *Teoría de autómatas y lenguajes formales*, 2008. (Bibliografía citada por la filmina.)
@@ -3484,3 +5142,4 @@ Es el mismo patrón de todo el apunte: el modelo formal (red de Petri) y el cód
 - Fowler, M. — *UML Distilled*, 3.ª ed., caps. 1, 3 y 4.
 - OMG — *Unified Modeling Language Specification*, v2.5.1 (fragmentos combinados).
 - Oracle — API de Java SE 8: https://docs.oracle.com/javase/8/docs/api/ · JEP 444 (Virtual Threads) · JEP 453 (Structured Concurrency).
+- Python — módulo `re`: https://docs.python.org/es/3/library/re.html · Debuggex: https://www.debuggex.com/ · Regex101: https://regex101.com/ · RegExr: https://regexr.com/
