@@ -11,3 +11,21 @@ Animaciones/voces_prueba/*.mp3
 Animaciones/voces_prueba/nombres/
 Animaciones/sfx/
 Animaciones/musica/
+
+# Ejercicios: clases compiladas
+Ejercicios/**/out/
+
+# Material binario (filminas, libros, fotos y PDF de parciales): se guarda sólo en disco.
+# Las preguntas de los parciales están transcriptas en "Parciales/Preguntas de parciales.md".
+# Los diagramas .svg del apunte (Apuntes/img) sí se versionan.
+*.pdf
+*.PDF
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.webp
+*.heic
+*.bmp
+*.ppt
+*.pptx
