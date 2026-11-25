@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bolillero del coloquio</title>
+<style>
+:root {
+  --bg: #f6f5f1; --card: #ffffff; --ink: #1d1d1b; --muted: #6b6a64; --line: #e3e1da;
+  --accent: #2f5bd3; --accent-soft: #e8eefc; --ok: #1f7a4a; --ok-soft: #e3f3ea;
+  --mid: #9a6700; --mid-soft: #fbf1d9; --bad: #b3261e; --bad-soft: #fbe7e5; --code: #f0eee8;
+  --on-accent: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141413; --card: #1f1f1d; --ink: #ecebe6; --muted: #a09f98; --line: #34332f;
+    --accent: #8aa8ff; --accent-soft: #232b44; --ok: #6fd29b; --ok-soft: #1b3326;
+    --mid: #e8c068; --mid-soft: #3a3120; --bad: #ff8a80; --bad-soft: #3a1f1d; --code: #2a2a27;
+    --on-accent: #10131c;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141413; --card: #1f1f1d; --ink: #ecebe6; --muted: #a09f98; --line: #34332f;
+  --accent: #8aa8ff; --accent-soft: #232b44; --ok: #6fd29b; --ok-soft: #1b3326;
+  --mid: #e8c068; --mid-soft: #3a3120; --bad: #ff8a80; --bad-soft: #3a1f1d; --code: #2a2a27;
+  --on-accent: #10131c;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink);
+  font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+.wrap { max-width: 880px; margin: 0 auto; padding: 24px 16px 80px; }
+h1 { font-size: 1.6rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+.sub { color: var(--muted); margin: 0 0 18px; }
+code { background: var(--code); padding: 1px 5px; border-radius: 4px; font-size: .92em;
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace; }
+button { font: inherit; cursor: pointer; }
+button:disabled { cursor: default; opacity: .5; }
+.btn { border: 1px solid var(--line); background: var(--card); color: var(--ink);
+  padding: 7px 12px; border-radius: 8px; font-size: .9rem; }
+.btn:hover:not(:disabled) { border-color: var(--accent); }
+.btn.primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent); font-weight: 600; }
+.themebtn { float: right; }
+
+/* ---------- Cómo practicar ---------- */
+details.guia { background: var(--card); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 18px; }
+details.guia > summary { cursor: pointer; padding: 10px 14px; font-weight: 600; }
+details.guia ol { margin: 0; padding: 0 18px 14px 36px; display: grid; gap: 6px; font-size: .95rem; }
+
+/* ---------- Bolillero ---------- */
+.bombo-box { display: grid; grid-template-columns: 230px 1fr; gap: 24px; align-items: center;
+  background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px; margin-bottom: 22px; }
+@media (max-width: 640px) { .bombo-box { grid-template-columns: 1fr; } #bombo { max-width: 210px; margin: 0 auto; } }
+#bombo { width: 100%; height: auto; display: block; }
+#bombo .aro { fill: var(--bg); stroke: var(--ink); stroke-width: 3; }
+#bombo .reja { stroke: var(--line); stroke-width: 1.5; }
+#bombo .soporte { stroke: var(--muted); stroke-width: 6; stroke-linecap: round; fill: none; }
+#bombo .manija { stroke: var(--ink); stroke-width: 4; stroke-linecap: round; fill: none; }
+#bombo .perilla, #bombo .eje { fill: var(--ink); }
+#bombo .bola circle { fill: var(--accent); stroke: var(--card); stroke-width: 1.5; }
+#bombo .bola text { fill: var(--on-accent); font: 700 13px system-ui, sans-serif; text-anchor: middle; dominant-baseline: central; }
+.tambor { transform-box: view-box; transform-origin: 120px 120px; }
+.tambor.girando { animation: girar 1.4s cubic-bezier(.3, .05, .25, 1); }
+@keyframes girar { from { transform: rotate(0deg); } to { transform: rotate(720deg); } }
+@media (prefers-reduced-motion: reduce) { .tambor.girando { animation: none; } .bigball { animation: none !important; } }
+
+.field { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+.lbl { font-size: .92rem; color: var(--muted); }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; background: var(--card); color: var(--ink); padding: 6px 16px; font-weight: 600; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button.on { background: var(--accent); color: var(--on-accent); }
+.tpcheck { display: flex; gap: 8px; align-items: center; font-size: .95rem; margin-bottom: 14px; cursor: pointer; }
+.tpcheck input { accent-color: var(--accent); width: 16px; height: 16px; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.estado { margin: 4px 0 6px; font-size: .92rem; color: var(--muted); }
+.salidas { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: .85rem; color: var(--muted); }
+.chipball { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--accent); color: var(--accent);
+  background: transparent; font-size: .78rem; font-weight: 700; padding: 0; display: grid; place-items: center; }
+.chipball:hover { background: var(--accent-soft); }
+
+/* ---------- Resultado ---------- */
+.sacadas { display: flex; gap: 12px; align-items: center; margin: 0 0 14px; flex-wrap: wrap; }
+.sacadas .lbl { margin-right: 2px; }
+.bigball { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--accent);
+  background: radial-gradient(circle at 34% 30%, color-mix(in srgb, var(--accent) 50%, #ffffff), var(--accent) 62%);
+  color: var(--on-accent); font-weight: 800; font-size: 1.35rem; box-shadow: 0 2px 6px rgba(0, 0, 0, .2);
+  animation: caer .55s cubic-bezier(.2, .9, .3, 1.3) both; }
+.bigball.tp { background: var(--mid); font-size: 1.05rem; }
+@keyframes caer { from { transform: translateY(-34px) scale(.5); opacity: 0; } to { transform: none; opacity: 1; } }
+.vacio { text-align: center; color: var(--muted); padding: 26px 18px; border: 1px dashed var(--line); border-radius: 14px; margin-bottom: 18px; }
+
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px 18px 14px; margin-bottom: 18px; }
+.card.completa { border-color: var(--ok); box-shadow: 0 0 0 1px var(--ok) inset; }
+.chead { display: flex; gap: 14px; align-items: center; margin-bottom: 4px; }
+.chead h2 { margin: 0; font-size: 1.2rem; line-height: 1.3; }
+.chead .sub { margin: 2px 0 0; font-size: .95rem; }
+.ball { flex: 0 0 auto; width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--accent); color: var(--on-accent); font-weight: 800; }
+.ball.tp { background: var(--mid); color: var(--card); font-size: .85rem; }
+.ball.sm { width: 28px; height: 28px; font-size: .8rem; }
+.card h3 { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 18px 0 6px; }
+.ctitle { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.ctitle h3 { margin-bottom: 6px; }
+.count { font-size: .85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.count.ok { color: var(--ok); font-weight: 700; }
+ol.check { margin: 0; padding: 0; list-style: none; counter-reset: it; display: grid; gap: 6px; }
+ol.check li { counter-increment: it; border: 1px solid var(--line); border-radius: 9px; padding: 8px 10px; }
+ol.check li.hecho { border-color: var(--ok); background: var(--ok-soft); }
+.item { display: flex; gap: 8px; align-items: flex-start; }
+.item label { display: flex; gap: 8px; flex: 1; cursor: pointer; align-items: flex-start; }
+.item label::before { content: counter(it) "."; color: var(--muted); font-weight: 700; min-width: 1.3em; text-align: right; }
+.item input { margin-top: 5px; accent-color: var(--ok); flex: 0 0 auto; }
+.hintbtn { flex: 0 0 auto; border: 1px solid var(--line); background: transparent; color: var(--accent);
+  border-radius: 999px; font-size: .78rem; padding: 2px 10px; margin-top: 1px; }
+.hintbtn[aria-expanded="true"] { background: var(--accent-soft); border-color: var(--accent); }
+.hint { margin: 8px 0 2px 2.9em; font-size: .93rem; background: var(--accent-soft); border-left: 3px solid var(--accent);
+  padding: 8px 10px; border-radius: 0 8px 8px 0; }
+.warn { background: var(--mid-soft); border-left: 3px solid var(--mid); padding: 9px 12px; border-radius: 0 8px 8px 0; font-size: .95rem; }
+.engancha { background: var(--ok-soft); border-left: 3px solid var(--ok); padding: 9px 12px; border-radius: 0 8px 8px 0; font-size: .95rem; margin: 0; }
+ul.ap { margin: 0; padding-left: 20px; font-size: .92rem; color: var(--muted); }
+.rp { display: grid; gap: 6px; }
+.rp details { border: 1px solid var(--line); border-radius: 9px; padding: 8px 10px; }
+.rp summary { cursor: pointer; font-weight: 600; font-size: .95rem; }
+.rp details p { margin: 8px 0 2px; font-size: .93rem; }
+.row-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+
+/* ---------- Todas las bolillas ---------- */
+.todas h2 { font-size: 1.25rem; margin: 30px 0 4px; }
+details.entrada { background: var(--card); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 8px; }
+details.entrada > summary { list-style: none; display: flex; gap: 12px; align-items: center; padding: 9px 14px; cursor: pointer; font-weight: 600; }
+details.entrada > summary::-webkit-details-marker { display: none; }
+details.entrada > summary::after { content: "▸"; margin-left: auto; color: var(--muted); transition: transform .15s; }
+details.entrada[open] > summary::after { transform: rotate(90deg); }
+details.entrada[open] > summary { border-bottom: 1px solid var(--line); }
+details.entrada .card { border: 0; box-shadow: none; margin: 0; border-radius: 0 0 12px 12px; }
+
+/* ---------- Mapa conceptual ---------- */
+dialog#dlgmapa { width: min(1240px, 96vw); max-width: 96vw; max-height: 94vh; padding: 0;
+  border: 1px solid var(--line); border-radius: 14px; background: var(--bg); color: var(--ink); }
+dialog#dlgmapa::backdrop { background: rgba(0, 0, 0, .5); }
+.dlghead { position: sticky; top: 0; z-index: 2; display: flex; justify-content: space-between; align-items: flex-start;
+  gap: 12px; padding: 12px 16px; background: var(--bg); border-bottom: 1px solid var(--line); }
+.dlghead h2 { margin: 0; font-size: 1.05rem; }
+.dlghead p { margin: 2px 0 0; font-size: .88rem; color: var(--muted); }
+.mapawrap { overflow: auto; padding: 10px 12px 16px; }
+#mapa { display: block; width: 100%; min-width: 980px; height: auto; }
+#mapa .zona rect { stroke: var(--line); stroke-width: 1.5; }
+#mapa .z-problema rect { fill: var(--bad-soft); }
+#mapa .z-modelar rect { fill: var(--accent-soft); }
+#mapa .z-implementar rect { fill: var(--mid-soft); }
+#mapa .z-verificar rect { fill: var(--ok-soft); }
+#mapa .zona text { fill: var(--muted); font: 800 13px system-ui, sans-serif; letter-spacing: .08em; }
+#mapa .nodo rect { fill: var(--card); stroke: var(--line); stroke-width: 1.5; }
+#mapa .nodo text { fill: var(--ink); font: 500 12.5px system-ui, sans-serif; text-anchor: middle; dominant-baseline: central; }
+#mapa .nodo.centro rect { fill: var(--ink); stroke: var(--ink); }
+#mapa .nodo.centro text { fill: var(--bg); font-weight: 800; font-size: 14px; }
+#mapa .nodo.estp rect { fill: var(--card); stroke: var(--mid); stroke-width: 2.5; }
+#mapa .nodo.estp text { font-weight: 700; font-size: 13.5px; }
+#mapa .chiptp rect { fill: var(--mid); }
+#mapa .chiptp text { fill: var(--card); font: 800 9px system-ui, sans-serif; text-anchor: middle; dominant-baseline: central; }
+#mapa .arista line { stroke: var(--muted); stroke-width: 1.4; marker-end: url(#flecha); }
+#mapa .arista.cruce line { stroke-dasharray: 6 4; }
+#mapa .rotulo { font: italic 500 11px system-ui, sans-serif; fill: var(--muted); text-anchor: middle; dominant-baseline: central;
+  paint-order: stroke; stroke-width: 5px; stroke-linejoin: round; }
+#mapa .h-problema { stroke: var(--bad-soft); }
+#mapa .h-modelar { stroke: var(--accent-soft); }
+#mapa .h-implementar { stroke: var(--mid-soft); }
+#mapa .h-verificar { stroke: var(--ok-soft); }
+#mapa .h-centro { stroke: var(--bg); }
+#mapa .punta { fill: var(--muted); }
+#mapa .punta-on { fill: var(--accent); }
+#mapa.resaltando .nodo:not(.on):not(.centro) { opacity: .26; }
+#mapa.resaltando .arista:not(.on) { opacity: .15; }
+#mapa .nodo.on rect { fill: var(--accent); stroke: var(--accent); }
+#mapa .nodo.on text { fill: var(--on-accent); font-weight: 700; }
+#mapa .arista.on line { stroke: var(--accent); stroke-width: 2.2; marker-end: url(#flecha-on); }
+#mapa .arista.on .rotulo { fill: var(--accent); font-weight: 700; }
+.leyenda { display: flex; flex-wrap: wrap; gap: 8px 18px; padding: 0 16px 16px; font-size: .85rem; color: var(--muted); }
+.leyenda span::before { content: ""; display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+.leyenda .l-on::before { background: var(--accent); }
+.leyenda .l-tp::before { background: var(--mid); }
+.leyenda .l-cruce::before { width: 18px; height: 0; border-top: 2px dashed var(--muted); border-radius: 0; vertical-align: 3px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <button class="btn themebtn" id="theme" title="Cambiar tema">◐</button>
+  <h1>Coloquio: bolillero</h1>
+  <p class="sub">Sacá bolillas al azar y desarrollá cada tema en voz alta, como en el coloquio. Cada bolilla trae el checklist de lo que tenés que decir, con una pista por ítem, y como ayuda el mapa conceptual de la materia con sus conceptos resaltados. Las bolillas que salieron quedan afuera del bombo hasta que las vuelvas a meter.</p>
+
+  <details class="guia">
+    <summary>Cómo practicar con el bolillero</summary>
+    <ol>
+      <li>Girá el bolillero. Si está marcada la defensa del TP, empezá por ahí, porque el coloquio arranca con el TP y desde ahí el tribunal tira de los hilos de la teoría.</li>
+      <li>Desarrollá cada bolilla en voz alta y sin mirar, entre 3 y 5 minutos. Arrancá por la definición precisa, seguí con el mecanismo y un ejemplo que puedas dibujar, y cerrá con la relación con otros temas.</li>
+      <li>Recién después abrí el checklist y tildá lo que dijiste. De lo que faltó, leé la pista y volvé a decirlo con tus palabras.</li>
+      <li>Si te trabás, abrí el mapa conceptual. Buscá de qué concepto sale el tuyo y a qué lleva, y retomá desde ahí.</li>
+      <li>Terminá cada tema con su enganche con el TP. Es la conexión que más preguntan.</li>
+      <li>Seguí girando hasta vaciar el bombo, y repetí al otro día las bolillas que te costaron.</li>
+    </ol>
+  </details>
+
+  <section class="bombo-box" aria-label="Bolillero">
+    <svg id="bombo" viewBox="0 0 250 262" role="img" aria-label="Bombo con las bolillas que quedan">
+      <g class="soporte">
+        <line x1="70" y1="200" x2="42" y2="252"/>
+        <line x1="170" y1="200" x2="198" y2="252"/>
+        <line x1="26" y1="252" x2="214" y2="252"/>
+      </g>
+      <g class="tambor" id="tambor">
+        <circle class="aro" cx="120" cy="120" r="100"/>
+        <line class="reja" x1="20" y1="120" x2="220" y2="120"/>
+        <line class="reja" x1="120" y1="20" x2="120" y2="220"/>
+        <line class="reja" x1="49.3" y1="49.3" x2="190.7" y2="190.7"/>
+        <line class="reja" x1="49.3" y1="190.7" x2="190.7" y2="49.3"/>
+        <g id="tambor-bolas"></g>
+      </g>
+      <circle class="eje" cx="120" cy="120" r="6"/>
+      <path class="manija" d="M220 120 H238 V146"/>
+      <circle class="perilla" cx="238" cy="150" r="6"/>
+    </svg>
+    <div>
+      <div class="field">
+        <span class="lbl">Bolillas por sorteo</span>
+        <div class="seg" id="cuantas">
+          <button data-n="1">1</button><button data-n="2">2</button><button data-n="3">3</button>
+        </div>
+      </div>
+      <label class="tpcheck"><input type="checkbox" id="contp"> Empezar por la defensa del TP</label>
+      <div class="controls">
+        <button class="btn primary" id="girar">Girar el bolillero</button>
+        <button class="btn" id="meter">Volver a meter todas</button>
+        <button class="btn" id="vermapa">Ver el mapa conceptual</button>
+      </div>
+      <p class="estado" id="estado"></p>
+      <div class="salidas" id="salidas"></div>
+    </div>
+  </section>
+
+  <div id="resultado"></div>
+
+  <section class="todas">
+    <h2>Todas las bolillas</h2>
+    <p class="sub">Para estudiar sin sortear. Cada una tiene el mismo checklist que cuando sale del bombo.</p>
+    <div id="lista"></div>
+  </section>
+</div>
+
+<dialog id="dlgmapa" aria-labelledby="mapatitulo">
+  <div class="dlghead">
+    <div>
+      <h2 id="mapatitulo">Mapa conceptual de la materia</h2>
+      <p id="mapasub"></p>
+    </div>
+    <button class="btn" id="cerrarmapa">Cerrar</button>
+  </div>
+  <div class="mapawrap"><svg id="mapa" viewBox="0 0 1200 1082" role="img" aria-label="Mapa conceptual de Programación Concurrente"></svg></div>
+  <div class="leyenda">
+    <span class="l-on">Conceptos de la bolilla</span>
+    <span class="l-tp">TP: aparece en el trabajo práctico</span>
+    <span class="l-cruce">Relación entre zonas</span>
+    <span>Cada flecha se lee como una frase: origen, rótulo, destino.</span>
+  </div>
+</dialog>
+
+<script>
+/* ---------- Bolillas ----------
+   Cada bolilla: {n, titulo, resumen, checklist:[{t, p}], tp, ojo?, ap:[secciones del apunte], nodos:[ids del mapa]}
+   t es lo que hay que desarrollar y p, la pista que se despliega. Admiten **negrita** y `código`.
+   Si la cátedra tiene un programa con otras bolillas, alcanza con cambiar este arreglo. */
+const BOLILLAS = [
+{n: 1, titulo: 'Corrección del software y por qué modelar',
+ resumen: 'Por qué la materia verifica sobre modelos en lugar de confiar en el testing.',
+ checklist: [
+  {t: 'Qué es un **sistema crítico** y por qué importa que el software sea correcto',
+   p: 'Equipamiento médico, control de vehículos, procesos industriales y finanzas, donde una falla cuesta vidas o mucho dinero. El caso concurrente es el **Therac-25**, con una condición de carrera entre la interfaz y el control.'},
+  {t: 'La frase de **Dijkstra** sobre el testing',
+   p: 'El testing puede confirmar la presencia de errores, pero nunca garantizar su ausencia. Un error de concurrencia depende de una intercalación puntual que ningún test fuerza.'},
+  {t: 'Los límites de la **verificación automática**',
+   p: 'Decidir si un programa cualquiera termina no es computable (**problema de la parada**). Por eso se acotan las propiedades que se quieren verificar y se trabaja sobre un modelo.'},
+  {t: 'Qué es **modelar** y qué deja afuera el modelo',
+   p: 'Es abstraer. El modelo conserva la concurrencia y descarta los datos, la asignación de recursos y la interacción con el usuario. Sobre él la comprobación es exhaustiva y mecánica.'},
+  {t: 'Propiedades de **seguridad** y de **progreso**',
+   p: 'Seguridad (safety) significa que nada malo ocurre nunca, por ejemplo que nunca haya dos hilos en la sección crítica. Progreso (liveness) significa que algo bueno termina ocurriendo, por ejemplo que todo pedido se atienda.'},
+  {t: 'Sistemas **reactivos** y **transformacionales**',
+   p: 'El transformacional recibe entradas, calcula una salida y termina. El reactivo interactúa permanentemente con el ambiente y no se espera que termine, así que se razona sobre secuencias infinitas de interacciones.'},
+  {t: 'Por qué **redes de Petri** y no máquinas de estado finito',
+   p: 'La FSM explota en tamaño. En la RdP el estado global emerge del marcado, y dos procesos de 10 estados son 100 estados en una FSM y 20 lugares en una red.'},
+  {t: 'El camino de la materia, del problema al programa',
+   p: 'UML para entender el problema, una RdP para modelarlo, propiedades e invariantes para verificarlo y un monitor que ejecuta la red. El testing queda como complemento.'}
+ ],
+ tp: 'El TP sigue ese camino. La red se analizó con PIPE antes de escribir el monitor, y la inanición del flujo de alto riesgo apareció primero en el análisis de la red y después en los experimentos.',
+ ap: ['Introducción a la Programación Concurrente › Historia y motivación', 'Introducción a la Programación Concurrente › El enfoque de modelar'],
+ nodos: ['correccion', 'testing', 'reactivos', 'modelarn']},
+
+{n: 2, titulo: 'Semántica: transiciones de estado e interleaving',
+ resumen: 'Cómo se ejecuta un programa concurrente y por qué es tan difícil razonar sobre él.',
+ checklist: [
+  {t: 'Definición de **sistema de transición de estados**',
+   p: 'Un grafo dirigido. Los nodos son los estados, las aristas son las transiciones atómicas que dan las sentencias, y hay un estado inicial distinguido.'},
+  {t: 'Qué incluye un **estado**',
+   p: 'No solo los valores de las variables compartidas. También el **contador de programa** de cada proceso, por eso el espacio de estados es el producto de todo.'},
+  {t: 'Qué es una **acción atómica**',
+   p: 'Una acción que se ejecuta completa, sin que otra se intercale en el medio. `x++` no es atómica, porque son tres pasos (leer, incrementar y escribir).'},
+  {t: 'Definición de **interleaving**',
+   p: 'Los procesos concurrentes se ejecutan intercalando las acciones atómicas que los componen. El orden no puede decidirse de antemano, por el no determinismo en la elección de la próxima acción.'},
+  {t: 'Qué es una **ejecución** y qué es el comportamiento del programa',
+   p: 'Una ejecución arranca en el estado inicial y cada par de estados consecutivos está en la relación de transición. El comportamiento es el conjunto de todas las ejecuciones posibles.'},
+  {t: 'Un ejemplo de resultados distintos según el interleaving',
+   p: 'Dos hilos con `contador++` leen los dos 0, escriben los dos 1 y se pierde una actualización. También sirve el ejemplo de `y1`, `y2` e `in_critical`.'},
+  {t: 'La **explosión de estados** y la cuenta',
+   p: 'Con n hilos de k estados cada uno hay kⁿ estados globales. Dos hilos de 3 estados dan 9, y cuatro hilos de 3 estados dan 81. Por eso el testing casi no da confianza.'},
+  {t: 'Interleaving y **orden parcial**',
+   p: 'En la semántica de orden parcial dos eventos independientes no se ordenan entre sí. Una RdP expresa esa independencia sin enumerar todas las intercalaciones.'}
+ ],
+ ojo: 'No digas que los procesos concurrentes se ejecutan "simultáneamente". Decí que se ejecutan intercalando acciones atómicas, que es la respuesta que acepta la cátedra.',
+ tp: 'El log del TP es una ejecución, del estilo `T0T1T0T6T2T7T3T9…`, y cada corrida da un interleaving distinto. Por eso la verificación no compara logs, sino que busca invariantes completos con una expresión regular.',
+ ap: ['Introducción a la Programación Concurrente › Semántica: transiciones de estado e interleaving'],
+ nodos: ['transicion', 'interleaving', 'explosion']},
+
+{n: 3, titulo: 'Procesos e hilos',
+ resumen: 'Qué es un proceso, qué es un hilo, qué comparten y por qué la concurrencia no es lo mismo que el paralelismo.',
+ checklist: [
+  {t: 'Definición de **proceso** y diferencia con programa',
+   p: 'Una unidad de actividad con una secuencia de instrucciones, un estado actual y un conjunto de recursos asociados. El programa es estático y el proceso es el programa en ejecución.'},
+  {t: 'Los **estados de un proceso** y sus transiciones',
+   p: 'New, Ready, Running, Blocked y Terminated, más los suspendidos. Para cada transición hay que decir de dónde viene, a dónde va y qué hace el SO (admitir, dispatch, fin de quantum, espera de E/S, ocurrió el evento).'},
+  {t: 'El **bloque de control de proceso** (PCB)',
+   p: 'PID, estado, contador de programa, registros, memoria, prioridad, recursos asignados y estadísticas. Se guarda y se restaura en cada cambio de contexto, y por eso un proceso es caro.'},
+  {t: 'Qué es un **hilo**, qué comparte y qué tiene propio',
+   p: 'Un flujo secuencial dentro de un proceso y la unidad que se planifica. Comparte el código, el heap, las variables globales y los archivos. Tiene propios el contador de programa, los registros, la pila y el estado.'},
+  {t: 'Comparación entre **proceso e hilo**',
+   p: 'El hilo es mucho más barato de crear, de terminar y de cambiar de contexto, y se comunica por memoria compartida sin pasar por el núcleo. Justamente por eso hay que sincronizar.'},
+  {t: 'Los estados de un hilo: **creación, bloqueo, desbloqueo y terminación**',
+   p: 'Al desbloquearse el hilo vuelve a Listo, no directamente a ejecución. Un hilo no tiene estados de suspensión, porque suspender es una operación del proceso.'},
+  {t: '**Multiprogramación, multiprocesamiento y procesamiento distribuido**',
+   p: 'La concurrencia aparece en los tres, incluso con un solo procesador, donde los procesos se intercalan en el tiempo.'},
+  {t: '**Concurrencia y paralelismo**',
+   p: 'En la ejecución paralela los procesos corren al mismo tiempo en procesadores distintos. En la concurrente el interleaving puede ser cualquiera, incluso el simultáneo. La concurrencia es una propiedad de la estructura del programa y el paralelismo, de la ejecución.'}
+ ],
+ ojo: 'El paralelismo es un caso particular de la concurrencia. Decir que concurrente significa "a la vez" fue corregido en los parciales.',
+ tp: 'El TP corre 9 hilos dentro de un proceso. Comparten la red y el log, que están en el heap, y por eso todo acceso pasa por el monitor. A lo sumo 3 hilos ejecutan una acción a la vez.',
+ ap: ['Introducción a la Programación Concurrente › Procesos', 'Introducción a la Programación Concurrente › Hilos', 'Introducción a la Programación Concurrente › Concurrencia: principios generales', 'Introducción a la Programación Concurrente › Concurrencia vs paralelismo'],
+ nodos: ['procesoshilos', 'concpar']},
+
+{n: 4, titulo: 'Interacción entre procesos y exclusión mutua',
+ resumen: 'Competencia y cooperación, sección crítica, los requisitos de la exclusión mutua y los problemas típicos.',
+ checklist: [
+  {t: 'Los **tres niveles de conocimiento** entre procesos',
+   p: 'Si no se conocen hay competencia. Con conocimiento indirecto (comparten un objeto) hay cooperación por compartimiento. Con conocimiento directo hay cooperación por comunicación.'},
+  {t: '**Recurso crítico** y **sección crítica**',
+   p: 'El recurso crítico no se puede compartir, y la sección crítica es la parte del programa que lo usa. Solo uno puede estar adentro a la vez, y conviene que sea lo más corta posible.'},
+  {t: 'Los **seis requisitos** de la exclusión mutua',
+   p: 'Exclusión efectiva, no interferencia desde fuera de la sección crítica, sin demora indefinida, entrada inmediata si está libre, ninguna suposición sobre velocidades ni cantidad de procesadores, y permanencia finita. El primero es de seguridad; el tercero, el cuarto y el sexto, de progreso.'},
+  {t: '**Deadlock** (interbloqueo)',
+   p: 'Dos o más procesos esperan mutuamente el avance del otro y ninguno avanza. El ejemplo típico son dos locks tomados en orden opuesto, que forman una espera circular.'},
+  {t: '**Inanición** y **livelock**',
+   p: 'En la inanición uno espera indefinidamente aunque el sistema avanza. En el livelock los procesos no se bloquean y consumen CPU, pero ninguno progresa.'},
+  {t: '**Condición de carrera** y violación de invariantes',
+   p: 'Sin exclusión mutua el resultado depende del orden de ejecución, y una propiedad que debería valer siempre deja de valer, como `in_critical <= 1`.'},
+  {t: '**Pasaje de mensajes**',
+   p: '`send` y `receive` pueden ser bloqueantes o no. Con los dos bloqueantes hay rendezvous, y la combinación más útil es envío no bloqueante con recepción bloqueante. No hay dato compartido, así que la sincronización queda implícita.'},
+  {t: 'Memoria compartida y pasaje de mensajes, comparados',
+   p: 'Con memoria compartida hay que proteger la sección crítica con semáforos, monitores o locks, y es lo natural entre hilos. Con mensajes no hay nada que proteger, y es lo natural en sistemas distribuidos.'}
+ ],
+ ojo: 'La inanición no es un deadlock. En la inanición el sistema sigue avanzando y uno solo queda esperando para siempre.',
+ tp: 'Los flujos del TP compiten por dos recursos de uso exclusivo, el gateway (P7) y el antifraude (P8), y el de alto riesgo necesita los dos a la vez. Ahí aparecen la exclusión mutua, garantizada por los P-invariantes, y la inanición del alto riesgo.',
+ ap: ['Introducción a la Programación Concurrente › Interacción entre procesos', 'Introducción a la Programación Concurrente › Requisitos para la exclusión mutua', 'Introducción a la Programación Concurrente › Sincronización por pasaje de mensajes'],
+ nodos: ['interaccion', 'exclusion', 'fallas']},
+
+{n: 5, titulo: 'Java y UML para modelar el problema',
+ resumen: 'Los conceptos de Java que usa la materia y los diagramas que ordenan el problema antes de modelarlo.',
+ checklist: [
+  {t: 'Los **modificadores de acceso** y el encapsulamiento',
+   p: '`private`, de paquete, `protected` y `public`. Encapsular el estado compartido es el primer paso para poder protegerlo.'},
+  {t: '`static` y `final`',
+   p: 'Un atributo `static` lo comparten todas las instancias, y por lo tanto todos los hilos. Un `final` fija la referencia, que es lo que conviene en un objeto que se usa como llave de un `synchronized`.'},
+  {t: '**Clases abstractas e interfaces**',
+   p: 'Por qué `Runnable` es una interfaz y por qué conviene implementarla en lugar de heredar de `Thread` (la herencia queda libre y la tarea se separa del hilo).'},
+  {t: 'El **diagrama de clases**',
+   p: 'Clases con atributos y métodos, y las relaciones de asociación, agregación, composición, herencia, realización y dependencia.'},
+  {t: 'El **diagrama de secuencia**',
+   p: 'Líneas de vida, activaciones y mensajes sincrónicos y asincrónicos. Un `start()` es un mensaje asincrónico.'},
+  {t: 'Los **fragmentos combinados**',
+   p: '`par` para lo que corre en paralelo, `critical` para la sección crítica, y además `loop`, `alt`, `opt` y `break`.'},
+  {t: 'Para qué sirve UML en esta materia y cuál es su límite',
+   p: 'Identifica los hilos, los recursos compartidos y las interacciones antes de modelar con una RdP. El diagrama de clases no describe comportamiento, y el de secuencia muestra un solo escenario.'}
+ ],
+ tp: 'El informe del TP tiene el diagrama de clases (con `implements`, composición, agregación, asociación, «create» y «use») y el diagrama de secuencia de `fireTransition`, con un `loop` y fragmentos `alt`.',
+ ap: ['Java — Conceptos Básicos', 'Modelado de un sistema con diagramas UML', 'Ejercicio 1 — Threads (diagramas de clases y de secuencia)'],
+ nodos: ['uml']},
+
+{n: 6, titulo: 'Gramáticas, lenguajes y jerarquía de Chomsky',
+ resumen: 'Qué es un lenguaje formal, cómo lo genera una gramática y cómo se ordenan por su capacidad de expresión.',
+ checklist: [
+  {t: '**Símbolo, alfabeto y cadena**, y la concatenación',
+   p: 'Un alfabeto es un conjunto finito de símbolos, una cadena es una secuencia finita de símbolos y la concatenación las une.'},
+  {t: 'El **universo del discurso** y la definición de **lenguaje**',
+   p: 'Σ* es el conjunto de todas las cadenas sobre el alfabeto. Un lenguaje es cualquier subconjunto de Σ*.'},
+  {t: 'La definición formal de **gramática**',
+   p: 'G = (Σ_{T}, Σ_{N}, S, P), con los terminales, los no terminales, el axioma y las reglas de producción.'},
+  {t: '**Derivación** y lenguaje generado por una gramática',
+   p: 'Se aplican producciones desde el axioma, y L(G) son las cadenas de terminales que se pueden derivar.'},
+  {t: 'La **jerarquía de Chomsky**',
+   p: 'Tipo 0 sin restricciones, tipo 1 sensibles al contexto, tipo 2 libres de contexto y tipo 3 regulares. Cada tipo contiene al siguiente.'},
+  {t: 'La correspondencia **gramática ↔ autómata**',
+   p: 'El tipo 0 se reconoce con una máquina de Turing, el 1 con un autómata linealmente acotado, el 2 con un autómata de pila y el 3 con un autómata finito.'},
+  {t: 'Ejemplos con aⁿbⁿ y qué tipo hace falta',
+   p: 'aⁿbⁿ es libre de contexto y no regular, porque hay que contar. aⁿbⁿcⁿ ya necesita una gramática sensible al contexto.'},
+  {t: 'Por qué este tema está en la materia',
+   p: 'Un sistema reactivo, o una arquitectura dirigida por eventos, se describe como un lenguaje de eventos. Las secuencias de disparo de una RdP forman un lenguaje.'}
+ ],
+ ojo: 'aⁿbᵐ con n ≥ 1 y m ≥ 0 es regular (a⁺b*), así que alcanza un autómata finito. aⁿbⁿ no lo es.',
+ tp: 'Las secuencias de disparo de la red del TP forman un lenguaje. Como la red es acotada, su grafo de alcanzabilidad es finito y ese lenguaje es regular, y por eso una expresión regular alcanza para reconocer los invariantes en el log.',
+ ap: ['Gramáticas, Lenguajes y Autómatas › Motivación', 'Gramáticas, Lenguajes y Autómatas › Definiciones previas', 'Gramáticas, Lenguajes y Autómatas › Definición formal de gramática', 'Gramáticas, Lenguajes y Autómatas › Jerarquía de Chomsky'],
+ nodos: ['gramaticas', 'chomsky']},
+
+{n: 7, titulo: 'Autómatas y expresiones regulares',
+ resumen: 'Los autómatas de la jerarquía, Moore y Mealy, y las expresiones regulares de la teoría a la práctica.',
+ checklist: [
+  {t: 'Definición formal de **autómata** y la idea de estado',
+   p: 'Una quíntupla con el alfabeto, los estados, la función de transición, el estado inicial y los estados finales. El estado resume la historia que hace falta recordar.'},
+  {t: '**AFND y AFD**, y el teorema de transformación',
+   p: 'En el AFND, desde un estado y con un mismo símbolo puede haber más de una transición, o transiciones λ. Todo AFND tiene un AFD equivalente, así que reconocen los mismos lenguajes.'},
+  {t: '**Moore y Mealy**',
+   p: 'En Moore la salida depende del estado y en Mealy, del estado y de la entrada. Mealy suele necesitar menos estados, y Moore es más segura porque su salida cambia con el estado y no reacciona a los glitches de la entrada.'},
+  {t: 'El **autómata de pila**',
+   p: 'Un autómata finito con una pila. Reconoce los lenguajes libres de contexto, como aⁿbⁿ, por estado final o por pila vacía.'},
+  {t: 'El **autómata linealmente acotado** y la **máquina de Turing**',
+   p: 'El LBA tiene una cinta acotada por el tamaño de la entrada y reconoce los sensibles al contexto. La máquina de Turing tiene cinta infinita de lectura y escritura y es el modelo más potente.'},
+  {t: 'La **tesis de Church** y qué puede expresar cada máquina',
+   p: 'Todo lo computable lo calcula una máquina de Turing, así que cualquier programa puede expresarse con una. Un autómata de pila no alcanza para un programa cualquiera.'},
+  {t: '**Expresiones regulares** y su equivalencia con los autómatas finitos',
+   p: 'Unión, concatenación y clausura. De una ER se pasa a un AFND con el método del GTG, y de un AF a una ER eliminando estados.'},
+  {t: 'Las regex en la práctica: cuantificadores, **greedy y lazy**, lookahead',
+   p: '`*` es codicioso y toma lo máximo, `*?` es perezoso y toma lo mínimo. `(?!\\d)` es un lookahead negativo, que exige que lo que sigue no sea un dígito.'},
+  {t: 'El grafo de alcanzabilidad como autómata',
+   p: 'Sus estados son los marcados y sus transiciones, los disparos. Una máquina de estado marcada con una sola ficha equivale a un autómata finito.'}
+ ],
+ ojo: 'En Moore la salida depende del estado. Responder que depende "de la gramática que se esté usando" sacó 0.',
+ tp: 'La regex del TP reconoce los tres T-invariantes con una sola expresión, huecos perezosos `(.*?)` entre transiciones y `(?!\\d)` para que `T1` no se confunda con el comienzo de `T10`. Con huecos codiciosos, un invariante se llevaría transiciones de otro.',
+ ap: ['Gramáticas, Lenguajes y Autómatas › Autómatas (hasta Autómatas finitos)', 'Gramáticas, Lenguajes y Autómatas › Expresiones regulares ↔ autómatas finitos', 'Expresiones regulares en la práctica: verificar T-invariantes'],
+ nodos: ['automatas', 'moore', 'er', 'regexlog']},
+
+{n: 8, titulo: 'Hilos en Java',
+ resumen: 'Cómo se crea, se controla y termina un hilo en Java.',
+ checklist: [
+  {t: 'Las dos formas de crear un hilo',
+   p: 'Heredar de `Thread` o implementar `Runnable` y pasárselo a un `Thread`. Con `Runnable` la clase puede heredar de otra y la tarea queda separada del hilo.'},
+  {t: '**`start()` y `run()`**',
+   p: '`start()` crea el hilo nuevo y la JVM llama a `run()` en él. Llamar a `run()` directamente ejecuta el código en el hilo actual, sin ninguna concurrencia.'},
+  {t: 'Los estados de **`Thread.State`**',
+   p: 'NEW, RUNNABLE, BLOCKED (esperando el lock de un `synchronized`), WAITING, TIMED_WAITING y TERMINATED. Hay que saber qué método lleva a cada uno.'},
+  {t: 'Los atributos del hilo, con la **prioridad**',
+   p: 'Id, nombre, prioridad, estado y si es daemon. La prioridad es una sugerencia al planificador y no garantiza nada.'},
+  {t: '**`interrupt()`**',
+   p: 'Marca una bandera. Si el hilo está en `sleep`, `wait` o `join`, sale con `InterruptedException` y la bandera se limpia. El hilo decide cómo terminar, y `stop()` no se usa.'},
+  {t: '**`sleep()`** y **`join()`**',
+   p: '`sleep` suspende al hilo un tiempo sin soltar los locks que tiene. `join` espera a que otro hilo termine, con o sin tiempo máximo.'},
+  {t: 'Los **hilos daemon** y cuándo termina el programa',
+   p: 'La JVM termina cuando terminan todos los hilos que no son daemon, y los daemon se cortan en ese momento.'},
+  {t: 'Las **excepciones no controladas** y las checked y unchecked',
+   p: 'Una excepción que escapa de `run()` termina solo ese hilo, y se puede atender con un `UncaughtExceptionHandler`. Las checked hay que capturarlas o declararlas (`InterruptedException`), y las unchecked heredan de `RuntimeException`.'},
+  {t: 'Las **variables locales de hilo** (`ThreadLocal`)',
+   p: 'Cada hilo tiene su propia copia. El caso típico es un mismo `Runnable` compartido por varios hilos que necesita guardar, por ejemplo, su fecha de inicio.'}
+ ],
+ ojo: 'Con un main, varios productores y dos hilos daemon, el programa termina cuando terminan main y los productores. Los daemon no lo mantienen vivo.',
+ tp: 'En el TP, `Main` arranca los 9 `Worker` y hace `join()` sobre cada uno antes de analizar el log. Los hilos no se cortan con `stop` ni con `System.exit`, sino que `fireTransition` devuelve `false` y cada uno sale de `run()`. El mutex se toma con `acquireUninterruptibly()`.',
+ ap: ['Threads en Java — atributos, estados y prioridades', 'Interrupción, sleep y join de hilos', 'Excepciones no controladas, hilos daemon, variables locales de hilo y CountDownLatch'],
+ nodos: ['thread', 'estados', 'interrupt']},
+
+{n: 9, titulo: 'Sincronización en Java',
+ resumen: '`synchronized`, `wait` y `notify`, locks y semáforos.',
+ checklist: [
+  {t: '**`synchronized`** en un método y en un bloque',
+   p: 'Toma el lock intrínseco del objeto, o el de la clase si el método es `static`. Con un bloque la sección crítica queda más chica.'},
+  {t: 'El rol del argumento en `synchronized(a)`',
+   p: 'El objeto `a` es la llave. Dos bloques con la misma llave se excluyen entre sí, y con llaves distintas no.'},
+  {t: 'El **error del objeto equivocado**',
+   p: 'Sincronizar sobre un `Integer` que se reasigna hace que la llave cambie de identidad y dos hilos entren a la vez. En el ejemplo del cine apareció recién después de muchísimas corridas.'},
+  {t: 'Dos recursos independientes con dos llaves',
+   p: 'En el cine cada sala tiene su propio objeto de control, y así dos hilos pueden vender en salas distintas a la vez.'},
+  {t: '**`wait()`, `notify()` y `notifyAll()`**',
+   p: 'Solo dentro de un `synchronized` sobre el mismo objeto. `wait` suelta el lock y espera; al despertar compite otra vez por él. Va siempre dentro de un `while`, porque la condición puede haber cambiado (signal and continue).'},
+  {t: '**`Lock`** y `ReentrantLock`',
+   p: '`lock()` y `unlock()` en un `finally`, `tryLock()`, varias `Condition` y modo fair. Es más flexible que `synchronized`, pero hay que liberarlo a mano.'},
+  {t: '**`ReadWriteLock`**',
+   p: 'Muchos lectores a la vez o un solo escritor. Conviene cuando hay muchas lecturas y pocas escrituras, con el riesgo de que los escritores sufran inanición.'},
+  {t: '**Semáforos** binarios y de N permisos',
+   p: '`acquire()` y `release()` sobre un contador de permisos. Sirven para exclusión mutua, para N recursos y para señalizar con un `Semaphore(0)`.'},
+  {t: '**Ownership** y **fairness**',
+   p: 'Un `Lock` tiene dueño y solo lo libera quien lo tomó. Un semáforo no tiene dueño, y cualquier hilo puede hacer `release()`. En modo fair se atiende por orden de llegada, lo que evita la inanición a costa de rendimiento.'}
+ ],
+ ojo: 'Explicá `synchronized(a)` por el objeto `a` como llave. Que dos bloques sincronicen sobre objetos distintos no los excluye.',
+ tp: 'El mutex del monitor del TP es un `Semaphore(1)` y no un `ReentrantLock`, porque con signal and exit el permiso pasa del hilo que dispara al despertado. Un lock con dueño no se puede ceder. Las colas de condición son semáforos que arrancan en 0, con un contador de los que esperan.',
+ ap: ['Sincronización con synchronized — fundamentos', 'Sincronización básica en Java — Locks, ReadWriteLocks y Semáforos'],
+ nodos: ['synchronized', 'waitnotify', 'locks', 'semaforos', 'exclusion']},
+
+{n: 10, titulo: 'Sincronizadores, ThreadFactory y Executors',
+ resumen: 'Las herramientas de alto nivel de Java para esperar eventos y administrar hilos.',
+ checklist: [
+  {t: '**`CountDownLatch`**',
+   p: 'Se inicializa con N, cada evento hace `countDown()` y los que esperan hacen `await()`. No se puede reiniciar. El ejemplo es la videoconferencia que arranca cuando llegaron todos.'},
+  {t: '**`CyclicBarrier`**',
+   p: 'N hilos se esperan entre sí en un punto común, y se puede reutilizar. Admite una acción que corre cuando llegaron todos.'},
+  {t: '**`Phaser`**',
+   p: 'Se inicializa con la cantidad de participantes, o con 0 y se registran con `register()`. Cada uno llama a `arriveAndAwaitAdvance()` al terminar una fase, o a `arriveAndDeregister()` para salir.'},
+  {t: 'Su equivalente en redes de Petri',
+   p: '`join`, `CountDownLatch` y las barreras son una transición de sincronización, con varias plazas de entrada. Un `Semaphore(0)` es una señalización.'},
+  {t: 'El **patrón Factory**',
+   p: 'Centraliza la creación de objetos en una clase, y así se pueden cambiar o contar los objetos creados sin tocar a quien los usa.'},
+  {t: '**`ThreadFactory`**',
+   p: 'Crea hilos con nombre, prioridad o condición de daemon uniformes, y puede llevar estadísticas de los hilos creados.'},
+  {t: '**Executors** y pools de hilos',
+   p: '`newFixedThreadPool` y `newCachedThreadPool`, `execute` y `submit` con un `Future`, y `shutdown` con `awaitTermination` para terminar.'},
+  {t: 'Executor contra hilos creados a mano',
+   p: 'El pool reutiliza hilos, limita cuántos hay y separa la tarea de cómo se ejecuta. Crear un hilo por pedido no escala.'}
+ ],
+ ojo: '`Phaser` salió en 2023 y quien la dejó en blanco sacó 0. Se inicializa con la cantidad de participantes. `CyclicBarrier` y `Phaser` no están en el apunte, así que repasalos del Java 9 Concurrency Cookbook (capítulo 3).',
+ tp: 'El TP no usa un pool, porque los 9 hilos son fijos y cada uno repite su secuencia. Un `newFixedThreadPool(n)` se modela con una plaza de tareas pendientes (no acotada si llegan más de las que se atienden) y n fichas de hilos libres, como la barbería.',
+ ap: ['Excepciones no controladas, hilos daemon, variables locales de hilo y CountDownLatch › CountDownLatch', 'Thread Factory y Executors'],
+ nodos: ['sincronizadores', 'executors']},
+
+{n: 11, titulo: 'Redes de Petri: definición, clases y modelos',
+ resumen: 'Qué es una red de Petri, cómo evoluciona y qué fenómenos y problemas clásicos modela.',
+ checklist: [
+  {t: 'La **definición formal**',
+   p: 'Un grafo bipartito N = (P, T, Pre, Post) con un marcado inicial M₀. Las plazas son condiciones, las transiciones son eventos y las fichas, recursos o estados locales.'},
+  {t: '**Sensibilización y disparo**',
+   p: 'Una transición está sensibilizada si cada plaza de entrada tiene al menos tantas fichas como el peso del arco. El disparo es atómico, dura cero y es una posibilidad, no una obligación.'},
+  {t: 'La **ecuación de estado**',
+   p: 'M′ = M + W·σ, con W = Post − Pre la matriz de incidencia y σ el vector de disparo. En una red impura W no representa los auto-loops, porque se cancelan.'},
+  {t: 'Redes **autónomas** y **no autónomas**',
+   p: 'La autónoma dice qué puede pasar, pero no cuándo. La no autónoma está sincronizada con eventos externos o es temporizada.'},
+  {t: 'Los fenómenos que modela',
+   p: 'Secuencia, concurrencia, conflicto (dos transiciones que comparten una plaza de entrada), sincronización y confusión.'},
+  {t: 'Las **clases** de redes ordinarias',
+   p: 'Máquina de estado (cada transición con una entrada y una salida, hay conflictos pero no sincronizaciones), grafo marcado (cada plaza con una entrada y una salida, sin conflictos), libre elección, libre elección extendida y simple. Además, qué es una red pura.'},
+  {t: 'Los **modelos básicos**',
+   p: 'Co-begin y co-end, señalización, exclusión mutua con un lugar mutex, N recursos y buffer acotado (productor y consumidor).'},
+  {t: 'Las **extensiones**',
+   p: 'Arcos con peso, arcos inhibidores, arcos lectores, prioridades, redes coloreadas y redes continuas e híbridas.'},
+  {t: 'Los problemas clásicos',
+   p: 'En los filósofos, tomar los dos tenedores en un solo disparo evita el deadlock pero no la inanición. En la barbería aparecen los inhibidores y el conflicto entre peluqueros.'}
+ ],
+ ojo: 'Sensibilizada no significa que va a disparar. Que una transición esté sensibilizada solo dice que puede dispararse.',
+ tp: 'La red del TP tiene un conflicto (T1, T4 y T6 sobre P1), dos plazas de recurso (P7 y P8) que funcionan como mutex, una plaza idle (P0) y un join en P9. No es de libre elección, porque T1, T4 y T6 comparten P1 pero tienen distintas plazas de recurso como entrada.',
+ ap: ['Introducción a la Programación Concurrente › Carl Adam Petri y las redes de Petri', 'Redes de Petri › Definición y elementos, hasta Modelos básicos', 'Redes de Petri › Abreviaturas y extensiones', 'Redes de Petri › La cena de los filósofos y El problema de la barbería'],
+ nodos: ['rdp', 'extensiones', 'clases', 'clasicos', 'ecestado']},
+
+{n: 12, titulo: 'Propiedades y análisis de las redes de Petri',
+ resumen: 'Cómo se decide si un modelo es correcto, recorriendo sus estados o sin recorrerlos.',
+ checklist: [
+  {t: '**Acotación** y **seguridad**',
+   p: 'Una red está acotada en k si ninguna plaza supera k fichas en ninguna marca alcanzable, y es segura si k = 1. Las dos dependen de M₀, y la red es estructuralmente acotada si lo está para cualquier M₀.'},
+  {t: 'Los niveles de **vivacidad**',
+   p: 'Quasi viva (cada transición dispara al menos una vez), pseudo viva (alguna transición sigue viva) y viva (desde toda marca alcanzable cada transición puede volver a dispararse). Una red viva no tiene deadlock.'},
+  {t: '**Deadlock**, **home state** y **reversibilidad**',
+   p: 'Un deadlock es una marca desde la que no se dispara nada. Un home state se alcanza desde cualquier marca, y la red es reversible si M₀ es un home state.'},
+  {t: 'Conflicto **estructural** y **efectivo**, y persistencia',
+   p: 'El estructural es compartir una plaza de entrada, y el efectivo, que además las fichas no alcancen para las dos. En una red persistente una transición solo deja de estar sensibilizada por su propio disparo. El conflicto efectivo se resuelve con una política, prioridades o arcos inhibidores.'},
+  {t: 'El **grafo de alcanzabilidad**',
+   p: 'Si la red es acotada el grafo es finito y decide todo. La acotación sale del máximo de fichas de cada plaza, el deadlock es un nodo sin sucesores y la vivacidad se ve en las componentes cerradas.'},
+  {t: 'El **árbol de cobertura** y la ω',
+   p: 'Se usa cuando la red no está acotada, y ω representa una cantidad de fichas que puede crecer sin límite. No alcanza para decidir la vivacidad ni la alcanzabilidad exacta.'},
+  {t: '**P-invariantes** y **T-invariantes**',
+   p: 'Un P-invariante cumple yᵀ·W = 0, así que la suma ponderada de fichas es constante. Depende de la estructura, y la constante, del marcado inicial. Un T-invariante cumple W·x = 0, y es una secuencia de disparos que vuelve al mismo marcado.'},
+  {t: '**Sifones** y **trampas**',
+   p: 'Un sifón solo puede perder fichas, y si se vacía queda vacío para siempre. Una trampa marcada queda marcada. Por el teorema de Commoner, una red de libre elección es viva si todo sifón contiene una trampa marcada.'},
+  {t: 'Estructura y comportamiento',
+   p: 'La estructura sola no determina el comportamiento, porque hace falta el marcado inicial. La vivacidad y la ausencia de deadlock pueden romperse al agregar fichas.'}
+ ],
+ ojo: 'La vivacidad y la ausencia de deadlock no son monótonas, y agregar fichas puede romperlas. La quasi vivacidad sí se mantiene, y la falta de acotación no se arregla con más fichas.',
+ tp: 'PIPE dio para la red del TP, sin tiempos, que no tiene deadlock, que es acotada en 3 y no segura, que es viva y reversible, y que tiene 52 marcados. Con tiempos, como PIPE da prioridad a las inmediatas, T4 y T5 pueden dejar de dispararse porque la componente cerrada del grafo no los contiene. Es el anticipo de la inanición del alto riesgo.',
+ ap: ['Redes de Petri › Propiedades de las redes de Petri, hasta Sifones y trampas', 'Redes de Petri › Ecuación fundamental e invariantes de marcado', 'Redes de Petri › Grafo de marcas y árbol de cobertura', 'Redes de Petri › Cálculo de P-invariantes y T-invariantes'],
+ nodos: ['propiedades', 'homestate', 'conflictos', 'grafo', 'cobertura', 'ecestado', 'pinv', 'tinv', 'sifones', 'pipe', 'inanicion']},
+
+{n: 13, titulo: 'Tiempo y monitores',
+ resumen: 'Cómo se le agrega tiempo a una red, cómo se la ejecuta y cómo la ejecuta un monitor.',
+ checklist: [
+  {t: 'El indeterminismo de una red autónoma',
+   p: 'No dice cuándo se dispara una transición sensibilizada ni cuál de varias en conflicto. El tiempo y las políticas reducen ese indeterminismo.'},
+  {t: 'Las **RdP con tiempo** y el intervalo [α, β]',
+   p: 'Si la transición se sensibiliza en τ, no puede dispararse antes de τ + α ni después de τ + β. α es el instante más cercano y β el más lejano, y [0, ∞) es el caso autónomo. El estado pasa a ser el marcado junto con los intervalos.'},
+  {t: 'Tiempo de **sensibilización** y de **disparo**, y semántica **fuerte** y **débil**',
+   p: 'Con tiempo de sensibilización el disparo sigue siendo atómico. En la semántica fuerte la transición debe dispararse dentro del intervalo, y en la débil puede hacerlo, sin estar obligada.'},
+  {t: 'La **ecuación de estado generalizada**',
+   p: 'Eₓ = E ∧ B ∧ L ∧ G ∧ V ∧ Z combina el sensibilizado con los inhibidores, los lectores, las guardas, los eventos y el tiempo. Es lógica conjuntiva y se puede implementar en hardware.'},
+  {t: 'Qué es un **monitor** y por qué no alcanza con semáforos',
+   p: 'Un mecanismo de alto nivel con los datos y los procedimientos del recurso, que se ejecutan en exclusión mutua. Con semáforos las primitivas quedan esparcidas y una sola omisión corrompe el sistema.'},
+  {t: 'Las **variables de condición** y las colas',
+   p: 'Hay una cola de entrada, una cola por condición y la cola de cortesía. El que espera dentro del monitor tiene prioridad sobre los que recién llegan.'},
+  {t: 'Las **políticas de señalización**',
+   p: 'Signal and continue (la de Java), signal and wait, signal and urgent wait y signal and exit. Con signal and continue hay que reevaluar la condición con un `while`, y con las otras la condición sigue valiendo al despertar.'},
+  {t: 'El **monitor guiado por una RdP**',
+   p: 'Un mutex, la red (la lógica), una cola por transición y una política. Las acciones se ejecutan afuera del monitor, y los hilos que se pueden despertar salen de sensibilizadas ∧ con hilos esperando.'}
+ ],
+ ojo: 'Las políticas de reactivación (entrada, condición y cortesía) resuelven el orden de acceso al monitor. Las de las colas de condición resuelven los conflictos de la red. Confundirlas sacó 0.',
+ tp: 'El monitor del TP usa signal and exit, semántica débil con β = ∞ y el α contado desde la sensibilización. Un hilo que llega antes de α marca la transición, cede el mutex y duerme lo que falta. La guarda sobre T0 hace que la red sea no autónoma.',
+ ap: ['Redes de Petri con tiempo y ecuación de estado generalizada', 'Monitores'],
+ nodos: ['tiempo', 'ecgen', 'monitores', 'senal', 'monitorrdp', 'extensiones']}
+];
+
+/* La defensa del TP no está en el bombo: si la casilla está marcada, va siempre primero. */
+const TP = {n: null, titulo: 'Defensa del TP final',
+ resumen: 'Red de Petri de un sistema de procesamiento de pagos, ejecutada por un monitor en Java. Exponela en unos 7 minutos, en el orden de la presentación.',
+ checklist: [
+  {t: '**El sistema**: un procesador de pagos con tres flujos y dos recursos',
+   p: 'Tarjeta (T1 → T2 → T3) usa el gateway (P7). Alto riesgo (T4 → T5) usa el gateway y el antifraude a la vez. Transferencia (T6 → T7 → T8) usa el antifraude (P8). Hay hasta 3 transacciones a la vez.'},
+  {t: '**La red** y dónde está la concurrencia (dibujala de memoria)',
+   p: 'P0 es la cola de arribo (idle), P1 las transacciones admitidas y P9 el buffer de salida. T1, T4 y T6 están en conflicto sobre P1, y T2, T3, T5, T7 y T8 son temporales.'},
+  {t: '**Las propiedades** que dio PIPE',
+   p: 'Sin deadlock, acotada en 3 y no segura (P0, P1 y P9 llegan a 3), viva y reversible sin tiempos, con 52 marcados. Con tiempos PIPE da prioridad a las inmediatas y T4 puede dejar de dispararse.'},
+  {t: '**Los invariantes** de plaza y de transición',
+   p: 'M(P0) + … + M(P6) + M(P9) = 3, M(P2) + M(P3) + M(P4) + M(P7) = 1 y M(P4) + M(P5) + M(P6) + M(P8) = 1. Los T-invariantes son T0 T1 T2 T3 T9, T0 T4 T5 T9 y T0 T6 T7 T8 T9.'},
+  {t: '**La cantidad de hilos**, que da 9',
+   p: 'Por el método del artículo, con los segmentos A (T0, 3 hilos), B (T1 a T3, 1), C (T4 y T5, 1), D (T6 a T8, 1) y E (T9, 3). En el conflicto va un segmento antes y uno por flujo, y en el join, tantos hilos como fichas simultáneas.'},
+  {t: '**El monitor**',
+   p: 'Su único método público es `fireTransition(t)`, con `tryFire`, `wakeNext`, `waitToRetry` y `finish`. El mutex es un `Semaphore`, hay una cola de condición por transición, usa signal and exit y no conoce la red, que llega por configuración.'},
+  {t: '**Las políticas**',
+   p: 'La aleatoria elige al azar entre las candidatas. La priorizada prioriza T4 y además retiene con `allows` a T1 y T6 mientras alto riesgo espera, porque elegir entre las candidatas no alcanzaba.'},
+  {t: '**La semántica temporal**',
+   p: 'Débil, con β = ∞ y α = 100 ms en las temporales. El timestamp es por transición y se toma con `nanoTime`. El hilo que llega antes de α duerme fuera del mutex, y hay un solo hilo por ventana.'},
+  {t: '**La terminación y la verificación**',
+   p: 'Una guarda en T0 corta la admisión después de 200, la red termina cuando no queda nada sensibilizado, `finish` despierta a los hilos en cadena y `Main` hace `join`. Los P-invariantes se verifican en cada disparo, antes de asignar el marcado, y los T-invariantes con la regex sobre el log, que tiene que quedar vacío.'},
+  {t: '**Los resultados y las conclusiones**',
+   p: 'Con la priorizada, 67/67/66 en todos los casos con tiempos. Con la aleatoria, si tarjeta y transferencia tardan distinto (caso 4b), alto riesgo no procesó nada en 9 de 10 corridas. La duración es de unos 200·α (20,1 s), cerca de la cota h·α₅ + máx(c·(α₂ + α₃), f·(α₇ + α₈)). El cuello de botella son los recursos, no los hilos.'}
+ ],
+ rp: [
+  {q: '¿Por qué el mutex es un `Semaphore` y no un `ReentrantLock`?',
+   r: 'Con signal and exit el hilo que disparó le pasa el permiso al despertado sin liberarlo. Un `ReentrantLock` tiene dueño y solo lo libera el hilo que lo tomó, mientras que un semáforo no tiene dueño.'},
+  {q: '¿Por qué con tiempos la red no es viva, si sin tiempos sí lo es?',
+   r: 'Con tiempos PIPE da prioridad a las inmediatas. Cada recurso que se libera lo vuelve a tomar el mismo flujo antes de que se libere el otro, así que P7 y P8 nunca quedan libres juntos y T4 no se sensibiliza. La única componente cerrada del grafo no contiene a T4 ni a T5.'},
+  {q: '¿Qué garantiza que el gateway lo use una sola transacción a la vez?',
+   r: 'El P-invariante M(P2) + M(P3) + M(P4) + M(P7) = 1. Vale en toda marca alcanzable porque yᵀ·W = 0 y el marcado inicial lo cumple.'},
+  {q: '¿Por qué la regex usa `(.*?)` y no `(.*)`? ¿Para qué está `(?!\\d)`?',
+   r: 'El cuantificador perezoso toma lo mínimo, así cada transición es la primera que aparece después de la anterior y un invariante no se lleva transiciones de otro. `(?!\\d)` impide que `T1` coincida con el comienzo de `T10`.'},
+  {q: '¿Por qué 9 hilos, si con 7 funciona igual?',
+   r: 'Es lo que da el método del artículo, con tantos hilos por segmento como fichas simultáneas en sus plazas de acción. El experimento 2 mostró que en A y en E alcanza uno porque T0 y T9 son inmediatas, y que en B, C y D hace falta exactamente uno por el reparto.'},
+  {q: '¿Por qué elegir entre las candidatas no alcanzaba para priorizar el alto riesgo?',
+   r: 'Cuando se libera un recurso con el otro ocupado, T4 no está sensibilizada, así que no es candidata y T1 o T6 toman el recurso. Por eso la priorizada también retiene a T1 y T6 mientras hay un hilo esperando en T4.'},
+  {q: '¿Qué hace un hilo que llega antes de α, y por qué no se queda con el mutex?',
+   r: 'Marca la transición como esperada, cede el mutex con `wakeNext` y duerme lo que falta. Si durmiera con el mutex tomado, frenaría a todos los demás flujos.'},
+  {q: '¿Cómo terminan los hilos sin `stop` ni `System.exit`?',
+   r: 'Después de 200 admisiones T0 deja de estar sensibilizada, y la red se detiene cuando terminaron todas las transacciones. Entonces `finish` despierta a los hilos en cadena, cada uno devuelve `false` y sale de `run()`, y `Main` los espera con `join`.'},
+  {q: '¿Cómo distinguen un deadlock del fin normal de la ejecución?',
+   r: 'Durante la ejecución no se distingue, porque en los dos casos no queda nada sensibilizado. Lo detecta el análisis del log, en el que quedan disparos sin formar un invariante completo.'},
+  {q: '¿Qué cambia en el monitor si cambia la red?',
+   r: 'Nada. La incidencia, el marcado, los invariantes, los α, los hilos y las prioridades salen de la configuración, y los conflictos se calculan desde la incidencia. Se probó con productor y consumidor, fork y join y lectores y escritores.'}
+ ],
+ ap: ['Informe del TP (docs/informe.pdf)', 'Presentación (docs/presentacion/Presentación.pptx)', 'Código: Monitor, ConditionQueues, PetriNet, TransitionTimer y PriorityPolicy'],
+ nodos: ['tp', 'uml', 'rdp', 'tiempo', 'ecestado', 'pinv', 'tinv', 'regexlog', 'pipe', 'grafo', 'conflictos', 'inanicion', 'semaforos', 'senal', 'monitorrdp', 'interrupt', 'exclusion']};
+
+/* ---------- Mapa conceptual ----------
+   Cuatro zonas de 2 columnas por 6 filas, más el nodo central y el del TP en la columna del medio.
+   Una arista se lee como frase: de, label, a. 'zona:x' es el borde interno de la zona x. */
+const ZONAS = {
+  problema:    {x: 16,  y: 16,  w: 460, h: 485, titulo: 'EL PROBLEMA'},
+  modelar:     {x: 724, y: 16,  w: 460, h: 485, titulo: 'MODELOS FORMALES'},
+  implementar: {x: 16,  y: 581, w: 460, h: 485, titulo: 'JAVA Y MONITORES'},
+  verificar:   {x: 724, y: 581, w: 460, h: 485, titulo: 'ANÁLISIS E INVARIANTES'}
+};
+const ANCLAS = {
+  problema: {x: 476, y: 258}, modelar: {x: 724, y: 258},
+  implementar: {x: 476, y: 823}, verificar: {x: 724, y: 823}
+};
+const N = (id, z, c, r, label, tp) => ({id, z, c, r, label, tp: !!tp});
+const NODOS_ZONA = [
+  N('correccion', 'problema', 0, 0, 'Corrección del\nsoftware'),
+  N('testing', 'problema', 1, 0, 'Límites del testing\n(Dijkstra)'),
+  N('reactivos', 'problema', 0, 1, 'Sistemas\nreactivos'),
+  N('modelarn', 'problema', 1, 1, 'Modelar: seguridad\ny progreso'),
+  N('transicion', 'problema', 0, 2, 'Sistemas de\ntransición'),
+  N('interleaving', 'problema', 1, 2, 'Interleaving de\nacciones atómicas'),
+  N('procesoshilos', 'problema', 0, 3, 'Procesos, PCB\ne hilos'),
+  N('explosion', 'problema', 1, 3, 'Explosión de\nestados'),
+  N('concpar', 'problema', 0, 4, 'Concurrencia vs\nparalelismo'),
+  N('interaccion', 'problema', 1, 4, 'Competencia y\ncooperación'),
+  N('fallas', 'problema', 0, 5, 'Deadlock e\ninanición'),
+  N('exclusion', 'problema', 1, 5, 'Sección crítica y\nexclusión mutua', true),
+
+  N('uml', 'modelar', 0, 0, 'UML: clases y\nsecuencia', true),
+  N('rdp', 'modelar', 1, 0, 'Redes de Petri:\ndisparo', true),
+  N('gramaticas', 'modelar', 0, 1, 'Gramáticas y\nlenguajes'),
+  N('extensiones', 'modelar', 1, 1, 'Inhibidores,\nlectores, pesos'),
+  N('chomsky', 'modelar', 0, 2, 'Jerarquía de\nChomsky'),
+  N('tiempo', 'modelar', 1, 2, 'RdP con tiempo\n[α, β]', true),
+  N('automatas', 'modelar', 0, 3, 'Autómatas: AF,\npila, LBA, Turing'),
+  N('ecgen', 'modelar', 1, 3, 'Ecuación de estado\ngeneralizada'),
+  N('moore', 'modelar', 0, 4, 'Moore y Mealy'),
+  N('clases', 'modelar', 1, 4, 'Clases y modelos\nbásicos'),
+  N('er', 'modelar', 0, 5, 'Expresiones\nregulares ⇔ AF'),
+  N('clasicos', 'modelar', 1, 5, 'Filósofos y\nbarbería'),
+
+  N('semaforos', 'implementar', 0, 0, 'Semáforos\n(sin dueño)', true),
+  N('synchronized', 'implementar', 1, 0, 'synchronized'),
+  N('monitores', 'implementar', 0, 1, 'Monitor y\ncolas de condición'),
+  N('waitnotify', 'implementar', 1, 1, 'wait, notify,\nnotifyAll'),
+  N('senal', 'implementar', 0, 2, 'Políticas de\nseñalización', true),
+  N('locks', 'implementar', 1, 2, 'Lock y\nReadWriteLock'),
+  N('monitorrdp', 'implementar', 0, 3, 'Monitor guiado\npor una RdP', true),
+  N('thread', 'implementar', 1, 3, 'Thread y Runnable\nstart vs run'),
+  N('executors', 'implementar', 0, 4, 'ThreadFactory y\nExecutors'),
+  N('estados', 'implementar', 1, 4, 'Thread.State'),
+  N('sincronizadores', 'implementar', 0, 5, 'CountDownLatch,\nbarreras, Phaser'),
+  N('interrupt', 'implementar', 1, 5, 'interrupt, sleep,\njoin, daemon', true),
+
+  N('regexlog', 'verificar', 0, 0, 'Regex sobre\nel log', true),
+  N('inanicion', 'verificar', 1, 0, 'Inanición: depende\nde la política', true),
+  N('tinv', 'verificar', 0, 1, 'T-invariantes', true),
+  N('conflictos', 'verificar', 1, 1, 'Conflicto y\npersistencia', true),
+  N('ecestado', 'verificar', 0, 2, 'Ecuación de estado\nM′ = M + W·σ', true),
+  N('pinv', 'verificar', 1, 2, 'P-invariantes', true),
+  N('pipe', 'verificar', 0, 3, 'PIPE: análisis\nautomático', true),
+  N('sifones', 'verificar', 1, 3, 'Sifones y trampas'),
+  N('grafo', 'verificar', 0, 4, 'Grafo de\nalcanzabilidad', true),
+  N('propiedades', 'verificar', 1, 4, 'Acotación,\nvivacidad, deadlock'),
+  N('cobertura', 'verificar', 0, 5, 'Árbol de\ncobertura (ω)'),
+  N('homestate', 'verificar', 1, 5, 'Home state y\nreversibilidad')
+];
+const NODOS = [
+  ...NODOS_ZONA.map(n => ({...n, x: ZONAS[n.z].x + (n.c ? 360 : 100), y: ZONAS[n.z].y + 92 + n.r * 70, w: 150, h: 46})),
+  {id: 'centro', x: 600, y: 541, w: 200, h: 66, label: 'Sistemas\nconcurrentes\ncorrectos', centro: true},
+  {id: 'tp', x: 600, y: 150, w: 210, h: 84, label: 'TP final:\nred de pagos y\nmonitor en Java', estp: true}
+];
+const NODO = Object.fromEntries(NODOS.map(n => [n.id, n]));
+const A = (de, a, label, cruce) => ({de, a, label, cruce: !!cruce});
+const ARISTAS = [
+  A('zona:problema', 'centro', 'exige'),
+  A('centro', 'zona:modelar', 'se modelan con'),
+  A('centro', 'zona:verificar', 'se verifican con'),
+  A('centro', 'zona:implementar', 'se implementan con'),
+  A('tp', 'centro', 'es un caso de', true),
+
+  A('testing', 'correccion', 'no garantiza'),
+  A('testing', 'modelarn', 'por eso'),
+  A('reactivos', 'modelarn', 'se razonan con'),
+  A('interleaving', 'transicion', 'se formaliza con'),
+  A('interleaving', 'explosion', 'produce'),
+  A('procesoshilos', 'interleaving', 'se ejecutan por'),
+  A('procesoshilos', 'concpar', 'en 1 o N CPU'),
+  A('interaccion', 'exclusion', 'exige'),
+  A('exclusion', 'fallas', 'puede causar'),
+
+  A('uml', 'rdp', 'se completa con'),
+  A('gramaticas', 'chomsky', 'se clasifican en'),
+  A('chomsky', 'automatas', 'se reconocen con'),
+  A('automatas', 'moore', 'con salida'),
+  A('clases', 'automatas', 'SM con 1 ficha ≈'),
+  A('rdp', 'extensiones', 'se amplía con'),
+  A('extensiones', 'tiempo', 'y con'),
+  A('tiempo', 'ecgen', 'se ejecutan con'),
+  A('clases', 'clasicos', 'modelan'),
+
+  A('synchronized', 'waitnotify', 'se completa con'),
+  A('waitnotify', 'locks', 'más flexible'),
+  A('waitnotify', 'senal', 'es SC (Java)'),
+  A('semaforos', 'monitores', 'se abstraen en'),
+  A('monitores', 'senal', 'se clasifican por'),
+  A('senal', 'monitorrdp', 'signal and exit en'),
+  A('thread', 'estados', 'pasa por'),
+  A('interrupt', 'estados', 'cambian el'),
+  A('executors', 'thread', 'crea y administra'),
+  A('sincronizadores', 'interrupt', 'generalizan el'),
+
+  A('tinv', 'regexlog', 'se buscan con'),
+  A('ecestado', 'tinv', 'W·x = 0'),
+  A('ecestado', 'pinv', 'yᵀ·W = 0'),
+  A('conflictos', 'inanicion', 'mal resuelto causa'),
+  A('pipe', 'grafo', 'genera el'),
+  A('grafo', 'cobertura', 'si no es finito'),
+  A('grafo', 'propiedades', 'decide (finito)'),
+  A('sifones', 'propiedades', 'por Commoner'),
+  A('propiedades', 'homestate', 'y también'),
+
+  A('synchronized', 'exclusion', 'garantiza la', true),
+  A('semaforos', 'fallas', 'mal usados causan', true),
+  A('regexlog', 'er', 'usa', true),
+  A('clasicos', 'inanicion', 'pueden sufrir', true)
+];
+
+/* ---------- Utilidades ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const inline = s => esc(s)
+  .replace(/`([^`]+)`/g, '<code>$1</code>')
+  .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
+  .replace(/_\{([^}]+)\}/g, '<sub>$1</sub>');
+const azar = n => { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] % n; };
+const SIN_MOVIMIENTO = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- Estado (sólo en este navegador) ---------- */
+const KEY = 'pc-coloquio-bolillero';
+const NUMEROS = BOLILLAS.map(b => b.n);
+let estado = {afuera: [], ultima: [], cuantas: 2, tp: true};
+try { Object.assign(estado, JSON.parse(localStorage.getItem(KEY)) || {}); } catch (e) {}
+estado.afuera = (estado.afuera || []).filter(n => NUMEROS.includes(n));
+estado.ultima = (estado.ultima || []).filter(n => NUMEROS.includes(n));
+if (![1, 2, 3].includes(estado.cuantas)) estado.cuantas = 2;
+function guardar() { try { localStorage.setItem(KEY, JSON.stringify(estado)); } catch (e) {} }
+let girando = false;
+
+/* ---------- Bombo ---------- */
+const POS = BOLILLAS.map((b, i) => {
+  const r = 74 * Math.sqrt((i + 0.5) / BOLILLAS.length), t = i * 2.39996;
+  return {x: 120 + r * Math.cos(t), y: 120 + r * Math.sin(t)};
+});
+function renderBombo() {
+  $('#tambor-bolas').innerHTML = BOLILLAS.map((b, i) => estado.afuera.includes(b.n) ? '' :
+    `<g class="bola" transform="translate(${POS[i].x.toFixed(1)} ${POS[i].y.toFixed(1)})"><circle r="15"/><text>${b.n}</text></g>`).join('');
+  const quedan = BOLILLAS.length - estado.afuera.length;
+  $('#estado').textContent = quedan
+    ? `Quedan ${quedan} de ${BOLILLAS.length} bolillas en el bombo.`
+    : 'El bombo está vacío. Volvé a meter todas las bolillas para seguir.';
+  $('#girar').disabled = girando || quedan === 0;
+  $('#meter').disabled = girando || estado.afuera.length === 0;
+  const sal = $('#salidas');
+  sal.innerHTML = '';
+  if (estado.afuera.length) {
+    sal.append('Ya salieron:');
+    estado.afuera.forEach(n => {
+      const b = document.createElement('button');
+      b.className = 'chipball';
+      b.textContent = n;
+      b.title = BOLILLAS.find(x => x.n === n).titulo;
+      b.onclick = () => irALista(n);
+      sal.appendChild(b);
+    });
+  }
+  document.querySelectorAll('#cuantas button').forEach(b => b.classList.toggle('on', +b.dataset.n === estado.cuantas));
+  $('#contp').checked = estado.tp;
+}
+
+function girar() {
+  const disponibles = NUMEROS.filter(n => !estado.afuera.includes(n));
+  if (girando || !disponibles.length) return;
+  const sacadas = [];
+  for (let k = Math.min(estado.cuantas, disponibles.length); k > 0; k--) {
+    sacadas.push(disponibles.splice(azar(disponibles.length), 1)[0]);
+  }
+  girando = true;
+  renderBombo();
+  const tambor = $('#tambor');
+  tambor.classList.remove('girando');
+  void tambor.getBoundingClientRect();
+  tambor.classList.add('girando');
+  setTimeout(() => {
+    tambor.classList.remove('girando');
+    girando = false;
+    estado.afuera.push(...sacadas);
+    estado.ultima = sacadas;
+    guardar();
+    renderBombo();
+    renderResultado();
+    $('#resultado').scrollIntoView({behavior: SIN_MOVIMIENTO ? 'auto' : 'smooth', block: 'start'});
+  }, SIN_MOVIMIENTO ? 0 : 1450);
+}
+
+/* ---------- Tarjetas ---------- */
+function tarjeta(b, enLista) {
+  const esTP = b === TP;
+  const el = document.createElement('article');
+  el.className = 'card';
+  const total = b.checklist.length;
+  el.innerHTML = `
+    ${enLista ? `<p class="sub" style="margin:0">${inline(b.resumen)}</p>` : `
+    <header class="chead">
+      <span class="ball${esTP ? ' tp' : ''}">${esTP ? 'TP' : b.n}</span>
+      <div><h2>${esc(b.titulo)}</h2><p class="sub">${inline(b.resumen)}</p></div>
+    </header>`}
+    <div class="ctitle"><h3>Qué tenés que desarrollar</h3><span class="count">0/${total} desarrollados</span></div>
+    <ol class="check">${b.checklist.map(it => `
+      <li><div class="item"><label><input type="checkbox"><span>${inline(it.t)}</span></label>
+        <button class="hintbtn" aria-expanded="false">pista</button></div>
+        <div class="hint" hidden>${inline(it.p)}</div></li>`).join('')}</ol>
+    ${b.ojo ? `<h3>Trampa típica</h3><div class="warn">${inline(b.ojo)}</div>` : ''}
+    ${b.tp ? `<h3>Enganche con el TP</h3><p class="engancha">${inline(b.tp)}</p>` : ''}
+    ${b.rp ? `<h3>Repreguntas probables</h3><div class="rp">${b.rp.map(x =>
+      `<details><summary>${inline(x.q)}</summary><p>${inline(x.r)}</p></details>`).join('')}</div>` : ''}
+    <h3>${esTP ? 'Para repasar' : 'En el apunte'}</h3>
+    <ul class="ap">${b.ap.map(s => `<li>${inline(s)}</li>`).join('')}</ul>
+    <div class="row-btns">
+      <button class="btn pista">Pista: mapa conceptual</button>
+      <button class="btn limpiar">Desmarcar todo</button>
+    </div>`;
+  const cajas = [...el.querySelectorAll('ol.check input')];
+  const contar = () => {
+    const n = cajas.filter(c => c.checked).length;
+    const cnt = el.querySelector('.count');
+    cnt.textContent = `${n}/${total} desarrollados`;
+    cnt.classList.toggle('ok', n === total);
+    el.classList.toggle('completa', n === total);
+    cajas.forEach(c => c.closest('li').classList.toggle('hecho', c.checked));
+  };
+  cajas.forEach(c => c.onchange = contar);
+  el.querySelectorAll('.hintbtn').forEach(btn => btn.onclick = () => {
+    const h = btn.closest('li').querySelector('.hint');
+    h.hidden = !h.hidden;
+    btn.setAttribute('aria-expanded', String(!h.hidden));
+  });
+  el.querySelector('.limpiar').onclick = () => { cajas.forEach(c => c.checked = false); contar(); };
+  el.querySelector('.pista').onclick = () => abrirMapa(b);
+  return el;
+}
+
+function renderResultado() {
+  const r = $('#resultado');
+  r.innerHTML = '';
+  if (!estado.ultima.length) {
+    r.innerHTML = '<div class="vacio">Girá el bolillero para sacar las bolillas que te tocan.</div>';
+    return;
+  }
+  const cab = document.createElement('div');
+  cab.className = 'sacadas';
+  cab.innerHTML = '<span class="lbl">Te tocaron</span>' +
+    (estado.tp ? '<span class="bigball tp" title="Defensa del TP">TP</span>' : '') +
+    estado.ultima.map((n, i) => `<span class="bigball" style="animation-delay:${(i + (estado.tp ? 1 : 0)) * 0.12}s" title="${esc(BOLILLAS.find(b => b.n === n).titulo)}">${n}</span>`).join('');
+  r.appendChild(cab);
+  if (estado.tp) r.appendChild(tarjeta(TP));
+  estado.ultima.forEach(n => r.appendChild(tarjeta(BOLILLAS.find(b => b.n === n))));
+}
+
+/* ---------- Todas las bolillas ---------- */
+function renderLista() {
+  const cont = $('#lista');
+  [TP, ...BOLILLAS].forEach(b => {
+    const d = document.createElement('details');
+    d.className = 'entrada';
+    d.id = 'b-' + (b === TP ? 'tp' : b.n);
+    d.innerHTML = `<summary><span class="ball sm${b === TP ? ' tp' : ''}">${b === TP ? 'TP' : b.n}</span><span>${esc(b.titulo)}</span></summary>`;
+    d.addEventListener('toggle', () => {
+      if (d.open && !d.dataset.listo) { d.appendChild(tarjeta(b, true)); d.dataset.listo = '1'; }
+    });
+    cont.appendChild(d);
+  });
+}
+function irALista(n) {
+  const d = document.getElementById('b-' + n);
+  d.open = true;
+  d.scrollIntoView({behavior: SIN_MOVIMIENTO ? 'auto' : 'smooth', block: 'start'});
+}
+
+/* ---------- Mapa ---------- */
+function extremo(id) {
+  if (id.startsWith('zona:')) return {...ANCLAS[id.slice(5)], ancla: true, z: id.slice(5)};
+  return NODO[id];
+}
+function borde(n, tx, ty) {
+  if (n.ancla) return {x: n.x, y: n.y};
+  const dx = tx - n.x, dy = ty - n.y;
+  const s = Math.min((n.w / 2) / (Math.abs(dx) || 1e-9), (n.h / 2) / (Math.abs(dy) || 1e-9));
+  return {x: n.x + dx * s, y: n.y + dy * s};
+}
+function zonaDe(x, y) {
+  for (const [k, z] of Object.entries(ZONAS)) if (x > z.x && x < z.x + z.w && y > z.y && y < z.y + z.h) return k;
+  return 'centro';
+}
+function textoNodo(n) {
+  const lineas = n.label.split('\n'), lh = n.centro || n.estp ? 17 : 15;
+  return `<text>${lineas.map((l, i) => `<tspan x="${n.x}" y="${(n.y + (i - (lineas.length - 1) / 2) * lh).toFixed(1)}">${esc(l)}</tspan>`).join('')}</text>`;
+}
+function dibujarMapa(on) {
+  const svg = $('#mapa');
+  const prendido = id => {
+    if (!on) return false;
+    if (id.startsWith('zona:')) return NODOS_ZONA.some(n => n.z === id.slice(5) && on.has(n.id));
+    return id === 'centro' || on.has(id);
+  };
+  const zonas = Object.entries(ZONAS).map(([k, z]) =>
+    `<g class="zona z-${k}"><rect x="${z.x}" y="${z.y}" width="${z.w}" height="${z.h}" rx="16"/>` +
+    `<text x="${z.x + 20}" y="${z.y + 32}">${z.titulo}</text></g>`).join('');
+  const aristas = ARISTAS.map(e => {
+    const a = extremo(e.de), b = extremo(e.a);
+    const p = borde(a, b.x, b.y), q0 = borde(b, a.x, a.y);
+    const len = Math.hypot(q0.x - p.x, q0.y - p.y) || 1;
+    const q = {x: q0.x - (q0.x - p.x) / len * 2, y: q0.y - (q0.y - p.y) / len * 2};
+    const mx = (p.x + q.x) / 2, my = (p.y + q.y) / 2;
+    const cls = 'arista' + (e.cruce ? ' cruce' : '') + (prendido(e.de) && prendido(e.a) ? ' on' : '');
+    return `<g class="${cls}"><line x1="${p.x.toFixed(1)}" y1="${p.y.toFixed(1)}" x2="${q.x.toFixed(1)}" y2="${q.y.toFixed(1)}"/>` +
+      `<text class="rotulo h-${zonaDe(mx, my)}" x="${mx.toFixed(1)}" y="${my.toFixed(1)}">${esc(e.label)}</text></g>`;
+  }).join('');
+  const nodos = NODOS.map(n => {
+    const cls = 'nodo' + (n.centro ? ' centro' : '') + (n.estp ? ' estp' : '') + (on && on.has(n.id) ? ' on' : '');
+    const chip = n.tp ? `<g class="chiptp"><rect x="${n.x + n.w / 2 - 24}" y="${n.y - n.h / 2 - 8}" width="26" height="15" rx="7.5"/>` +
+      `<text x="${n.x + n.w / 2 - 11}" y="${n.y - n.h / 2 - 0.5}">TP</text></g>` : '';
+    return `<g class="${cls}"><rect x="${n.x - n.w / 2}" y="${n.y - n.h / 2}" width="${n.w}" height="${n.h}" rx="${n.centro ? 14 : 10}"/>${textoNodo(n)}${chip}</g>`;
+  }).join('');
+  svg.classList.toggle('resaltando', !!on);
+  svg.innerHTML = `<defs>
+      <marker id="flecha" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="punta" d="M0,0 L10,5 L0,10 z"/></marker>
+      <marker id="flecha-on" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="punta-on" d="M0,0 L10,5 L0,10 z"/></marker>
+    </defs>${zonas}${aristas}${nodos}`;
+}
+function abrirMapa(b) {
+  if (b) {
+    dibujarMapa(new Set(b.nodos));
+    $('#mapatitulo').textContent = b === TP ? 'Pista · Defensa del TP' : `Pista · Bolilla ${b.n}: ${b.titulo}`;
+    $('#mapasub').textContent = 'Resaltados, los conceptos de esta bolilla. Seguí las flechas para ver de dónde sale cada uno y a qué lleva.';
+  } else {
+    dibujarMapa(null);
+    $('#mapatitulo').textContent = 'Mapa conceptual de la materia';
+    $('#mapasub').textContent = 'Del problema a sus modelos, su análisis y su implementación. Los conceptos marcados con TP aparecen en el trabajo práctico.';
+  }
+  const dlg = $('#dlgmapa');
+  if (!dlg.open) dlg.showModal();
+  dlg.scrollTop = 0;
+  dlg.querySelector('.mapawrap').scrollLeft = 0;
+  /* Con una bolilla, se lleva a la vista el primero de sus conceptos */
+  const primero = b && $('#mapa .nodo.on:not(.centro)');
+  if (primero) primero.scrollIntoView({block: 'center', inline: 'nearest'});
+}
+
+/* ---------- Controles ---------- */
+$('#girar').onclick = girar;
+$('#meter').onclick = () => {
+  if (!estado.afuera.length) return;
+  estado.afuera = [];
+  estado.ultima = [];
+  guardar();
+  renderBombo();
+  renderResultado();
+};
+document.querySelectorAll('#cuantas button').forEach(b => b.onclick = () => {
+  estado.cuantas = +b.dataset.n;
+  guardar();
+  renderBombo();
+});
+$('#contp').onchange = e => { estado.tp = e.target.checked; guardar(); renderResultado(); };
+$('#vermapa').onclick = () => abrirMapa(null);
+$('#cerrarmapa').onclick = () => $('#dlgmapa').close();
+$('#dlgmapa').addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.close(); });
+$('#theme').onclick = () => {
+  const root = document.documentElement;
+  const oscuroAhora = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  root.dataset.theme = oscuroAhora ? 'light' : 'dark';
+};
+
+renderBombo();
+renderResultado();
+renderLista();
+</script>
+</body>
+</html>

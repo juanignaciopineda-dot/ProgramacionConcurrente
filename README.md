@@ -14,7 +14,7 @@ Apuntes y material de estudio personal para la materia **Programación Concurren
   - `Clase 7` — *(pendiente de cargar)*
 - **[Libros/](Libros)** — Bibliografía de referencia (concurrencia en Java, sistemas operativos, redes de Petri, programación concurrente).
 - **[Apuntes/](Apuntes)** — Resúmenes y notas propias *(a completar)*.
-- **[Ejercicios/](Ejercicios)** — Ejercicios resueltos de práctica *(a completar)*.
+- **[Ejercicios/](Ejercicios)** — Ejercicios para programar en Java, por unidad y con verificador automático (unidades 1 a 5 disponibles).
 - **[Trabajos Practicos/](Trabajos%20Practicos)** — Entregas y resoluciones de los TPs de la materia *(a completar)*.
 - **[Animaciones/](Animaciones)** — Animaciones o simulaciones (por ejemplo, de redes de Petri o algoritmos concurrentes) *(a completar)*.
 

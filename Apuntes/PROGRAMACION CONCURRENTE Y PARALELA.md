@@ -488,13 +488,11 @@ La consecuencia directa, y la razón de ser de toda la materia, es que cualquier
 Por eso Windows y Linux tienen fama de hilos "baratos" y procesos "costosos", y por eso una aplicación que se descompone en unidades de ejecución relacionadas conviene implementarla como una colección de hilos y no de procesos separados (Stallings, cap. 4.1).
 
 ###### **Estados de un hilo**
-Los mismos tres estados básicos:
-
+Los mismos tres estados básicos: 
 - Ejecución.
 - Listo.
 - Bloqueado.
-
-Un hilo no tiene los estados de suspensión, porque suspender es una operación a nivel de proceso.
+Un hilo no tiene los estados de suspensión, porque suspender es una operación a nivel de proceso. 
 
 Las transiciones:
 
@@ -3765,15 +3763,15 @@ Recordatorio de la terminología de grafos que usa esa demostración:
 
 Los grafos de estado y de eventos son las dos primeras **estructuras particulares** de RdP. Hay varias más, y todas se obtienen **restringiendo la estructura** del grafo, y la idea es que, a cambio de modelar menos casos, cada restricción permite demostrar más propiedades. Todas se definen sobre la red **no marcada**, con la notación $p^\bullet$ (transiciones de salida del lugar $p$) y $^\bullet t$ (lugares de entrada de $t$).
 
-| Clase | Condición | Lo que se puede encontrar | Lo que **no** |
-|---|---|---|---|
-| **Grafo de estado** (máquina de estado, SM) | $\forall t:\ \lvert{}^\bullet t\rvert = \lvert t^\bullet\rvert = 1$ | Conflictos | Sincronizaciones (una transición con dos entradas) |
-| **Grafo de eventos** (grafo marcado, GM) | $\forall p:\ \lvert{}^\bullet p\rvert = \lvert p^\bullet\rvert = 1$ | Sincronizaciones | Conflictos |
-| **Libre de conflicto** | Cada lugar tiene **como máximo una** transición de salida | Un lugar con varias entradas | Un lugar con dos transiciones de salida |
-| **Libre elección** (*free choice*, FC) | $p_1 \ne p_2,\ p_1^\bullet \cap p_2^\bullet \ne \varnothing \Rightarrow \lvert p_1^\bullet\rvert = \lvert p_2^\bullet\rvert = 1$ | Conflictos, si el lugar del conflicto es la **única** entrada de las transiciones en conflicto | Una transición en conflicto que además tenga otra entrada |
-| **Libre elección extendida** (EFC) | $p_1^\bullet \cap p_2^\bullet \ne \varnothing \Rightarrow p_1^\bullet = p_2^\bullet$ | Transiciones en conflicto con **el mismo conjunto** de lugares de entrada | Transiciones en conflicto con entradas distintas |
-| **Simple** | $p \ne p',\ p^\bullet \cap p'^\bullet \ne \varnothing \Rightarrow \lvert p^\bullet\rvert \le 1 \ \text{o}\ \lvert p'^\bullet\rvert \le 1$ | Cada transición involucrada en **a lo sumo un** conflicto | Una transición que pertenezca a dos conflictos distintos |
-| **Simple extendida** | $p^\bullet \cap p'^\bullet \ne \varnothing \Rightarrow p^\bullet \subseteq p'^\bullet \ \text{o}\ p'^\bullet \subseteq p^\bullet$ | Conjuntos de salida anidados | Conjuntos de salida que se cruzan sin incluirse |
+| Clase                                       | Condición                                                                                                                                 | Lo que se puede encontrar                                                                      | Lo que **no**                                             |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| **Grafo de estado** (máquina de estado, SM) | $\forall t:\ \lvert{}^\bullet t\rvert = \lvert t^\bullet\rvert = 1$                                                                       | Conflictos                                                                                     | Sincronizaciones (una transición con dos entradas)        |
+| **Grafo de eventos** (grafo marcado, GM)    | $\forall p:\ \lvert{}^\bullet p\rvert = \lvert p^\bullet\rvert = 1$                                                                       | Sincronizaciones                                                                               | Conflictos                                                |
+| **Libre de conflicto**                      | Cada lugar tiene **como máximo una** transición de salida                                                                                 | Un lugar con varias entradas                                                                   | Un lugar con dos transiciones de salida                   |
+| **Libre elección** (*free choice*, FC)      | $p_1 \ne p_2,\ p_1^\bullet \cap p_2^\bullet \ne \varnothing \Rightarrow \lvert p_1^\bullet\rvert = \lvert p_2^\bullet\rvert = 1$          | Conflictos, si el lugar del conflicto es la **única** entrada de las transiciones en conflicto | Una transición en conflicto que además tenga otra entrada |
+| **Libre elección extendida** (EFC)          | $p_1^\bullet \cap p_2^\bullet \ne \varnothing \Rightarrow p_1^\bullet = p_2^\bullet$                                                      | Transiciones en conflicto con **el mismo conjunto** de lugares de entrada                      | Transiciones en conflicto con entradas distintas          |
+| **Simple**                                  | $p \ne p',\ p^\bullet \cap p'^\bullet \ne \varnothing \Rightarrow \lvert p^\bullet\rvert \le 1 \ \text{o}\ \lvert p'^\bullet\rvert \le 1$ | Cada transición involucrada en **a lo sumo un** conflicto                                      | Una transición que pertenezca a dos conflictos distintos  |
+| **Simple extendida**                        | $p^\bullet \cap p'^\bullet \ne \varnothing \Rightarrow p^\bullet \subseteq p'^\bullet \ \text{o}\ p'^\bullet \subseteq p^\bullet$         | Conjuntos de salida anidados                                                                   | Conjuntos de salida que se cruzan sin incluirse           |
 
 Lo que hay que entender de cada una:
 
