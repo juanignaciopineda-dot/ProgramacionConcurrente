@@ -69,7 +69,8 @@ details.guia ol { margin: 0; padding: 0 18px 14px 36px; display: grid; gap: 6px;
 .seg button { border: 0; background: var(--card); color: var(--ink); padding: 6px 16px; font-weight: 600; }
 .seg button + button { border-left: 1px solid var(--line); }
 .seg button.on { background: var(--accent); color: var(--on-accent); }
-.tpcheck { display: flex; gap: 8px; align-items: center; font-size: .95rem; margin-bottom: 14px; cursor: pointer; }
+.tpcheck { display: flex; gap: 8px; align-items: center; font-size: .95rem; margin-bottom: 8px; cursor: pointer; }
+.tpcheck + .controls { margin-top: 14px; }
 .tpcheck input { accent-color: var(--accent); width: 16px; height: 16px; }
 .controls { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
 .estado { margin: 4px 0 6px; font-size: .92rem; color: var(--muted); }
@@ -124,6 +125,44 @@ ul.ap { margin: 0; padding-left: 20px; font-size: .92rem; color: var(--muted); }
 .rp summary { cursor: pointer; font-weight: 600; font-size: .95rem; }
 .rp details p { margin: 8px 0 2px; font-size: .93rem; }
 .row-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+.row-btns.mapabtns { margin-top: 12px; }
+.btn.vermapa.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+
+/* ---------- Mapa de una bolilla ---------- */
+.cm-ayuda { margin: 0 0 8px; font-size: .88rem; color: var(--muted); }
+.cmap { padding: 14px 14px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); }
+.cm-raiz { display: inline-block; background: var(--ink); color: var(--bg); font-weight: 800; padding: 8px 14px; border-radius: 10px; }
+.cm-raiz code { background: transparent; color: inherit; }
+.cm-ramas { margin-left: 18px; }
+.cm-rama { position: relative; display: grid; grid-template-columns: 150px minmax(150px, 210px) 1fr;
+  column-gap: 12px; align-items: center; padding: 7px 0; }
+.cm-rama::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; border-left: 2px solid var(--muted); }
+.cm-rama:last-child::before { bottom: 50%; }
+.cm-rama::after { content: ""; position: absolute; left: 0; width: 154px; top: 50%; border-top: 2px solid var(--muted); }
+.cm-enlace { position: relative; z-index: 1; justify-self: center; text-align: center; font-size: .8rem; font-style: italic;
+  line-height: 1.25; color: var(--muted); background: var(--bg); padding: 1px 6px; margin-left: 8px; }
+.cm-nodo { position: relative; display: flex; gap: 8px; align-items: center; background: var(--card);
+  border: 1.5px solid var(--accent); border-radius: 9px; padding: 6px 10px; font-weight: 600; font-size: .95rem; line-height: 1.3; }
+.cm-nodo::before { content: ""; position: absolute; left: -10px; top: 50%; margin-top: -5px;
+  border: 5px solid transparent; border-left: 8px solid var(--muted); border-right: 0; }
+.cm-num { flex: 0 0 auto; width: 21px; height: 21px; border-radius: 50%; background: var(--accent); color: var(--on-accent);
+  font-size: .72rem; font-weight: 800; display: grid; place-items: center; }
+.cm-det { position: relative; display: flex; flex-wrap: wrap; gap: 6px; }
+.cm-det:not(:empty)::before { content: ""; position: absolute; left: -12px; width: 12px; top: 50%; border-top: 1.5px dashed var(--muted); }
+.cm-chip { background: var(--code); border: 1px solid var(--line); border-radius: 8px; padding: 3px 8px; font-size: .85rem; line-height: 1.35; }
+.cm-chip i { color: var(--muted); }
+.cm-chip code { background: var(--card); }
+.cm-con { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--line); }
+.cm-con .lbl { font-size: .85rem; margin-right: 2px; }
+.cm-link { border: 1px solid var(--accent); color: var(--ink); background: transparent; border-radius: 999px; padding: 2px 10px; font-size: .82rem; text-align: left; }
+.cm-link b { color: var(--accent); margin-right: 2px; }
+.cm-link:hover { background: var(--accent-soft); }
+@media (max-width: 640px) {
+  .cm-rama { grid-template-columns: 1fr; row-gap: 5px; padding-left: 16px; }
+  .cm-rama::after { width: 12px; top: 22px; }
+  .cm-enlace { justify-self: start; margin-left: 0; padding-left: 0; }
+  .cm-nodo::before, .cm-det:not(:empty)::before { display: none; }
+}
 
 /* ---------- Todas las bolillas ---------- */
 .todas h2 { font-size: 1.25rem; margin: 30px 0 4px; }
@@ -187,16 +226,16 @@ dialog#dlgmapa::backdrop { background: rgba(0, 0, 0, .5); }
 <div class="wrap">
   <button class="btn themebtn" id="theme" title="Cambiar tema">◐</button>
   <h1>Coloquio: bolillero</h1>
-  <p class="sub">Sacá bolillas al azar y desarrollá cada tema en voz alta, como en el coloquio. Cada bolilla trae el checklist de lo que tenés que decir, con una pista por ítem, y como ayuda el mapa conceptual de la materia con sus conceptos resaltados. Las bolillas que salieron quedan afuera del bombo hasta que las vuelvas a meter.</p>
+  <p class="sub">El coloquio son 3 temas sacados al azar. Sacalos del bombo y desarrollá cada uno en voz alta, como en la mesa. Cada bolilla trae su propio mapa conceptual para guiar la exposición, el checklist de lo que tenés que decir con una pista por ítem, y su ubicación en el mapa conceptual de toda la materia. Las bolillas que salieron quedan afuera del bombo hasta que las vuelvas a meter.</p>
 
   <details class="guia">
     <summary>Cómo practicar con el bolillero</summary>
     <ol>
-      <li>Girá el bolillero. Si está marcada la defensa del TP, empezá por ahí, porque el coloquio arranca con el TP y desde ahí el tribunal tira de los hilos de la teoría.</li>
+      <li>Girá el bolillero y sacá 3 bolillas, como en el coloquio. Desarrollalas en el orden en que salieron.</li>
       <li>Desarrollá cada bolilla en voz alta y sin mirar, entre 3 y 5 minutos. Arrancá por la definición precisa, seguí con el mecanismo y un ejemplo que puedas dibujar, y cerrá con la relación con otros temas.</li>
       <li>Recién después abrí el checklist y tildá lo que dijiste. De lo que faltó, leé la pista y volvé a decirlo con tus palabras.</li>
-      <li>Si te trabás, abrí el mapa conceptual. Buscá de qué concepto sale el tuyo y a qué lleva, y retomá desde ahí.</li>
-      <li>Terminá cada tema con su enganche con el TP. Es la conexión que más preguntan.</li>
+      <li>Si te trabás, o mientras le agarrás la mano a un tema, mostrá el mapa de la bolilla. Tiene los conceptos numerados en el orden en que conviene exponerlos, con lo que hay que decir de cada uno. Para ver con qué otros temas se conecta, ubicala en el mapa de la materia.</li>
+      <li>Cuando un concepto se entiende mejor con un caso concreto, usá el ejemplo del TP que trae cada bolilla.</li>
       <li>Seguí girando hasta vaciar el bombo, y repetí al otro día las bolillas que te costaron.</li>
     </ol>
   </details>
@@ -222,12 +261,13 @@ dialog#dlgmapa::backdrop { background: rgba(0, 0, 0, .5); }
     </svg>
     <div>
       <div class="field">
-        <span class="lbl">Bolillas por sorteo</span>
+        <span class="lbl">Temas por sorteo</span>
         <div class="seg" id="cuantas">
           <button data-n="1">1</button><button data-n="2">2</button><button data-n="3">3</button>
         </div>
+        <span class="lbl">(en el coloquio son 3)</span>
       </div>
-      <label class="tpcheck"><input type="checkbox" id="contp"> Empezar por la defensa del TP</label>
+      <label class="tpcheck"><input type="checkbox" id="conmapas"> Mostrar el mapa de cada bolilla al sacarla</label>
       <div class="controls">
         <button class="btn primary" id="girar">Girar el bolillero</button>
         <button class="btn" id="meter">Volver a meter todas</button>
@@ -244,6 +284,12 @@ dialog#dlgmapa::backdrop { background: rgba(0, 0, 0, .5); }
     <h2>Todas las bolillas</h2>
     <p class="sub">Para estudiar sin sortear. Cada una tiene el mismo checklist que cuando sale del bombo.</p>
     <div id="lista"></div>
+  </section>
+
+  <section class="todas">
+    <h2>Aparte: defensa del TP final</h2>
+    <p class="sub">No entra en el coloquio, porque el TP se evalúa por separado. Queda acá para prepararlo.</p>
+    <div id="aparte"></div>
   </section>
 </div>
 
@@ -286,12 +332,12 @@ const BOLILLAS = [
   {t: 'Sistemas **reactivos** y **transformacionales**',
    p: 'El transformacional recibe entradas, calcula una salida y termina. El reactivo interactúa permanentemente con el ambiente y no se espera que termine, así que se razona sobre secuencias infinitas de interacciones.'},
   {t: 'Por qué **redes de Petri** y no máquinas de estado finito',
-   p: 'La FSM explota en tamaño. En la RdP el estado global emerge del marcado, y dos procesos de 10 estados son 100 estados en una FSM y 20 lugares en una red.'},
+   p: 'La FSM explota en tamaño. En la RdP el estado global emerge del marcado, y dos procesos de 10 estados son 100 estados en una FSM y 20 plazas en una red.'},
   {t: 'El camino de la materia, del problema al programa',
    p: 'UML para entender el problema, una RdP para modelarlo, propiedades e invariantes para verificarlo y un monitor que ejecuta la red. El testing queda como complemento.'}
  ],
  tp: 'El TP sigue ese camino. La red se analizó con PIPE antes de escribir el monitor, y la inanición del flujo de alto riesgo apareció primero en el análisis de la red y después en los experimentos.',
- ap: ['Introducción a la Programación Concurrente › Historia y motivación', 'Introducción a la Programación Concurrente › El enfoque de modelar'],
+ ap: ['Teoría › Introducción a la Programación Concurrente › Historia y motivación', 'Teoría › Introducción a la Programación Concurrente › El enfoque de modelar'],
  nodos: ['correccion', 'testing', 'reactivos', 'modelarn']},
 
 {n: 2, titulo: 'Semántica: transiciones de estado e interleaving',
@@ -316,7 +362,7 @@ const BOLILLAS = [
  ],
  ojo: 'No digas que los procesos concurrentes se ejecutan "simultáneamente". Decí que se ejecutan intercalando acciones atómicas, que es la respuesta que acepta la cátedra.',
  tp: 'El log del TP es una ejecución, del estilo `T0T1T0T6T2T7T3T9…`, y cada corrida da un interleaving distinto. Por eso la verificación no compara logs, sino que busca invariantes completos con una expresión regular.',
- ap: ['Introducción a la Programación Concurrente › Semántica: transiciones de estado e interleaving'],
+ ap: ['Teoría › Introducción a la Programación Concurrente › Semántica: transiciones de estado e interleaving'],
  nodos: ['transicion', 'interleaving', 'explosion']},
 
 {n: 3, titulo: 'Procesos e hilos',
@@ -341,7 +387,7 @@ const BOLILLAS = [
  ],
  ojo: 'El paralelismo es un caso particular de la concurrencia. Decir que concurrente significa "a la vez" fue corregido en los parciales.',
  tp: 'El TP corre 9 hilos dentro de un proceso. Comparten la red y el log, que están en el heap, y por eso todo acceso pasa por el monitor. A lo sumo 3 hilos ejecutan una acción a la vez.',
- ap: ['Introducción a la Programación Concurrente › Procesos', 'Introducción a la Programación Concurrente › Hilos', 'Introducción a la Programación Concurrente › Concurrencia: principios generales', 'Introducción a la Programación Concurrente › Concurrencia vs paralelismo'],
+ ap: ['Teoría › Introducción a la Programación Concurrente › Procesos', 'Teoría › Introducción a la Programación Concurrente › Hilos', 'Teoría › Introducción a la Programación Concurrente › Concurrencia: principios generales', 'Teoría › Introducción a la Programación Concurrente › Concurrencia vs paralelismo'],
  nodos: ['procesoshilos', 'concpar']},
 
 {n: 4, titulo: 'Interacción entre procesos y exclusión mutua',
@@ -366,7 +412,7 @@ const BOLILLAS = [
  ],
  ojo: 'La inanición no es un deadlock. En la inanición el sistema sigue avanzando y uno solo queda esperando para siempre.',
  tp: 'Los flujos del TP compiten por dos recursos de uso exclusivo, el gateway (P7) y el antifraude (P8), y el de alto riesgo necesita los dos a la vez. Ahí aparecen la exclusión mutua, garantizada por los P-invariantes, y la inanición del alto riesgo.',
- ap: ['Introducción a la Programación Concurrente › Interacción entre procesos', 'Introducción a la Programación Concurrente › Requisitos para la exclusión mutua', 'Introducción a la Programación Concurrente › Sincronización por pasaje de mensajes'],
+ ap: ['Teoría › Introducción a la Programación Concurrente › Interacción entre procesos', 'Teoría › Introducción a la Programación Concurrente › Requisitos para la exclusión mutua', 'Teoría › Introducción a la Programación Concurrente › Sincronización por pasaje de mensajes'],
  nodos: ['interaccion', 'exclusion', 'fallas']},
 
 {n: 5, titulo: 'Java y UML para modelar el problema',
@@ -388,7 +434,7 @@ const BOLILLAS = [
    p: 'Identifica los hilos, los recursos compartidos y las interacciones antes de modelar con una RdP. El diagrama de clases no describe comportamiento, y el de secuencia muestra un solo escenario.'}
  ],
  tp: 'El informe del TP tiene el diagrama de clases (con `implements`, composición, agregación, asociación, «create» y «use») y el diagrama de secuencia de `fireTransition`, con un `loop` y fragmentos `alt`.',
- ap: ['Java — Conceptos Básicos', 'Modelado de un sistema con diagramas UML', 'Ejercicio 1 — Threads (diagramas de clases y de secuencia)'],
+ ap: ['Práctica › Java — Conceptos Básicos', 'Práctica › Modelado de un sistema con diagramas UML', 'Práctica › Primer hilo: `start()` vs `run()` (diagramas de clases y de secuencia)'],
  nodos: ['uml']},
 
 {n: 6, titulo: 'Gramáticas, lenguajes y jerarquía de Chomsky',
@@ -413,7 +459,7 @@ const BOLILLAS = [
  ],
  ojo: 'aⁿbᵐ con n ≥ 1 y m ≥ 0 es regular (a⁺b*), así que alcanza un autómata finito. aⁿbⁿ no lo es.',
  tp: 'Las secuencias de disparo de la red del TP forman un lenguaje. Como la red es acotada, su grafo de alcanzabilidad es finito y ese lenguaje es regular, y por eso una expresión regular alcanza para reconocer los invariantes en el log.',
- ap: ['Gramáticas, Lenguajes y Autómatas › Motivación', 'Gramáticas, Lenguajes y Autómatas › Definiciones previas', 'Gramáticas, Lenguajes y Autómatas › Definición formal de gramática', 'Gramáticas, Lenguajes y Autómatas › Jerarquía de Chomsky'],
+ ap: ['Teoría › Gramáticas, Lenguajes y Autómatas › Motivación', 'Teoría › Gramáticas, Lenguajes y Autómatas › Definiciones previas', 'Teoría › Gramáticas, Lenguajes y Autómatas › Definición formal de gramática', 'Teoría › Gramáticas, Lenguajes y Autómatas › Jerarquía de Chomsky'],
  nodos: ['gramaticas', 'chomsky']},
 
 {n: 7, titulo: 'Autómatas y expresiones regulares',
@@ -440,7 +486,7 @@ const BOLILLAS = [
  ],
  ojo: 'En Moore la salida depende del estado. Responder que depende "de la gramática que se esté usando" sacó 0.',
  tp: 'La regex del TP reconoce los tres T-invariantes con una sola expresión, huecos perezosos `(.*?)` entre transiciones y `(?!\\d)` para que `T1` no se confunda con el comienzo de `T10`. Con huecos codiciosos, un invariante se llevaría transiciones de otro.',
- ap: ['Gramáticas, Lenguajes y Autómatas › Autómatas (hasta Autómatas finitos)', 'Gramáticas, Lenguajes y Autómatas › Expresiones regulares ↔ autómatas finitos', 'Expresiones regulares en la práctica: verificar T-invariantes'],
+ ap: ['Teoría › Gramáticas, Lenguajes y Autómatas › Autómatas (hasta Autómatas finitos)', 'Teoría › Gramáticas, Lenguajes y Autómatas › Expresiones regulares ↔ autómatas finitos', 'Práctica › Expresiones regulares en la práctica: verificar T-invariantes'],
  nodos: ['automatas', 'moore', 'er', 'regexlog']},
 
 {n: 8, titulo: 'Hilos en Java',
@@ -467,7 +513,7 @@ const BOLILLAS = [
  ],
  ojo: 'Con un main, varios productores y dos hilos daemon, el programa termina cuando terminan main y los productores. Los daemon no lo mantienen vivo.',
  tp: 'En el TP, `Main` arranca los 9 `Worker` y hace `join()` sobre cada uno antes de analizar el log. Los hilos no se cortan con `stop` ni con `System.exit`, sino que `fireTransition` devuelve `false` y cada uno sale de `run()`. El mutex se toma con `acquireUninterruptibly()`.',
- ap: ['Threads en Java — atributos, estados y prioridades', 'Interrupción, sleep y join de hilos', 'Excepciones no controladas, hilos daemon, variables locales de hilo y CountDownLatch'],
+ ap: ['Práctica › Threads en Java — atributos, estados y prioridades', 'Práctica › Interrupción, sleep y join de hilos', 'Práctica › Excepciones no controladas, hilos daemon, variables locales de hilo y CountDownLatch'],
  nodos: ['thread', 'estados', 'interrupt']},
 
 {n: 9, titulo: 'Sincronización en Java',
@@ -494,7 +540,7 @@ const BOLILLAS = [
  ],
  ojo: 'Explicá `synchronized(a)` por el objeto `a` como llave. Que dos bloques sincronicen sobre objetos distintos no los excluye.',
  tp: 'El mutex del monitor del TP es un `Semaphore(1)` y no un `ReentrantLock`, porque con signal and exit el permiso pasa del hilo que dispara al despertado. Un lock con dueño no se puede ceder. Las colas de condición son semáforos que arrancan en 0, con un contador de los que esperan.',
- ap: ['Sincronización con synchronized — fundamentos', 'Sincronización básica en Java — Locks, ReadWriteLocks y Semáforos'],
+ ap: ['Práctica › Sincronización con `synchronized` — fundamentos', 'Práctica › Sincronización básica en Java — Locks, ReadWriteLocks y Semáforos'],
  nodos: ['synchronized', 'waitnotify', 'locks', 'semaforos', 'exclusion']},
 
 {n: 10, titulo: 'Sincronizadores, ThreadFactory y Executors',
@@ -519,7 +565,7 @@ const BOLILLAS = [
  ],
  ojo: '`Phaser` salió en 2023 y quien la dejó en blanco sacó 0. Se inicializa con la cantidad de participantes. `CyclicBarrier` y `Phaser` no están en el apunte, así que repasalos del Java 9 Concurrency Cookbook (capítulo 3).',
  tp: 'El TP no usa un pool, porque los 9 hilos son fijos y cada uno repite su secuencia. Un `newFixedThreadPool(n)` se modela con una plaza de tareas pendientes (no acotada si llegan más de las que se atienden) y n fichas de hilos libres, como la barbería.',
- ap: ['Excepciones no controladas, hilos daemon, variables locales de hilo y CountDownLatch › CountDownLatch', 'Thread Factory y Executors'],
+ ap: ['Práctica › Excepciones no controladas, hilos daemon, variables locales de hilo y CountDownLatch › Esperar múltiples eventos concurrentes: `CountDownLatch`', 'Práctica › Thread Factory y Executors'],
  nodos: ['sincronizadores', 'executors']},
 
 {n: 11, titulo: 'Redes de Petri: definición, clases y modelos',
@@ -538,7 +584,7 @@ const BOLILLAS = [
   {t: 'Las **clases** de redes ordinarias',
    p: 'Máquina de estado (cada transición con una entrada y una salida, hay conflictos pero no sincronizaciones), grafo marcado (cada plaza con una entrada y una salida, sin conflictos), libre elección, libre elección extendida y simple. Además, qué es una red pura.'},
   {t: 'Los **modelos básicos**',
-   p: 'Co-begin y co-end, señalización, exclusión mutua con un lugar mutex, N recursos y buffer acotado (productor y consumidor).'},
+   p: 'Co-begin y co-end, señalización, exclusión mutua con una plaza mutex, N recursos y buffer acotado (productor y consumidor).'},
   {t: 'Las **extensiones**',
    p: 'Arcos con peso, arcos inhibidores, arcos lectores, prioridades, redes coloreadas y redes continuas e híbridas.'},
   {t: 'Los problemas clásicos',
@@ -546,7 +592,7 @@ const BOLILLAS = [
  ],
  ojo: 'Sensibilizada no significa que va a disparar. Que una transición esté sensibilizada solo dice que puede dispararse.',
  tp: 'La red del TP tiene un conflicto (T1, T4 y T6 sobre P1), dos plazas de recurso (P7 y P8) que funcionan como mutex, una plaza idle (P0) y un join en P9. No es de libre elección, porque T1, T4 y T6 comparten P1 pero tienen distintas plazas de recurso como entrada.',
- ap: ['Introducción a la Programación Concurrente › Carl Adam Petri y las redes de Petri', 'Redes de Petri › Definición y elementos, hasta Modelos básicos', 'Redes de Petri › Abreviaturas y extensiones', 'Redes de Petri › La cena de los filósofos y El problema de la barbería'],
+ ap: ['Teoría › Introducción a la Programación Concurrente › Carl Adam Petri y las redes de Petri', 'Teoría › Redes de Petri › Definición y elementos, hasta Modelos básicos', 'Teoría › Redes de Petri › Abreviaturas y extensiones', 'Teoría › Redes de Petri › La cena de los filósofos y El problema de la barbería'],
  nodos: ['rdp', 'extensiones', 'clases', 'clasicos', 'ecestado']},
 
 {n: 12, titulo: 'Propiedades y análisis de las redes de Petri',
@@ -573,7 +619,7 @@ const BOLILLAS = [
  ],
  ojo: 'La vivacidad y la ausencia de deadlock no son monótonas, y agregar fichas puede romperlas. La quasi vivacidad sí se mantiene, y la falta de acotación no se arregla con más fichas.',
  tp: 'PIPE dio para la red del TP, sin tiempos, que no tiene deadlock, que es acotada en 3 y no segura, que es viva y reversible, y que tiene 52 marcados. Con tiempos, como PIPE da prioridad a las inmediatas, T4 y T5 pueden dejar de dispararse porque la componente cerrada del grafo no los contiene. Es el anticipo de la inanición del alto riesgo.',
- ap: ['Redes de Petri › Propiedades de las redes de Petri, hasta Sifones y trampas', 'Redes de Petri › Ecuación fundamental e invariantes de marcado', 'Redes de Petri › Grafo de marcas y árbol de cobertura', 'Redes de Petri › Cálculo de P-invariantes y T-invariantes'],
+ ap: ['Teoría › Redes de Petri › Propiedades de las redes de Petri, hasta Sifones y trampas', 'Teoría › Redes de Petri › Ecuación fundamental e invariantes de marcado', 'Teoría › Redes de Petri › Grafo de marcas y árbol de cobertura', 'Teoría › Redes de Petri › Cálculo de P-invariantes y T-invariantes'],
  nodos: ['propiedades', 'homestate', 'conflictos', 'grafo', 'cobertura', 'ecestado', 'pinv', 'tinv', 'sifones', 'pipe', 'inanicion']},
 
 {n: 13, titulo: 'Tiempo y monitores',
@@ -598,11 +644,11 @@ const BOLILLAS = [
  ],
  ojo: 'Las políticas de reactivación (entrada, condición y cortesía) resuelven el orden de acceso al monitor. Las de las colas de condición resuelven los conflictos de la red. Confundirlas sacó 0.',
  tp: 'El monitor del TP usa signal and exit, semántica débil con β = ∞ y el α contado desde la sensibilización. Un hilo que llega antes de α marca la transición, cede el mutex y duerme lo que falta. La guarda sobre T0 hace que la red sea no autónoma.',
- ap: ['Redes de Petri con tiempo y ecuación de estado generalizada', 'Monitores'],
+ ap: ['Teoría › Redes de Petri con tiempo y ecuación de estado generalizada', 'Teoría › Monitores', 'Práctica › Monitores en Java'],
  nodos: ['tiempo', 'ecgen', 'monitores', 'senal', 'monitorrdp', 'extensiones']}
 ];
 
-/* La defensa del TP no está en el bombo: si la casilla está marcada, va siempre primero. */
+/* La defensa del TP no entra en el coloquio (se evalúa aparte): no está en el bombo, solo en su propia sección al pie. */
 const TP = {n: null, titulo: 'Defensa del TP final',
  resumen: 'Red de Petri de un sistema de procesamiento de pagos, ejecutada por un monitor en Java. Exponela en unos 7 minutos, en el orden de la presentación.',
  checklist: [
@@ -651,6 +697,159 @@ const TP = {n: null, titulo: 'Defensa del TP final',
  ],
  ap: ['Informe del TP (docs/informe.pdf)', 'Presentación (docs/presentacion/Presentación.pptx)', 'Código: Monitor, ConditionQueues, PetriNet, TransitionTimer y PriorityPolicy'],
  nodos: ['tp', 'uml', 'rdp', 'tiempo', 'ecestado', 'pinv', 'tinv', 'regexlog', 'pipe', 'grafo', 'conflictos', 'inanicion', 'semaforos', 'senal', 'monitorrdp', 'interrupt', 'exclusion']};
+
+/* ---------- Mapa conceptual de cada bolilla ----------
+   Una raíz y sus ramas numeradas en el orden en que conviene exponer. Cada rama se lee como una
+   proposición: raíz, enlace (e), concepto (n). Los detalles (d) son pares [relación, concepto], con la
+   relación vacía si no hace falta. "con" son las conexiones con otras bolillas (número) o con el TP ('tp'). */
+const R = (e, n, ...d) => ({e, n, d});
+const MAPAS = {
+1: {raiz: 'Corrección del software', ramas: [
+  R('importa en', 'Sistemas críticos', ['ej.', 'Therac-25, una condición de carrera'], ['ej.', 'Ariane 5, Patriot, Mars Climate Orbiter']),
+  R('no la garantiza', 'El testing', ['según Dijkstra', 'muestra errores, no su ausencia'], ['porque', 'el error depende de una intercalación']),
+  R('ni la decide en general', 'La verificación automática', ['choca con', 'el problema de la parada'], ['salida', 'acotar las propiedades']),
+  R('por eso se recurre a', 'Modelar (abstraer)', ['conserva', 'la concurrencia'], ['descarta', 'datos, recursos y usuario'], ['permite', 'un análisis exhaustivo']),
+  R('para verificar', 'Seguridad y progreso', ['seguridad', 'nada malo ocurre nunca'], ['progreso', 'algo bueno termina ocurriendo']),
+  R('sobre sistemas', 'Reactivos', ['a diferencia de', 'los transformacionales'], ['se razona sobre', 'secuencias infinitas']),
+  R('con el formalismo', 'Redes de Petri', ['mejor que', 'una FSM, que explota en tamaño'], ['porque', 'el estado emerge del marcado'])],
+ con: [[2, 'la explosión de estados explica por qué el testing no alcanza'], [11, 'el formalismo elegido'], [12, 'cómo se verifican seguridad y progreso'], ['tp', 'la red se analizó con PIPE antes de programar']]},
+
+2: {raiz: 'Semántica de un programa concurrente', ramas: [
+  R('se da con un', 'Sistema de transición de estados', ['nodos', 'estados (variables y pc de cada hilo)'], ['aristas', 'acciones atómicas'], ['tiene', 'un estado inicial']),
+  R('cuyas aristas son', 'Acciones atómicas', ['no lo es', '`x++` (leer, sumar, escribir)']),
+  R('que se ejecutan por', 'Interleaving', ['el orden', 'no se decide de antemano'], ['por', 'el no determinismo']),
+  R('cada recorrido es una', 'Ejecución', ['arranca en', 'el estado inicial'], ['todas juntas', 'son el comportamiento']),
+  R('el riesgo son', 'Resultados distintos', ['ej.', 'actualización perdida con `contador++`'], ['ej.', '`y1`, `y2` e `in_critical`']),
+  R('el costo es la', 'Explosión de estados', ['cuenta', 'kⁿ estados globales'], ['por eso', 'el testing no alcanza']),
+  R('la alternativa es el', 'Orden parcial', ['en', 'las redes de Petri'], ['evita', 'enumerar intercalaciones'])],
+ con: [[3, 'quiénes se intercalan, procesos e hilos'], [7, 'el grafo de estados es un autómata'], [12, 'el grafo de alcanzabilidad es el sistema de transición de una red'], ['tp', 'el log de disparos es una ejecución']]},
+
+3: {raiz: 'Procesos e hilos', ramas: [
+  R('un proceso es un', 'Programa en ejecución', ['tiene', 'instrucciones, estado y recursos'], ['lo describe', 'el PCB']),
+  R('y pasa por', 'Estados del proceso', ['', 'New, Ready, Running, Blocked, Terminated'], ['además', 'los suspendidos']),
+  R('contiene uno o más', 'Hilos', ['comparten', 'código, heap y archivos'], ['tienen propios', 'pc, registros, pila y estado']),
+  R('comparados', 'Proceso vs hilo', ['el hilo es', 'más barato de crear y de cambiar'], ['se comunica', 'por memoria compartida']),
+  R('el hilo pasa por', 'Creación, bloqueo, desbloqueo y fin', ['al desbloquearse', 'vuelve a Listo']),
+  R('se ejecutan con', 'Concurrencia o paralelismo', ['concurrencia', 'cualquier interleaving'], ['paralelismo', 'a la vez, en varias CPU'], ['aparece en', 'multiprogramación, multiprocesamiento, distribuido'])],
+ con: [[2, 'cómo se intercalan sus acciones'], [4, 'qué pasa cuando comparten datos'], [8, 'los mismos estados en Java'], ['tp', '9 hilos en un proceso que comparten la red y el log']]},
+
+4: {raiz: 'Interacción entre procesos', ramas: [
+  R('según cuánto se conocen', 'Competencia y cooperación', ['no se conocen', 'competencia'], ['comparten un objeto', 'cooperación por compartimiento'], ['se nombran', 'cooperación por comunicación']),
+  R('compiten por un', 'Recurso crítico', ['se usa en la', 'sección crítica'], ['conviene', 'que sea corta']),
+  R('que exige', 'Exclusión mutua', ['cumple', 'seis requisitos'], ['seguridad', 'exclusión efectiva'], ['progreso', 'sin demora, entrada inmediata, permanencia finita']),
+  R('mal resuelta causa', 'Deadlock', ['es', 'espera mutua, nadie avanza'], ['ej.', 'locks en orden opuesto']),
+  R('o también', 'Inanición y livelock', ['inanición', 'uno espera para siempre'], ['livelock', 'activos, pero sin progreso']),
+  R('sin protección hay', 'Condición de carrera', ['viola', 'invariantes como `in_critical <= 1`']),
+  R('la alternativa es el', 'Pasaje de mensajes', ['primitivas', '`send` y `receive`'], ['los dos bloqueantes', 'rendezvous'], ['no hay', 'dato compartido'])],
+ con: [[9, 'cómo se implementa la exclusión mutua en Java'], [11, 'el mutex y los recursos como plazas'], [12, 'deadlock e inanición en una red'], ['tp', 'el gateway y el antifraude son recursos críticos']]},
+
+5: {raiz: 'Java y UML', ramas: [
+  R('el estado se protege con', 'Encapsulamiento', ['modificadores', '`private`, `protected`, `public`']),
+  R('cuidado con', '`static` y `final`', ['`static`', 'estado compartido por todos los hilos'], ['`final`', 'llave fija para `synchronized`']),
+  R('las tareas se escriben con', 'Interfaces', ['ej.', '`Runnable` en lugar de heredar de `Thread`']),
+  R('la estructura con el', 'Diagrama de clases', ['relaciones', 'asociación, agregación, composición, herencia, realización, dependencia'], ['no muestra', 'comportamiento']),
+  R('la interacción con el', 'Diagrama de secuencia', ['mensajes', 'sincrónicos y asincrónicos (`start()`)'], ['fragmentos', '`par`, `critical`, `loop`, `alt`, `opt`, `break`']),
+  R('sirven para', 'Identificar hilos y recursos', ['antes de', 'modelar con una RdP'], ['límite', 'un escenario por diagrama'])],
+ con: [[8, 'cómo se crean los hilos'], [11, 'el modelo que viene después'], ['tp', 'los diagramas de clases y de secuencia del informe']]},
+
+6: {raiz: 'Lenguajes formales', ramas: [
+  R('se construyen sobre', 'Alfabeto y cadenas', ['operación', 'concatenación'], ['universo', 'Σ*']),
+  R('un lenguaje es un', 'Subconjunto de Σ*'),
+  R('lo genera una', 'Gramática', ['es', 'G = (Σ_{T}, Σ_{N}, S, P)'], ['por', 'derivación desde S']),
+  R('se ordenan en la', 'Jerarquía de Chomsky', ['tipo 0', 'sin restricciones'], ['tipo 1', 'sensibles al contexto'], ['tipo 2', 'libres de contexto'], ['tipo 3', 'regulares']),
+  R('cada tipo se reconoce con', 'Un autómata', ['tipo 0', 'Turing'], ['tipo 1', 'LBA'], ['tipo 2', 'de pila'], ['tipo 3', 'finito']),
+  R('por ejemplo', 'aⁿbⁿ, a⁺b* y aⁿbⁿcⁿ', ['aⁿbⁿ', 'tipo 2, hay que contar'], ['a⁺b*', 'regular'], ['aⁿbⁿcⁿ', 'tipo 1']),
+  R('en la materia', 'Lenguaje de eventos', ['describe', 'sistemas reactivos y EDA'], ['ej.', 'las secuencias de disparo de una RdP'])],
+ con: [[7, 'el autómata de cada tipo'], [12, 'el grafo de una red acotada es finito'], ['tp', 'el log del TP es una palabra de ese lenguaje']]},
+
+7: {raiz: 'Autómatas', ramas: [
+  R('se definen como una', 'Quíntupla', ['', '(Σ, Q, δ, q₀, F)'], ['el estado', 'resume la historia']),
+  R('el más simple es el', 'Autómata finito', ['AFND', 'varias transiciones o λ'], ['AFD', 'equivalente, por subconjuntos']),
+  R('con salida', 'Moore y Mealy', ['Moore', 'salida según el estado, más segura'], ['Mealy', 'según estado y entrada, menos estados']),
+  R('agregando una pila', 'Autómata de pila', ['reconoce', 'libres de contexto como aⁿbⁿ']),
+  R('con una cinta', 'LBA y máquina de Turing', ['LBA', 'cinta acotada, sensibles al contexto'], ['Turing', 'cinta infinita, lo más potente'], ['tesis de Church', 'calcula todo lo computable']),
+  R('el finito equivale a las', 'Expresiones regulares', ['ER → AFND', 'método del GTG'], ['AF → ER', 'eliminación de estados']),
+  R('en la práctica', 'Regex', ['`*` y `*?`', 'greedy y lazy'], ['`(?!\\d)`', 'lookahead negativo'])],
+ con: [[6, 'la gramática que reconoce cada uno'], [12, 'el grafo de alcanzabilidad es un autómata'], ['tp', 'la regex que verifica los T-invariantes del log']]},
+
+8: {raiz: 'Hilos en Java', ramas: [
+  R('se crean con', '`Thread` o `Runnable`', ['conviene', '`Runnable`, que deja libre la herencia']),
+  R('arrancan con', '`start()`', ['no con', '`run()`, que corre en el hilo actual']),
+  R('pasan por', '`Thread.State`', ['', 'NEW, RUNNABLE, BLOCKED'], ['', 'WAITING, TIMED_WAITING, TERMINATED']),
+  R('tienen', 'Atributos', ['', 'id, nombre y estado'], ['prioridad', 'solo una sugerencia'], ['daemon', 'no mantiene viva la JVM']),
+  R('se controlan con', '`interrupt`, `sleep` y `join`', ['`interrupt`', 'bandera o `InterruptedException`'], ['`sleep`', 'no suelta los locks'], ['`join`', 'espera a que otro termine']),
+  R('si fallan hay', 'Excepciones no controladas', ['matan', 'solo a ese hilo'], ['se atienden con', '`UncaughtExceptionHandler`'], ['checked y unchecked', '`InterruptedException` y `RuntimeException`']),
+  R('guardan datos propios con', '`ThreadLocal`', ['da', 'una copia por hilo'])],
+ con: [[3, 'los estados del hilo en el sistema operativo'], [9, 'BLOCKED y WAITING vienen de la sincronización'], [10, '`CountDownLatch` generaliza el `join`'], ['tp', '`Main` hace `join` de los 9 `Worker`']]},
+
+9: {raiz: 'Sincronización en Java', ramas: [
+  R('la exclusión mutua con', '`synchronized`', ['toma', 'el lock intrínseco del objeto'], ['en', 'un método o un bloque'], ['la llave', 'es el objeto `a` de `synchronized(a)`']),
+  R('su error clásico es la', 'Llave equivocada', ['ej.', 'el `Integer` reasignado del cine'], ['se evita con', 'una llave `final` por recurso']),
+  R('esperar condiciones con', '`wait` y `notify`', ['dentro de', 'un `synchronized` del mismo objeto'], ['siempre en', 'un `while`'], ['política', 'signal and continue']),
+  R('más flexible es', '`Lock` y `ReentrantLock`', ['ofrece', '`tryLock`, `Condition` y modo fair'], ['se libera en', 'un `finally`'], ['tiene', 'dueño']),
+  R('con muchos lectores', '`ReadWriteLock`', ['permite', 'N lectores o un escritor'], ['riesgo', 'inanición de escritores']),
+  R('un contador de permisos es un', 'Semáforo', ['opera con', '`acquire` y `release`'], ['sirve para', 'mutex, N recursos y señalización'], ['no tiene', 'dueño']),
+  R('el orden de atención es la', 'Fairness', ['evita', 'la inanición'], ['cuesta', 'rendimiento'])],
+ con: [[4, 'los requisitos que implementan'], [13, 'los monitores y sus políticas de señalización'], [11, 'un semáforo es una plaza con fichas'], ['tp', 'el mutex es un `Semaphore(1)` porque se cede con signal and exit']]},
+
+10: {raiz: 'Herramientas de alto nivel', ramas: [
+  R('para esperar N eventos', '`CountDownLatch`', ['métodos', '`countDown` y `await`'], ['no', 'se reinicia']),
+  R('para esperarse entre sí', '`CyclicBarrier`', ['se', 'reutiliza'], ['corre una acción', 'cuando llegaron todos']),
+  R('para avanzar por fases', '`Phaser`', ['se inicia con', 'la cantidad de participantes'], ['métodos', '`register`, `arriveAndAwaitAdvance`']),
+  R('en una RdP son', 'Sincronización', ['latch y barrera', 'una transición con varias entradas'], ['`Semaphore(0)`', 'una señalización']),
+  R('para crear objetos', 'Patrón Factory', ['para hilos', '`ThreadFactory`'], ['permite', 'nombres, prioridad y estadísticas']),
+  R('para administrar hilos', 'Executors', ['pools', '`newFixedThreadPool`, `newCachedThreadPool`'], ['tareas', '`execute`, `submit` y `Future`'], ['cierre', '`shutdown` y `awaitTermination`']),
+  R('frente a hilos a mano', 'Ventajas del pool', ['', 'reutiliza y limita los hilos'], ['', 'separa la tarea de su ejecución'])],
+ con: [[8, 'el `join` y los estados del hilo'], [11, 'los modelos básicos de sincronización y la barbería'], ['tp', 'el TP usa 9 hilos fijos, sin pool']]},
+
+11: {raiz: 'Redes de Petri', ramas: [
+  R('se definen como un', 'Grafo bipartito', ['', 'N = (P, T, Pre, Post) con M₀'], ['plazas', 'condiciones o recursos'], ['transiciones', 'eventos']),
+  R('evolucionan por', 'Sensibilización y disparo', ['sensibilizada', 'fichas ≥ peso en cada entrada'], ['el disparo', 'es atómico, dura cero y no es obligatorio']),
+  R('en álgebra, con la', 'Ecuación de estado', ['', 'M′ = M + W·σ'], ['W', 'Post − Pre'], ['no representa', 'los auto-loops (redes impuras)']),
+  R('según qué las controla', 'Autónomas y no autónomas', ['autónoma', 'dice qué, no cuándo'], ['no autónoma', 'eventos externos o tiempo']),
+  R('modelan', 'Fenómenos', ['', 'secuencia, concurrencia, conflicto'], ['', 'sincronización, confusión']),
+  R('restringiendo la estructura', 'Clases', ['máquina de estado', 'conflictos, sin sincronización'], ['grafo marcado', 'sin conflictos'], ['además', 'libre elección, simple, pura']),
+  R('con patrones de', 'Modelos básicos', ['', 'co-begin, señal, mutex'], ['', 'N recursos, buffer acotado']),
+  R('se amplían con', 'Extensiones', ['arcos', 'con peso, inhibidores, lectores'], ['', 'prioridades, coloreadas']),
+  R('se ilustran con', 'Problemas clásicos', ['filósofos', 'tomar los dos tenedores juntos evita el deadlock'], ['barbería', 'inhibidores y conflicto entre peluqueros'])],
+ con: [[1, 'por qué este formalismo'], [12, 'cómo se analizan'], [13, 'el tiempo y la ejecución con un monitor'], ['tp', 'conflicto T1/T4/T6, recursos P7 y P8, join en P9']]},
+
+12: {raiz: 'Análisis de una red de Petri', ramas: [
+  R('cuántas fichas puede haber', 'Acotación y seguridad', ['acotada', 'como máximo k por plaza'], ['segura', 'k = 1'], ['depende de', 'M₀']),
+  R('si sigue funcionando', 'Vivacidad', ['niveles', 'quasi viva, pseudo viva, viva'], ['viva ⇒', 'sin deadlock'], ['no es', 'monótona con el marcado']),
+  R('a dónde puede volver', 'Home state y reversibilidad', ['reversible', 'M₀ es un home state']),
+  R('quién dispara', 'Conflictos', ['estructural', 'comparten una plaza'], ['efectivo', 'no alcanzan las fichas'], ['se resuelve con', 'política, prioridad o inhibidor']),
+  R('recorriendo los estados', 'Grafo de alcanzabilidad', ['si es finito', 'decide todo'], ['deadlock', 'un nodo sin sucesores'], ['vivacidad', 'componentes cerradas']),
+  R('si no es acotada', 'Árbol de cobertura', ['ω', 'fichas sin límite'], ['no decide', 'la vivacidad']),
+  R('sin recorrer, con', 'Invariantes', ['P-invariante', 'yᵀ·W = 0'], ['T-invariante', 'W·x = 0'], ['la constante', 'depende de M₀']),
+  R('por la estructura', 'Sifones y trampas', ['un sifón vacío', 'queda vacío'], ['una trampa marcada', 'queda marcada'], ['Commoner', 'vivacidad en libre elección'])],
+ con: [[2, 'el grafo es su sistema de transición'], [4, 'deadlock e inanición'], [7, 'el grafo de una red acotada es un autómata finito'], ['tp', 'PIPE dio sin deadlock, acotada en 3 y viva sin tiempos']]},
+
+13: {raiz: 'Tiempo y monitores', ramas: [
+  R('para reducir el indeterminismo', 'Interpretaciones', ['dicen', 'cuándo y cuál dispara']),
+  R('con tiempo', 'RdP con tiempo [α, β]', ['se cuenta desde', 'la sensibilización'], ['[0, ∞)', 'es el caso autónomo'], ['el estado', 'marcado e intervalos']),
+  R('según la obligación', 'Semántica fuerte o débil', ['fuerte', 'debe disparar en el intervalo'], ['débil', 'puede, sin obligación']),
+  R('todo junto en la', 'Ecuación generalizada', ['', 'Eₓ = E ∧ B ∧ L ∧ G ∧ V ∧ Z'], ['es', 'lógica conjuntiva, implementable en hardware']),
+  R('se ejecuta con un', 'Monitor', ['en lugar de', 'semáforos esparcidos por el código'], ['garantiza', 'la exclusión mutua de sus métodos']),
+  R('se espera con', 'Variables de condición', ['colas', 'de entrada, de condición, de cortesía'], ['prioridad', 'al que ya esperaba']),
+  R('se despierta según', 'Políticas de señalización', ['', 'SC (Java), SW, SU, SX'], ['con SC', 'se reevalúa con `while`']),
+  R('en la materia', 'Monitor guiado por la RdP', ['la lógica', 'la red'], ['la política', 'resuelve los conflictos'], ['las acciones', 'afuera del monitor'])],
+ con: [[9, '`synchronized` y `wait`/`notify` son signal and continue'], [11, 'la red que ejecuta'], [12, 'los conflictos que resuelve la política'], ['tp', 'signal and exit y α desde la sensibilización']]},
+
+tp: {raiz: 'TP final: procesador de pagos', ramas: [
+  R('modela', 'Tres flujos', ['tarjeta', 'T1 → T2 → T3, usa P7'], ['alto riesgo', 'T4 → T5, usa P7 y P8'], ['transferencia', 'T6 → T7 → T8, usa P8']),
+  R('con una', 'Red de Petri', ['conflicto', 'T1, T4 y T6 sobre P1'], ['recursos', 'P7 gateway, P8 antifraude'], ['temporales', 'T2, T3, T5, T7 y T8']),
+  R('analizada con', 'PIPE', ['sin deadlock', 'acotada en 3, no segura'], ['sin tiempos', 'viva y reversible, 52 marcados'], ['con tiempos', 'T4 y T5 pueden dejar de dispararse']),
+  R('que cumple', 'Invariantes', ['de plaza', '3 transacciones, gateway y antifraude exclusivos'], ['de transición', 'uno por flujo, de T0 a T9']),
+  R('ejecutada por', '9 hilos', ['segmentos', 'A 3, B 1, C 1, D 1, E 3'], ['casos', 'conflicto en P1 y join en P9']),
+  R('coordinados por un', 'Monitor', ['entrada', '`fireTransition(t)`'], ['mutex', '`Semaphore`, signal and exit'], ['colas', 'una por transición']),
+  R('que decide con', 'Políticas', ['aleatoria', 'al azar entre las candidatas'], ['priorizada', 'prioriza T4 y retiene a T1 y T6']),
+  R('respetando el', 'Tiempo', ['semántica', 'débil, con β = ∞'], ['antes de α', 'duerme sin el mutex']),
+  R('y termina con', 'Guarda y cadena de `finish`', ['guarda', '200 disparos de T0'], ['`Main`', 'hace `join` de todos']),
+  R('verificado con', 'Invariantes en ejecución', ['de plaza', 'en cada disparo'], ['de transición', 'regex sobre el log']),
+  R('y medido con', 'Experimentos', ['priorizada', '67/67/66'], ['aleatoria en 4b', 'alto riesgo sin procesar'], ['el límite', 'son los recursos, no los hilos'])],
+ con: [[9, 'semáforos y ownership'], [12, 'propiedades e invariantes'], [13, 'monitor y tiempo'], [7, 'la regex del log']]}
+};
 
 /* ---------- Mapa conceptual ----------
    Cuatro zonas de 2 columnas por 6 filas, más el nodo central y el del TP en la columna del medio.
@@ -793,11 +992,16 @@ const SIN_MOVIMIENTO = matchMedia('(prefers-reduced-motion: reduce)').matches;
 /* ---------- Estado (sólo en este navegador) ---------- */
 const KEY = 'pc-coloquio-bolillero';
 const NUMEROS = BOLILLAS.map(b => b.n);
-let estado = {afuera: [], ultima: [], cuantas: 2, tp: true};
-try { Object.assign(estado, JSON.parse(localStorage.getItem(KEY)) || {}); } catch (e) {}
+let estado = {afuera: [], ultima: [], cuantas: 3, mapas: false, v: 2};
+try {
+  const guardado = JSON.parse(localStorage.getItem(KEY));
+  /* Versión 1: sorteaba 2 y sumaba la defensa del TP. El coloquio son 3 temas y el TP se evalúa aparte. */
+  if (guardado && guardado.v !== 2) { guardado.cuantas = 3; guardado.v = 2; delete guardado.tp; }
+  Object.assign(estado, guardado || {});
+} catch (e) {}
 estado.afuera = (estado.afuera || []).filter(n => NUMEROS.includes(n));
 estado.ultima = (estado.ultima || []).filter(n => NUMEROS.includes(n));
-if (![1, 2, 3].includes(estado.cuantas)) estado.cuantas = 2;
+if (![1, 2, 3].includes(estado.cuantas)) estado.cuantas = 3;
 function guardar() { try { localStorage.setItem(KEY, JSON.stringify(estado)); } catch (e) {} }
 let girando = false;
 
@@ -829,7 +1033,7 @@ function renderBombo() {
     });
   }
   document.querySelectorAll('#cuantas button').forEach(b => b.classList.toggle('on', +b.dataset.n === estado.cuantas));
-  $('#contp').checked = estado.tp;
+  $('#conmapas').checked = estado.mapas;
 }
 
 function girar() {
@@ -857,8 +1061,30 @@ function girar() {
   }, SIN_MOVIMIENTO ? 0 : 1450);
 }
 
+/* ---------- Mapa de una bolilla ---------- */
+function mapaBolilla(b) {
+  const m = MAPAS[b === TP ? 'tp' : b.n];
+  const div = document.createElement('div');
+  div.className = 'cmap';
+  div.innerHTML = `
+    <div class="cm-raiz">${inline(m.raiz)}</div>
+    <div class="cm-ramas">${m.ramas.map((r, i) => `
+      <div class="cm-rama">
+        <span class="cm-enlace">${inline(r.e)}</span>
+        <div class="cm-nodo"><span class="cm-num">${i + 1}</span><span>${inline(r.n)}</span></div>
+        <div class="cm-det">${r.d.map(([rel, c]) =>
+          `<span class="cm-chip">${rel ? `<i>${inline(rel)}</i> ` : ''}${inline(c)}</span>`).join('')}</div>
+      </div>`).join('')}
+    </div>
+    <div class="cm-con"><span class="lbl">Se conecta con</span>${m.con.map(([dest, t]) =>
+      `<button class="cm-link" data-dest="${dest}" title="Abrir ${dest === 'tp' ? 'la defensa del TP' : 'la bolilla ' + dest} en la lista">` +
+      `<b>${dest === 'tp' ? 'TP' : 'B' + dest}</b> ${inline(t)}</button>`).join('')}</div>`;
+  div.querySelectorAll('.cm-link').forEach(btn => btn.onclick = () => irALista(btn.dataset.dest));
+  return div;
+}
+
 /* ---------- Tarjetas ---------- */
-function tarjeta(b, enLista) {
+function tarjeta(b, enLista, conMapa) {
   const esTP = b === TP;
   const el = document.createElement('article');
   el.className = 'card';
@@ -869,21 +1095,39 @@ function tarjeta(b, enLista) {
       <span class="ball${esTP ? ' tp' : ''}">${esTP ? 'TP' : b.n}</span>
       <div><h2>${esc(b.titulo)}</h2><p class="sub">${inline(b.resumen)}</p></div>
     </header>`}
+    <div class="row-btns mapabtns">
+      <button class="btn vermapa" aria-expanded="false">Mostrar el mapa de la ${esTP ? 'defensa' : 'bolilla'}</button>
+      <button class="btn pista">${esTP ? 'Ubicar la defensa' : 'Ubicarla'} en el mapa de la materia</button>
+    </div>
+    <div class="mapa-bolilla" hidden>
+      <h3>Mapa de la ${esTP ? 'defensa' : 'bolilla'}</h3>
+      <p class="cm-ayuda">Exponé siguiendo las ramas en orden. Cada una se lee como una frase, de la raíz al concepto, y los recuadros grises son lo que tenés que decir de ese concepto.</p>
+    </div>
     <div class="ctitle"><h3>Qué tenés que desarrollar</h3><span class="count">0/${total} desarrollados</span></div>
     <ol class="check">${b.checklist.map(it => `
       <li><div class="item"><label><input type="checkbox"><span>${inline(it.t)}</span></label>
         <button class="hintbtn" aria-expanded="false">pista</button></div>
         <div class="hint" hidden>${inline(it.p)}</div></li>`).join('')}</ol>
     ${b.ojo ? `<h3>Trampa típica</h3><div class="warn">${inline(b.ojo)}</div>` : ''}
-    ${b.tp ? `<h3>Enganche con el TP</h3><p class="engancha">${inline(b.tp)}</p>` : ''}
+    ${b.tp ? `<h3>Ejemplo en el TP</h3><p class="engancha">${inline(b.tp)}</p>` : ''}
     ${b.rp ? `<h3>Repreguntas probables</h3><div class="rp">${b.rp.map(x =>
       `<details><summary>${inline(x.q)}</summary><p>${inline(x.r)}</p></details>`).join('')}</div>` : ''}
     <h3>${esTP ? 'Para repasar' : 'En el apunte'}</h3>
     <ul class="ap">${b.ap.map(s => `<li>${inline(s)}</li>`).join('')}</ul>
     <div class="row-btns">
-      <button class="btn pista">Pista: mapa conceptual</button>
       <button class="btn limpiar">Desmarcar todo</button>
     </div>`;
+  const caja = el.querySelector('.mapa-bolilla');
+  const btnMapa = el.querySelector('.vermapa');
+  const mostrarMapa = ver => {
+    if (ver && !caja.querySelector('.cmap')) caja.appendChild(mapaBolilla(b));
+    caja.hidden = !ver;
+    btnMapa.textContent = `${ver ? 'Ocultar' : 'Mostrar'} el mapa de la ${esTP ? 'defensa' : 'bolilla'}`;
+    btnMapa.setAttribute('aria-expanded', String(ver));
+    btnMapa.classList.toggle('on', ver);
+  };
+  btnMapa.onclick = () => mostrarMapa(caja.hidden);
+  if (conMapa) mostrarMapa(true);
   const cajas = [...el.querySelectorAll('ol.check input')];
   const contar = () => {
     const n = cajas.filter(c => c.checked).length;
@@ -914,17 +1158,15 @@ function renderResultado() {
   const cab = document.createElement('div');
   cab.className = 'sacadas';
   cab.innerHTML = '<span class="lbl">Te tocaron</span>' +
-    (estado.tp ? '<span class="bigball tp" title="Defensa del TP">TP</span>' : '') +
-    estado.ultima.map((n, i) => `<span class="bigball" style="animation-delay:${(i + (estado.tp ? 1 : 0)) * 0.12}s" title="${esc(BOLILLAS.find(b => b.n === n).titulo)}">${n}</span>`).join('');
+    estado.ultima.map((n, i) => `<span class="bigball" style="animation-delay:${i * 0.12}s" title="${esc(BOLILLAS.find(b => b.n === n).titulo)}">${n}</span>`).join('');
   r.appendChild(cab);
-  if (estado.tp) r.appendChild(tarjeta(TP));
-  estado.ultima.forEach(n => r.appendChild(tarjeta(BOLILLAS.find(b => b.n === n))));
+  estado.ultima.forEach(n => r.appendChild(tarjeta(BOLILLAS.find(b => b.n === n), false, estado.mapas)));
 }
 
 /* ---------- Todas las bolillas ---------- */
 function renderLista() {
-  const cont = $('#lista');
-  [TP, ...BOLILLAS].forEach(b => {
+  [...BOLILLAS, TP].forEach(b => {
+    const cont = b === TP ? $('#aparte') : $('#lista');
     const d = document.createElement('details');
     d.className = 'entrada';
     d.id = 'b-' + (b === TP ? 'tp' : b.n);
@@ -1026,7 +1268,15 @@ document.querySelectorAll('#cuantas button').forEach(b => b.onclick = () => {
   guardar();
   renderBombo();
 });
-$('#contp').onchange = e => { estado.tp = e.target.checked; guardar(); renderResultado(); };
+$('#conmapas').onchange = e => {
+  estado.mapas = e.target.checked;
+  guardar();
+  /* Abre o cierra los mapas de las bolillas que ya están en pantalla, sin perder lo tildado */
+  document.querySelectorAll('#resultado .card').forEach(c => {
+    const caja = c.querySelector('.mapa-bolilla');
+    if (caja.hidden === estado.mapas) c.querySelector('.vermapa').click();
+  });
+};
 $('#vermapa').onclick = () => abrirMapa(null);
 $('#cerrarmapa').onclick = () => $('#dlgmapa').close();
 $('#dlgmapa').addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.close(); });
