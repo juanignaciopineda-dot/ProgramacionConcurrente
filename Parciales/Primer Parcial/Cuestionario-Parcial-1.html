@@ -115,8 +115,8 @@ textarea:focus { outline: 2px solid var(--accent-soft); border-color: var(--acce
 <body>
 <div class="wrap">
   <button class="btn themebtn" id="theme" title="Cambiar tema">◐</button>
-  <h1>Primer Parcial: preguntas reales</h1>
-  <p class="sub">Salen de los parciales 2020, 2021, recuperatorio 2021 y 2023 que hay en <code>Parciales/Primer Parcial</code>. El parcial es escrito: 10 preguntas de desarrollo en unos 50 minutos. Escribí tu respuesta y después comparala con la respuesta modelo y los puntos que corrige la cátedra. Cuando la cátedra corrigió de forma rara o contradictoria, aparece una nota en amarillo.</p>
+  <h1>Primer Parcial: cuestionario completo</h1>
+  <p class="sub">Dos fuentes. Las preguntas reales de los parciales 2020, 2021, recuperatorio 2021 y 2023 que hay en <code>Parciales/Primer Parcial</code>. Y preguntas armadas con el apunte sobre los temas del primer parcial que todavía no salieron (Java y UML, API de hilos, locks y semáforos, expresiones regulares). El parcial es escrito: 10 preguntas de desarrollo en unos 50 minutos. Escribí tu respuesta y después comparala con la respuesta modelo y los puntos que corrige la cátedra. Cuando la cátedra corrigió de forma rara o contradictoria, aparece una nota en amarillo. El simulacro saca 8 preguntas de parciales y 2 del apunte.</p>
 
   <div class="tabs">
     <button class="tab" data-modo="sim">Simulacro (10 al azar)</button>
@@ -133,6 +133,7 @@ textarea:focus { outline: 2px solid var(--accent-soft); border-color: var(--acce
     <button class="btn primary" id="reset">Nueva ronda</button>
     <button class="btn" id="flojas">Repasar las flojas</button>
     <button class="btn" id="borrar">Olvidar historial</button>
+    <button class="btn" id="origen"></button>
   </div>
   <div class="chips" id="chips"></div>
 
@@ -153,6 +154,9 @@ const T = {
   EST:  'Estados de hilos y procesos',
   SC:   'Sección crítica, monitor, semáforo',
   JAVA: 'Java',
+  UML:  'Java básico y UML',
+  HIL:  'Hilos en Java: API y ciclo de vida',
+  LOCK: 'Locks, ReadWriteLock y semáforos',
   GRAM: 'Lenguajes y gramáticas',
   AUT:  'Autómatas y máquinas'
 };
@@ -343,7 +347,7 @@ const BANCO = [
  r:'Puede venir de tres estados:\n\n- **nuevo**: recién creado, después de `start()`\n- **bloqueado**: recibió la señal de desbloqueo\n- **ejecución**: le quitaron el procesador porque se le acabó el quantum o hizo `yield()`\n\nMientras está listo espera en la **cola de listos**. Cuando el planificador de la MV lo elige, **va a ejecución**.',
  k:['Viene de NUEVO (start)','Viene de BLOQUEADO (desbloqueo)','Viene de EJECUCIÓN (le quitan la CPU)','Va a EJECUCIÓN cuando el planificador lo elige'],
  n:'En 2023 respondieron "viene de sleeping…" y el comentario fue: "¿Y si fue recientemente creado?". Nombrá todos los orígenes posibles.',
- mc:{q:'¿Desde qué estado **no** llega un hilo a *listo para ejecutar*?',
+ mc:{q:'¿Desde qué estado **no** llega un hilo a listo para ejecutar?',
      o:[['Terminado (muerto).','Correcta: un hilo terminado no vuelve a correr, ni siquiera llamando otra vez a `start()`.'],
         ['Nuevo, después de start().','Sí llega: es el camino normal de un hilo recién creado.'],
         ['Bloqueado, al recibir la señal de desbloqueo.','Sí llega: al desbloquearse vuelve a listo.'],
@@ -624,7 +628,440 @@ const BANCO = [
  q:'¿Qué máquina es más segura de utilizar, MEALY o MOORE? ¿Por qué?',
  r:'**Moore.** Su salida depende sólo del estado, así que cambia **sincronizada** con el cambio de estado, en el flanco del reloj (un ciclo más tarde). No reacciona a cambios transitorios ni a glitches de la entrada. En Mealy, la salida puede cambiar en cuanto cambia la entrada.',
  k:['Moore','La salida cambia con el estado, en el flanco del reloj','No le afectan los glitches de la entrada'],
- mc:{o:[['Moore, porque su salida cambia sincronizada con el estado (flanco del reloj).','Correcta.'],['Mealy, porque tiene menos estados.','No: tener menos estados no la hace más segura. Su salida sigue directamente a la entrada.'],['Son igual de seguras.','No: la salida de Mealy es sensible a los cambios transitorios de la entrada.'],['Mealy, porque reacciona más rápido.','Reacciona más rápido, pero justamente eso la hace menos segura.']], c:0}}
+ mc:{o:[['Moore, porque su salida cambia sincronizada con el estado (flanco del reloj).','Correcta.'],['Mealy, porque tiene menos estados.','No: tener menos estados no la hace más segura. Su salida sigue directamente a la entrada.'],['Son igual de seguras.','No: la salida de Mealy es sensible a los cambios transitorios de la entrada.'],['Mealy, porque reacciona más rápido.','Reacciona más rápido, pero justamente eso la hace menos segura.']], c:0}},
+
+/* =====================================================================
+   PREGUNTAS ARMADAS CON EL APUNTE (todavía no salieron en los parciales)
+   ===================================================================== */
+
+/* ---------- Concurrencia y verificación ---------- */
+{id:'deadlock-livelock', tema:T.VER, src:'apunte',
+ q:'¿Qué diferencia hay entre deadlock, livelock y starvation?',
+ r:'- **Deadlock** (interbloqueo): dos o más procesos **esperan mutuamente** a que el otro avance. Están bloqueados, no consumen CPU y nadie avanza.\n- **Livelock**: los procesos **no están bloqueados**. Siguen ejecutando y reaccionando a los cambios de los otros, pero **ninguno progresa** (dos personas que se corren para el mismo lado en un pasillo).\n- **Starvation** (inanición): el sistema en conjunto **sí avanza**, pero uno o más procesos esperan **indefinidamente** un recurso o un mensaje que siempre se le da a otro.',
+ k:['Deadlock: espera mutua, bloqueados, nadie avanza','Livelock: activos y consumiendo CPU, pero sin progreso','Starvation: el sistema avanza, pero un proceso nunca es atendido'],
+ mc:{q:'Dos hilos detectan que el otro quiere el recurso, se lo ceden y vuelven a intentar, una y otra vez, consumiendo CPU sin que ninguno termine. ¿Qué problema es?',
+     o:[['Livelock.','Correcta: están activos, pero ninguno progresa.'],
+        ['Deadlock.','No: en un deadlock los procesos están bloqueados y no consumen CPU.'],
+        ['Starvation.','No: en la inanición el sistema avanza y sólo uno queda postergado. Acá no avanza nadie.'],
+        ['Condición de carrera.','No: no hay un dato corrompido por el intercalado. El problema es de progreso.']], c:0}},
+
+{id:'req-exclusion', tema:T.VER, src:'apunte',
+ q:'¿Qué requisitos debe cumplir cualquier solución al problema de la sección crítica? ¿Cuál es de seguridad y cuáles de progreso?',
+ r:'Los seis requisitos de Stallings:\n- **Exclusión mutua**: un solo proceso a la vez en su SC por el mismo recurso.\n- Un proceso que se detiene **fuera** de su SC no debe interferir con los demás.\n- **Sin demora indefinida**: ni interbloqueo ni inanición.\n- Si nadie está en la SC, quien pide entrar debe hacerlo **sin demora**.\n- **Sin suposiciones** sobre la velocidad relativa de los procesos ni sobre la cantidad de procesadores.\n- Cada proceso permanece en su SC sólo un **tiempo finito**.\n\nLa exclusión mutua es la propiedad de **seguridad**. La ausencia de demora indefinida, la entrada inmediata y la permanencia finita son de **progreso**.',
+ k:['Exclusión mutua (seguridad)','No interferir desde fuera de la SC','Sin deadlock ni inanición, y entrada inmediata si está libre (progreso)','Sin suposiciones de velocidad ni de cantidad de procesadores','Permanencia finita en la SC'],
+ mc:{q:'¿Cuál de estos requisitos de la exclusión mutua es una propiedad de seguridad?',
+     o:[['Nunca hay más de un proceso en su sección crítica por el mismo recurso.','Correcta: dice que algo malo no ocurre nunca.'],
+        ['Un proceso que pide entrar no es demorado indefinidamente.','No: es de progreso (algo bueno termina ocurriendo).'],
+        ['Si la SC está libre, quien pide entrar lo hace sin demora.','No: es de progreso.'],
+        ['Cada proceso permanece en la SC un tiempo finito.','No: es de progreso, y es responsabilidad del programador.']], c:0}},
+
+{id:'tres-niveles', tema:T.CONC, src:'apunte',
+ q:'Según cuánto conocen los procesos de la existencia de los demás, ¿qué tipos de interacción hay y qué problemas de control trae cada una?',
+ r:'- **No se conocen entre sí**: **competencia** por los recursos. Problemas: exclusión mutua, deadlock e inanición.\n- **Se conocen indirectamente** (comparten un objeto, sin conocerse por identificador): **cooperación por compartimiento**. Los mismos problemas, más la **coherencia de los datos**.\n- **Se conocen directamente** (se comunican por identificador): **cooperación por comunicación**. Problemas: deadlock (un mensaje que nunca llega) e inanición. No hay dato compartido que proteger.',
+ k:['No se conocen: competencia (exclusión mutua, deadlock, inanición)','Indirecto: cooperación por compartimiento (+ coherencia de datos)','Directo: cooperación por comunicación (deadlock, inanición)'],
+ mc:{q:'Dos procesos acceden a un mismo archivo sin conocerse por identificador. ¿Qué problema de control tienen, que la competencia pura no tiene?',
+     o:[['La coherencia de los datos compartidos.','Correcta: es lo que agrega la cooperación por compartimiento.'],
+        ['El deadlock.','No: el deadlock también aparece en la competencia.'],
+        ['La inanición.','No: también aparece en la competencia.'],
+        ['Ninguno: es lo mismo que la competencia.','No: al compartir datos hay que garantizar su integridad.']], c:0}},
+
+{id:'pasaje-mensajes', tema:T.CONC, src:'apunte',
+ q:'En la sincronización por pasaje de mensajes, ¿qué combinaciones de send y receive hay? ¿Cuál es el rendezvous?',
+ r:'- **Send bloqueante + receive bloqueante**: el **rendezvous**. Los dos se bloquean hasta que el mensaje se entrega: sincronización fuerte.\n- **Send no bloqueante + receive bloqueante**: la combinación **más útil**. El emisor sigue trabajando y el receptor espera lo que necesita.\n- **Send no bloqueante + receive no bloqueante**: nadie espera a nadie.\n\nA diferencia de la memoria compartida, no hay un dato compartido que proteger: la sincronización está **implícita** en el send y el receive.',
+ k:['Bloqueante/bloqueante = rendezvous','No bloqueante/bloqueante = la más útil','La sincronización queda implícita en send/receive'],
+ mc:{q:'¿Qué combinación de primitivas es el rendezvous?',
+     o:[['Send bloqueante y receive bloqueante.','Correcta: los dos se esperan hasta que el mensaje se entrega.'],
+        ['Send no bloqueante y receive bloqueante.','No: esa es la combinación más útil, pero el emisor no espera.'],
+        ['Send no bloqueante y receive no bloqueante.','No: ahí nadie espera a nadie.'],
+        ['Cualquier combinación con memoria compartida.','No: el rendezvous es de pasaje de mensajes.']], c:0}},
+
+{id:'velocidad', tema:T.CONC, src:'apunte',
+ q:'Enuncie el principio sobre la velocidad de los procesos que debe cumplir todo programa concurrente.',
+ r:'Los resultados de un proceso deben ser **independientes de la velocidad** a la que se ejecuten los demás procesos concurrentes. Si el resultado cambia según quién corre más rápido, el programa está mal: hay una condición de carrera. Por eso tampoco se puede depender de las prioridades ni de un `sleep` para "ordenar" hilos.',
+ k:['El resultado no puede depender de la velocidad relativa','Si depende, hay condición de carrera','No usar prioridades ni sleep para ordenar'],
+ vf:{q:'Un programa concurrente es correcto si da el resultado esperado en la máquina de desarrollo, aunque ese resultado dependa de qué hilo corra más rápido.', v:false,
+     e:'Falso: el resultado tiene que ser independiente de la velocidad relativa de los procesos. Si depende de ella, la condición de carrera va a aparecer en otra máquina o con otra carga.'}},
+
+{id:'monoprocesador', tema:T.CONC, src:'apunte',
+ q:'Un programa concurrente que corre en un monoprocesador, ¿es paralelo? ¿Tiene los problemas de la concurrencia?',
+ r:'**No es paralelo**, pero **sí** tiene todos los problemas. La concurrencia es una propiedad de la **estructura** del programa (tareas que pueden ejecutarse en cualquier orden). El paralelismo es una propiedad de la **ejecución** (tareas que corren a la vez en hardware distinto). En un monoprocesador el SO intercala los hilos (multiprogramación), cualquier interleaving es posible, y aparecen las mismas condiciones de carrera, deadlocks e inanición.',
+ k:['No es paralelo','Concurrencia: estructura; paralelismo: ejecución','El SO intercala los hilos y aparecen los mismos problemas'],
+ vf:{q:'En un monoprocesador no puede haber condiciones de carrera, porque nunca corren dos hilos al mismo tiempo.', v:false,
+     e:'Falso: el planificador puede desalojar un hilo en medio de `x++` (entre leer y escribir) y darle la CPU a otro. El interleaving alcanza para perder actualizaciones.'}},
+
+{id:'estado-pc', tema:T.VER, src:'apunte',
+ q:'¿Qué forma parte del estado de un programa concurrente? ¿Por qué el espacio de estados crece tan rápido?',
+ r:'El estado incluye el valor de las variables **y** el **program counter de cada proceso** (en qué sentencia está parado cada uno), que son variables implícitas. El espacio de estados es el **producto** de los valores posibles de las variables por las posiciones posibles de cada pc. Crece exponencialmente con la cantidad de procesos: es la **explosión de estados**, y es la razón por la que el testing no alcanza.',
+ k:['Variables + program counter de cada proceso','El espacio de estados es un producto','Crece exponencialmente: explosión de estados'],
+ vf:{q:'El estado de un programa concurrente queda determinado sólo por el valor de sus variables globales.', v:false,
+     e:'Falso: también incluye el program counter de cada proceso. Dos ejecuciones con las mismas variables pero con los procesos parados en sentencias distintas están en estados distintos.'}},
+
+{id:'dijkstra', tema:T.VER, src:'apunte',
+ q:'¿Qué aportes de Dijkstra fundan la programación concurrente?',
+ r:'- Plantea el problema de la **exclusión mutua** para n procesos (1965): la noción de sección crítica.\n- El sistema operativo **THE**, organizado en capas.\n- Cooperating Sequential Processes (1968), que origina el campo.\n- El **semáforo**, primer mecanismo de sincronización entre procesos.\n- Identifica el **deadlock** y propone el algoritmo del banquero.\n- Los **filósofos comensales** (1971).\n- La frase sobre el testing: puede mostrar la presencia de errores, nunca su ausencia.',
+ k:['Exclusión mutua y sección crítica','Semáforo','Deadlock y algoritmo del banquero','Filósofos comensales','El testing no garantiza ausencia de errores'],
+ mc:{q:'¿Cuál fue el primer mecanismo de sincronización entre procesos concurrentes, propuesto por Dijkstra?',
+     o:[['El semáforo.','Correcta: se usó por primera vez en el sistema operativo THE.'],
+        ['El monitor.','No: lo formalizaron Brinch Hansen (1973) y Hoare (1974), a partir de una idea de Dijkstra.'],
+        ['El `ReentrantLock`.','No: es una clase de Java.'],
+        ['La red de Petri.','No: es de Carl Adam Petri, y es un formalismo de modelado, no un mecanismo de sincronización.']], c:0}},
+
+{id:'multiprog', tema:T.CONC, src:'apunte',
+ q:'¿En qué escenarios aparece la concurrencia?',
+ r:'- **Multiprogramación**: varios procesos en un sistema **monoprocesador**.\n- **Multiprocesamiento**: varios procesos en un sistema **multiprocesador**.\n- **Procesamiento distribuido**: varios procesos en **varias computadoras**.\n\nY surge en tres contextos: múltiples aplicaciones que comparten el procesador, aplicaciones estructuradas como un conjunto de hilos, y la propia estructura del sistema operativo.',
+ k:['Multiprogramación (un procesador)','Multiprocesamiento (varios procesadores)','Procesamiento distribuido (varias computadoras)'],
+ mc:{q:'¿Cómo se llama la gestión de varios procesos en un sistema con un solo procesador?',
+     o:[['Multiprogramación.','Correcta.'],
+        ['Multiprocesamiento.','No: implica varios procesadores.'],
+        ['Procesamiento distribuido.','No: implica varias computadoras.'],
+        ['Paralelismo.','No: con un solo procesador no hay ejecución simultánea real.']], c:0}},
+
+/* ---------- Procesos e hilos ---------- */
+{id:'proceso-vs-hilo', tema:T.EST, src:'apunte',
+ q:'¿Qué diferencia hay entre un proceso y un hilo? ¿Qué comparten los hilos de un mismo proceso?',
+ r:'El **proceso** es la unidad de **propiedad de recursos** (espacio de direcciones, archivos abiertos). El **hilo** es la unidad de **planificación y ejecución**.\n\nLos hilos de un proceso **comparten** la memoria (código, datos, heap) y los recursos del proceso. Cada hilo tiene **propios** su contador de programa, sus registros, su pila y su estado.\n\nPor eso crear y conmutar hilos es más barato que hacerlo con procesos. Y por eso los hilos necesitan sincronizarse: comparten datos sin ninguna protección.',
+ k:['Proceso: unidad de propiedad de recursos','Hilo: unidad de planificación','Comparten memoria y recursos del proceso','Propio de cada hilo: PC, registros, pila, estado','Más baratos de crear y conmutar'],
+ mc:{q:'¿Qué tiene cada hilo como propio, sin compartirlo con los otros hilos de su proceso?',
+     o:[['Su pila, sus registros y su contador de programa.','Correcta.'],
+        ['Su espacio de direcciones.','No: es del proceso y lo comparten todos sus hilos.'],
+        ['Los archivos abiertos.','No: también son del proceso.'],
+        ['El heap con los objetos.','No: es compartido. Justamente por eso hay condiciones de carrera.']], c:0}},
+
+{id:'pcb', tema:T.EST, src:'apunte',
+ q:'¿Qué es el Bloque de Control de Proceso (BCP o PCB) y qué contiene?',
+ r:'Es la estructura de datos con la que el SO **representa** a cada proceso, y la que permite **interrumpirlo y reanudarlo** después como si nada hubiera pasado. Contiene:\n- **Identificación**: PID, proceso padre, usuario.\n- **Estado del procesador**: contador de programa, registros, puntero de pila.\n- **Información de control**: estado, prioridad, datos de planificación, memoria asignada, archivos y recursos.\n\nEn el cambio de contexto, el SO guarda el contexto del proceso saliente en su PCB y carga el del entrante.',
+ k:['Estructura con la que el SO representa al proceso','Identificación','Estado del procesador (PC, registros, pila)','Información de control (estado, prioridad, recursos)','Permite interrumpir y reanudar (cambio de contexto)'],
+ mc:{q:'¿Para qué se guardan en el PCB el contador de programa y los registros?',
+     o:[['Para poder reanudar el proceso después, exactamente donde quedó.','Correcta: es lo que hace el cambio de contexto.'],
+        ['Para que otros procesos puedan leer sus variables.','No: el PCB es del SO, no un mecanismo de comunicación.'],
+        ['Para que el proceso no pueda ser interrumpido.','No: es al revés, permite interrumpirlo sin perder nada.'],
+        ['Para calcular la prioridad del proceso.','No: la prioridad es otro campo del PCB.']], c:0}},
+
+{id:'estados-java', tema:T.EST, src:'apunte',
+ q:'¿Cuáles son los estados de un hilo en Java (`Thread.State`)? ¿Por qué la filmina habla de 7?',
+ r:'El enum `Thread.State` tiene **seis** valores:\n- **NEW**: creado, todavía sin `start()`.\n- **RUNNABLE**: ejecutándose **o** listo esperando el procesador.\n- **BLOCKED**: esperando un monitor para entrar a un `synchronized`.\n- **WAITING**: espera indefinida (`wait()`, `join()`).\n- **TIMED_WAITING**: espera con plazo (`sleep(t)`, `wait(t)`, `join(t)`).\n- **TERMINATED**: `run()` terminó.\n\nLos **7** de la filmina salen de desdoblar RUNNABLE en **listo** y **en ejecución**, como en el modelo del SO. La JVM no distingue si el hilo está efectivamente sobre el procesador.',
+ k:['NEW, RUNNABLE, BLOCKED, WAITING, TIMED_WAITING, TERMINATED','RUNNABLE incluye listo y en ejecución','7 = RUNNABLE desdoblado en listo y ejecución'],
+ n:'Si preguntan "cuántos estados", aclará las dos cuentas: 6 en el enum de Java y 7 en el modelo de la filmina (con listo y en ejecución separados).',
+ mc:{q:'¿En qué estado de `Thread.State` queda un hilo que llamó a `Thread.sleep(1000)`?',
+     o:[['TIMED_WAITING.','Correcta: es una espera con plazo.'],
+        ['WAITING.','No: WAITING es la espera sin plazo (`wait()`, `join()`).'],
+        ['BLOCKED.','No: BLOCKED es esperar un monitor ocupado.'],
+        ['RUNNABLE.','No: hasta que vence el plazo no está listo para correr.']], c:0}},
+
+{id:'blocked-vs-waiting', tema:T.EST, src:'apunte',
+ q:'¿Qué diferencia hay entre los estados BLOCKED y WAITING de un hilo Java?',
+ r:'**BLOCKED**: el hilo quiere **entrar** a un bloque o método `synchronized` cuyo monitor tiene otro hilo. Sale cuando el monitor se libera.\n\n**WAITING**: el hilo **eligió** esperar a otro, con `wait()` (hasta un `notify`/`notifyAll`) o con `join()` (hasta que el otro termine). Un hilo que hace `wait()` **libera** el monitor; uno en BLOCKED nunca lo tuvo.\n\nDe los dos estados se vuelve a RUNNABLE, nunca directo a ejecución.',
+ k:['BLOCKED: espera entrar a un synchronized ocupado','WAITING: wait() o join(), espera a otro hilo','wait() libera el monitor','De ambos se vuelve a RUNNABLE'],
+ mc:{q:'Un hilo intenta ejecutar un método `synchronized` de un objeto cuyo monitor tiene otro hilo. ¿En qué estado queda?',
+     o:[['BLOCKED.','Correcta: está esperando el monitor.'],
+        ['WAITING.','No: WAITING es para `wait()` o `join()`.'],
+        ['TIMED_WAITING.','No: no hay ningún plazo de por medio.'],
+        ['NEW.','No: NEW es antes de `start()`.']], c:0}},
+
+/* ---------- Java básico y UML ---------- */
+{id:'modificadores', tema:T.UML, src:'apunte',
+ q:'¿Cuántos niveles de acceso hay en Java y qué permite cada uno?',
+ r:'Cuatro:\n- **public**: accesible desde cualquier clase.\n- **protected**: misma clase, mismo paquete y subclases de otros paquetes.\n- **package-private** (sin modificador): misma clase y mismo paquete.\n- **private**: sólo la misma clase.',
+ k:['Son cuatro','public, protected, package-private, private','package-private es el que queda sin modificador'],
+ vf:{q:'En Java existen tres niveles de acceso: `public`, `protected` y `private`.', v:false,
+     e:'Falso: son cuatro. Falta el package-private, que es el que queda cuando no se escribe ningún modificador.'}},
+
+{id:'runnable-vs-thread', tema:T.UML, src:'apunte',
+ q:'¿Cuáles son las dos formas de crear un hilo en Java y cuál se recomienda? ¿Por qué?',
+ r:'1. **Extender `Thread`** y sobrescribir `run()`.\n2. **Implementar `Runnable`** y pasarle el objeto al constructor de `Thread`.\n\nSe recomienda **`Runnable`**. Java tiene herencia simple, y extender `Thread` gasta la única herencia. Además, con `Runnable` la **tarea** queda separada del **mecanismo** que la ejecuta: la misma tarea se le puede dar a un `Thread` o a un executor. En los dos casos el hilo arranca con `start()`.',
+ k:['Extender Thread','Implementar Runnable (recomendada)','Herencia simple','Separa la tarea del mecanismo de ejecución'],
+ mc:{q:'¿Por qué se prefiere implementar `Runnable` antes que extender `Thread`?',
+     o:[['Porque extender `Thread` gasta la única herencia y ata la tarea al hilo.','Correcta.'],
+        ['Porque un `Runnable` se ejecuta más rápido.','No: la velocidad es la misma; al final lo ejecuta un `Thread`.'],
+        ['Porque `Thread` no permite sobrescribir `run()`.','No: se puede, es la primera forma.'],
+        ['Porque a un `Thread` heredado no se le puede poner nombre.','No: `setName()` funciona igual en las dos formas.']], c:0}},
+
+{id:'start-vs-run', tema:T.HIL, src:'apunte',
+ q:'¿Qué diferencia hay entre llamar a `h1.start()` y a `h1.run()`?',
+ r:'`start()` le pide a la JVM que cree un **hilo nuevo** y que ese hilo ejecute `run()`. El que llama sigue de largo inmediatamente.\n\n`run()` es una llamada a método **común**: se ejecuta en el **mismo hilo** que la hace, de forma secuencial, sin concurrencia.\n\nEn el buscador de archivos: con `run()`, el `main` busca él mismo hasta el final y el `interrupt()` posterior no tiene efecto; con `start()`, el `main` sigue, duerme 10 s e interrumpe la búsqueda.',
+ k:['start(): crea un hilo nuevo que ejecuta run()','run(): llamada común, en el mismo hilo','Con run() no hay concurrencia'],
+ mc:{q:'Si en lugar de `hilo.start()` se escribe `hilo.run()`, ¿qué pasa?',
+     o:[['El código de `run()` se ejecuta en el hilo que llama, sin crear un hilo nuevo.','Correcta.'],
+        ['Se crea el hilo igual, pero con prioridad mínima.','No: no se crea ningún hilo.'],
+        ['Lanza `IllegalThreadStateException`.','No: eso pasa si se llama a `start()` dos veces sobre el mismo hilo.'],
+        ['El hilo arranca pero no se puede interrumpir.','No: no arranca ningún hilo.']], c:0}},
+
+{id:'uml-secuencia', tema:T.UML, src:'apunte',
+ q:'En un diagrama de secuencia UML, ¿cómo se representa el `start()` de un hilo? ¿Qué fragmentos combinados sirven para mostrar concurrencia?',
+ r:'El `start()` es un **mensaje asincrónico** (punta abierta): el emisor sigue sin esperar respuesta. Una llamada común como `run()` es un **mensaje sincrónico** (punta llena), que bloquea al que llama hasta el retorno.\n\nFragmentos útiles:\n- **`par`**: los operandos se intercalan de cualquier forma, cada uno con su orden interno. Es el interleaving dibujado.\n- **`critical`**: región atómica que ningún otro fragmento puede intercalar. Es la sección crítica.\n- **`loop`**, **`alt`** y **`opt`**: repetición y alternativas con guardas.',
+ k:['start(): mensaje asincrónico','Llamada común: mensaje sincrónico','par = interleaving','critical = sección crítica'],
+ mc:{q:'¿Qué fragmento combinado marca una región que ningún otro fragmento puede intercalar?',
+     o:[['`critical`.','Correcta: es la sección crítica dibujada.'],
+        ['`par`.','No: `par` es lo contrario, deja intercalar los operandos.'],
+        ['`strict`.','No: impone un orden vertical estricto, pero no habla de atomicidad.'],
+        ['`alt`.','No: elige un operando según su guarda.']], c:0}},
+
+{id:'static-thread-safe', tema:T.UML, src:'apunte',
+ q:'¿Los atributos `static` son thread safe? Justifique.',
+ r:'**No.** Un atributo `static` pertenece a la **clase**, así que **todos** los hilos ven la misma variable. Es el caso más puro de estado compartido y el primer candidato a condición de carrera. Ser `static` no agrega ninguna sincronización.\n\nExcepciones: un `static final` de un tipo inmutable, las variables `volatile` (dan visibilidad, no atomicidad) y las clases `Atomic*`.\n\nEn el práctico, `y1`, `y2` y `critical` estáticos compartidos por T1 y T2 terminaron mostrando `critical = -1` y `1`.',
+ k:['No','static = una sola variable compartida por todos los hilos','No agrega sincronización','Excepción: static final inmutable'],
+ vf:{q:'Un atributo `static` es thread safe porque hay una sola copia en memoria.', v:false,
+     e:'Falso: tener una sola copia es justamente lo que la vuelve compartida por todos los hilos. Sin sincronización, hay condiciones de carrera.'}},
+
+{id:'volatile', tema:T.UML, src:'apunte',
+ q:'¿Qué garantiza `volatile` y qué no?',
+ r:'Garantiza **visibilidad**: una escritura en la variable la ven inmediatamente los demás hilos, no queda en la caché o en un registro de un núcleo.\n\n**No** garantiza **atomicidad**: `contador++` sobre un `volatile` sigue siendo leer, incrementar y escribir, y dos hilos pueden perder actualizaciones. Para eso hace falta `synchronized`, un `Lock` o un `AtomicInteger`.',
+ k:['Garantiza visibilidad','No garantiza atomicidad','x++ sigue rompiéndose'],
+ vf:{q:'Declarar `volatile` un contador hace que `contador++` sea atómico.', v:false,
+     e:'Falso: `volatile` da visibilidad, no atomicidad. `contador++` sigue siendo tres pasos que otro hilo puede intercalar.'}},
+
+/* ---------- Hilos en Java: API y ciclo de vida ---------- */
+{id:'prioridad', tema:T.HIL, src:'apunte',
+ q:'¿Qué rango tiene la prioridad de un hilo en Java? ¿Garantiza un orden de ejecución?',
+ r:'Es un entero de **1 a 10** (`MIN_PRIORITY` = 1, `NORM_PRIORITY` = 5, `MAX_PRIORITY` = 10).\n\n**No garantiza nada.** Es una sugerencia al planificador del SO, se mapea distinto en cada plataforma, y con varios núcleos puede no haber competencia que resolver. Un programa cuya corrección dependa de las prioridades está mal diseñado.',
+ k:['1 a 10 (normal 5)','Es sólo una sugerencia al planificador','Depende de la plataforma','No garantiza orden'],
+ mc:{q:'En el práctico, ¿por qué los hilos con `MAX_PRIORITY` no terminaban siempre antes que los de `MIN_PRIORITY`?',
+     o:[['Porque la prioridad es una sugerencia al planificador y, con varios núcleos, todos pueden correr a la vez.','Correcta.'],
+        ['Porque la prioridad máxima en Java es 5.','No: la máxima es 10; 5 es la normal.'],
+        ['Porque Java ignora la prioridad de los hilos no daemon.','No: no hay tal regla.'],
+        ['Porque `setPriority()` no hace nada en Java.','No: la cambia, pero el efecto depende del SO y no garantiza orden.']], c:0}},
+
+{id:'interrupt', tema:T.HIL, src:'apunte',
+ q:'¿Qué hace `interrupt()` sobre un hilo? ¿Lo detiene?',
+ r:'**No lo detiene**: sólo pone en `true` una **bandera** interna. Es un pedido, y el hilo puede ignorarlo.\n- Si el hilo está corriendo código normal, no pasa nada automático. Su código tiene que consultar el flag (`isInterrupted()` o `Thread.interrupted()`) y decidir terminar.\n- Si está bloqueado en `sleep()`, `wait()` o `join()`, ese método lanza **`InterruptedException`** y el flag **se borra**.\n\nCómo terminar lo decide el código de la tarea, por ejemplo con un `return` en el `catch`. Es la alternativa segura a `stop()`, que está deprecado.',
+ k:['No mata al hilo: levanta un flag','Corriendo: el código debe consultar el flag','En sleep/wait/join: InterruptedException y el flag se borra','La tarea decide cómo terminar'],
+ mc:{q:'Un hilo está dentro de `Thread.sleep(5000)` y otro llama a su `interrupt()`. ¿Qué pasa?',
+     o:[['`sleep` lanza `InterruptedException` y el flag de interrupción queda en `false`.','Correcta.'],
+        ['El hilo muere inmediatamente.','No: eso hacía `stop()`, que está deprecado.'],
+        ['No pasa nada hasta que termina el `sleep`.','No: el `sleep` se corta antes de tiempo.'],
+        ['`sleep` lanza `InterruptedException` y el flag queda en `true`.','No: el flag se borra al lanzar la excepción.']], c:0}},
+
+{id:'interrupted-vs-is', tema:T.HIL, src:'apunte',
+ q:'¿Qué diferencia hay entre `isInterrupted()` y `Thread.interrupted()`?',
+ r:'`isInterrupted()` es **de instancia**: consulta el flag del hilo sobre el que se llama y **no lo modifica**.\n\n`Thread.interrupted()` es **estático**: consulta el flag del hilo **actual** y lo **borra** (lo deja en `false`).',
+ k:['isInterrupted(): de instancia, no borra','Thread.interrupted(): estático, hilo actual, borra el flag'],
+ vf:{q:'`Thread.interrupted()` consulta el flag del hilo actual sin modificarlo.', v:false,
+     e:'Falso: lo borra. El que consulta sin modificar es `isInterrupted()`.'}},
+
+{id:'stop', tema:T.HIL, src:'apunte',
+ q:'¿Por qué `Thread.stop()` está deprecado y qué se usa en su lugar?',
+ r:'`stop()` mataba al hilo **en cualquier punto** de su ejecución, sin darle oportunidad de liberar locks, cerrar archivos o dejar los datos en un estado consistente. Está deprecado desde Java 1.2.\n\nEn su lugar se usa **`interrupt()`**: un pedido gentil que el código de la tarea atiende en puntos seguros.',
+ k:['Mataba al hilo en cualquier punto','Podía dejar datos inconsistentes y recursos tomados','Se reemplaza por interrupt()'],
+ mc:{q:'¿Cuál es el problema de `Thread.stop()`?',
+     o:[['Corta el hilo en cualquier punto y puede dejar datos inconsistentes o recursos sin liberar.','Correcta.'],
+        ['Que el hilo puede ignorarlo.','No: eso le pasa a `interrupt()`, y es a propósito.'],
+        ['Que sólo funciona en hilos daemon.','No.'],
+        ['Que bloquea al hilo que lo llama.','No.']], c:0}},
+
+{id:'join', tema:T.HIL, src:'apunte',
+ q:'¿Qué hace `join()`? En el ejemplo de los grupos de mensajes, ¿qué pasa si se sacan los `join()`?',
+ r:'El hilo que llama a `otro.join()` **se suspende** (WAITING, o TIMED_WAITING con `join(ms)`) hasta que `otro` termina.\n\nEn el ejemplo, cada `start()` va seguido de su `join()`, así que hay un solo grupo vivo a la vez y los mensajes salen ordenados por grupo. Sin `join()`, los grupos **se intercalan** y el mensaje final de `main` puede salir en cualquier momento, casi siempre al principio. El programa igual no termina hasta que terminan los hilos, porque son no-daemon.',
+ k:['Suspende al que llama hasta que el otro hilo termine','WAITING o TIMED_WAITING','Sin join, los mensajes se intercalan','join ordena respecto de lo que viene después'],
+ mc:{q:'Se arrancan tres hilos y recién después se hacen los tres `join()`. ¿Qué se garantiza?',
+     o:[['Que `main` sigue sólo cuando terminaron los tres, aunque sus mensajes se intercalen entre sí.','Correcta: `join()` ordena respecto de lo que viene después de él.'],
+        ['Que los tres hilos se ejecutan en orden.','No: arrancaron juntos, así que se intercalan.'],
+        ['Nada: `join()` no hace efecto después de `start()`.','No: justamente se usa después de `start()`.'],
+        ['Que los mensajes de `main` salen primero.','No: `main` espera a los tres.']], c:0}},
+
+{id:'sleep-listo', tema:T.HIL, src:'apunte',
+ q:'Cuando termina el plazo de un `sleep()`, ¿el hilo vuelve a ejecutarse inmediatamente?',
+ r:'No. Pasa de TIMED_WAITING a **RUNNABLE** (la cola de listos) y continúa cuando el planificador le asigne CPU. De los estados de espera siempre se vuelve a listo, nunca directo a ejecución. Por eso `sleep()` no sirve para ordenar hilos con precisión.',
+ k:['No','Vuelve a RUNNABLE (listo)','Sigue cuando le asignan CPU'],
+ vf:{q:'Al terminar el plazo de `sleep()`, el hilo vuelve a ejecutarse en ese mismo instante.', v:false,
+     e:'Falso: pasa a listo (RUNNABLE) y espera que el planificador le dé la CPU.'}},
+
+{id:'daemon-set', tema:T.HIL, src:'apunte',
+ q:'¿Cuándo se puede marcar un hilo como daemon y qué pasa si se hace tarde?',
+ r:'`setDaemon(true)` se llama **antes de `start()`**. Después, la condición queda fija, y llamarlo lanza **`IllegalThreadStateException`**.\n\nUn daemon da servicios en segundo plano, como el limpiador de eventos viejos del práctico. Cuando los únicos hilos vivos son daemons, la JVM los termina y cierra el programa.',
+ k:['Antes de start()','Después: IllegalThreadStateException','Si sólo quedan daemons, la JVM termina'],
+ vf:{q:'Un hilo puede pasar a ser daemon en cualquier momento de su ejecución, llamando a `setDaemon(true)`.', v:false,
+     e:'Falso: sólo antes de `start()`. Después lanza `IllegalThreadStateException`.'}},
+
+{id:'uncaught', tema:T.HIL, src:'apunte',
+ q:'¿Qué pasa si una excepción unchecked se escapa del `run()` de un hilo? ¿Cómo se la puede interceptar?',
+ r:'La JVM imprime el stack trace y **termina sólo ese hilo**, no todo el programa. Es peligroso: el hilo muere en silencio y puede dejar el sistema a medio hacer.\n\nPara interceptarla se implementa **`Thread.UncaughtExceptionHandler`** (método `uncaughtException(Thread t, Throwable e)`) y se lo asigna con `setUncaughtExceptionHandler()`, o para todos los hilos con `Thread.setDefaultUncaughtExceptionHandler()`.',
+ k:['Termina sólo ese hilo','Se imprime el stack trace','UncaughtExceptionHandler'],
+ mc:{q:'Un hilo lanza una `NullPointerException` no capturada dentro de `run()`. ¿Qué ocurre por defecto?',
+     o:[['Se imprime el stack trace y termina sólo ese hilo.','Correcta.'],
+        ['Termina todo el programa.','No: los demás hilos siguen.'],
+        ['El compilador obliga a capturarla.','No: es unchecked.'],
+        ['El hilo pasa a WAITING hasta que alguien la maneje.','No: el hilo termina.']], c:0}},
+
+{id:'latch', tema:T.HIL, src:'apunte',
+ q:'¿Qué es un `CountDownLatch`? ¿Qué elementos tiene y qué limitaciones?',
+ r:'Es un sincronizador que permite que uno o más hilos **esperen a que ocurran N eventos**. Tiene tres elementos:\n- El **valor inicial**: cuántos eventos se esperan.\n- **`await()`**: lo llama quien espera, y se duerme hasta que el contador llega a 0.\n- **`countDown()`**: lo llama cada evento al terminar.\n\nLimitaciones: es de **uso único** (el contador no se resetea; en 0 queda en 0 y `await()` retorna enseguida), y **no protege** una sección crítica. Ejemplo: la videoconferencia que arranca cuando llegaron todos los participantes.',
+ k:['Esperar N eventos','Valor inicial, await(), countDown()','Uso único, no se resetea','No es exclusión mutua'],
+ mc:{q:'¿Qué pasa si se llama a `await()` sobre un `CountDownLatch` cuyo contador ya llegó a 0?',
+     o:[['Retorna inmediatamente.','Correcta.'],
+        ['Se bloquea hasta que alguien llame a `reset()`.','No: el `CountDownLatch` no tiene reset.'],
+        ['Lanza una excepción.','No.'],
+        ['Vuelve a contar desde el valor inicial.','No: es de un solo uso.']], c:0}},
+
+/* ---------- synchronized ---------- */
+{id:'sync-static', tema:T.SC, src:'apunte',
+ q:'¿Qué monitor toma un método `synchronized` de instancia y cuál uno `static synchronized`? ¿Pueden ejecutarse a la vez?',
+ r:'Un método `synchronized` de instancia toma el monitor del **objeto** (`this`). Uno `static synchronized` toma el monitor de la **clase** (el objeto `Clase.class`).\n\nSon **dos llaves distintas**: un hilo puede estar en un método estático sincronizado y otro en uno de instancia sincronizado **al mismo tiempo**. Si los dos tocan el mismo dato estático, hay condición de carrera.',
+ k:['De instancia: monitor de this','static: monitor de la clase','Son llaves distintas: no se excluyen'],
+ mc:{q:'Un hilo ejecuta un método `static synchronized` de la clase `Cuenta`, y otro un método `synchronized` de instancia de un objeto `Cuenta`. ¿Se excluyen?',
+     o:[['No: uno usa el monitor de la clase y el otro el del objeto.','Correcta.'],
+        ['Sí: los dos usan el monitor de la clase.','No: el de instancia usa `this`.'],
+        ['Sí: los dos usan el monitor del objeto.','No: el estático usa `Cuenta.class`.'],
+        ['No compila: no se puede combinar `static` con `synchronized`.','No: es válido.']], c:0}},
+
+{id:'sync-integer', tema:T.SC, src:'apunte',
+ q:'¿Por qué es un error sincronizar con un `Integer` que se modifica dentro del bloque?',
+ r:'`synchronized` toma el monitor **del objeto** al que apunta la referencia en ese momento. Un `Integer` es **inmutable**: `valor = valor + 1` crea otro objeto y reasigna la referencia. El siguiente hilo que haga `synchronized (valor)` toma el monitor de **otro objeto**, y dos hilos pueden quedar dentro a la vez.\n\nHay que sincronizar con un objeto cuya identidad no cambie, por ejemplo un `Object` dedicado y `final`. En el experimento de la cátedra, el error no apareció en 10 corridas: hizo falta correrlo 100.000 veces. El testing puede engañarte.',
+ k:['synchronized toma el monitor del objeto apuntado','Integer es inmutable: cada valor es otro objeto','Dos hilos pueden entrar a la vez','Usar un Object dedicado y final'],
+ mc:{q:'¿Cuál de estas llaves garantiza la exclusión mutua?',
+     o:[['Un `private final Object lock = new Object()` dedicado.','Correcta: su identidad nunca cambia.'],
+        ['La variable `Integer` que se incrementa dentro del bloque.','No: cada incremento la hace apuntar a otro objeto.'],
+        ['Un elemento de un arreglo que se reasigna dentro del bloque.','No: es el caso 4 de la cátedra, que dio erróneo.'],
+        ['Un `String` que se concatena dentro del bloque.','No: `String` también es inmutable, y cada concatenación crea otro objeto.']], c:0}},
+
+{id:'cinema', tema:T.SC, src:'apunte',
+ q:'En el ejemplo del cine (`Cinema`), ¿por qué se usan dos objetos de control en lugar de sincronizar los métodos?',
+ r:'El cine tiene **dos salas independientes**. Con métodos `synchronized`, todos usarían la misma llave (`this`): vender en la sala 1 bloquearía a quien vende en la sala 2, aunque no compartan datos.\n\nCon dos objetos (`controlCinema1` y `controlCinema2`) y bloques `synchronized` sobre cada uno, cada recurso se protege **por separado**: hay exclusión mutua dentro de cada sala y paralelismo entre salas. Es la ventaja del bloque sobre el método: elegir la llave y achicar la sección crítica.',
+ k:['Dos recursos independientes','Métodos synchronized: una sola llave para todo','Dos llaves: exclusión por sala, paralelismo entre salas'],
+ mc:{q:'¿Qué se gana sincronizando bloques con dos llaves distintas en lugar de dos métodos `synchronized`?',
+     o:[['Que las operaciones sobre recursos independientes ya no se excluyen entre sí.','Correcta.'],
+        ['Que se evita el deadlock en cualquier caso.','No: si un hilo toma las dos llaves en orden opuesto al de otro, puede haber deadlock.'],
+        ['Que ya no hace falta sincronizar las lecturas.','No: las lecturas también tienen que ver datos consistentes.'],
+        ['Nada: es equivalente.','No: los métodos `synchronized` comparten la llave `this`.']], c:0}},
+
+{id:'while-wait', tema:T.SC, src:'apunte',
+ q:'¿Por qué la condición de un `wait()` se chequea con `while` y no con `if`?',
+ r:'Porque al despertar **la condición puede ya no valer**. `notifyAll()` despierta a todos, y otro hilo pudo adelantarse y volver a llenar (o vaciar) el buffer antes de que éste recupere el monitor. También existen los despertares espurios.\n\nCon `while`, el hilo vuelve a evaluar la condición y, si no se cumple, vuelve a dormir. Con `if` seguiría de largo con una condición falsa.',
+ k:['Al despertar la condición puede no valer','notifyAll despierta a todos; otro puede adelantarse','while vuelve a chequear'],
+ mc:{q:'En el `EventStorage` del productor/consumidor, ¿qué puede pasar si se cambia el `while` del `wait()` por un `if`?',
+     o:[['Un productor despertado puede agregar con el buffer otra vez lleno.','Correcta: no vuelve a chequear la condición.'],
+        ['Ninguno de los hilos se despierta nunca.','No: `notifyAll()` los despierta igual.'],
+        ['El programa no compila.','No: compila sin problemas.'],
+        ['El `wait()` deja de liberar el monitor.','No: `wait()` siempre libera el monitor.']], c:0}},
+
+{id:'deadlock-orden', tema:T.SC, src:'apunte',
+ q:'Dos hilos usan dos locks, X e Y. ¿Cómo puede producirse un deadlock y cómo se evita?',
+ r:'Si el hilo A toma X y espera Y, mientras B toma Y y espera X, los dos quedan bloqueados para siempre: es una **espera circular** producida por adquirir los locks en **orden opuesto**.\n\nSe evita fijando un **orden global** de adquisición que todo el código respete (siempre X antes que Y), o usando `tryLock()` con plazo para no esperar indefinidamente.',
+ k:['Cada hilo tiene un lock y espera el del otro','Orden de adquisición opuesto','Solución: orden global de adquisición (o tryLock)'],
+ mc:{q:'¿Cuál es la solución de diseño clásica a ese deadlock?',
+     o:[['Que todos los hilos tomen los locks en el mismo orden global.','Correcta.'],
+        ['Subir la prioridad de uno de los hilos.','No: la prioridad no rompe la espera circular.'],
+        ['Hacer `volatile` las variables protegidas.','No: `volatile` no tiene nada que ver con los locks.'],
+        ['Agregar un `sleep()` antes de tomar el segundo lock.','No: sólo cambia la probabilidad, no elimina el deadlock.']], c:0}},
+
+/* ---------- Locks y semáforos ---------- */
+{id:'lock-vs-sync', tema:T.LOCK, src:'apunte',
+ q:'¿Qué ventajas tiene un `Lock` (`ReentrantLock`) sobre `synchronized`? ¿Cuándo conviene cada uno?',
+ r:'El `Lock` ofrece:\n- `tryLock()`: intentar tomarlo sin bloquearse (con o sin plazo).\n- `lockInterruptibly()`: adquirirlo de forma interrumpible.\n- **Fairness** opcional.\n- Bloques más flexibles, por ejemplo tomarlo en un método y liberarlo en otro.\n- `ReadWriteLock`, que separa lectura de escritura.\n\nRegla práctica: usar `synchronized` por defecto (es más simple y libera solo), y `Lock` cuando hace falta alguna de esas capacidades. El precio es que hay que llamar a `unlock()` **en un `finally`**.',
+ k:['tryLock() sin bloquearse','lockInterruptibly()','Fairness','Estructura flexible y ReadWriteLock','Por defecto synchronized; Lock si hace falta lo extra'],
+ mc:{q:'¿Qué ofrece `Lock` que `synchronized` no tiene?',
+     o:[['Intentar tomar la llave sin bloquearse, con `tryLock()`.','Correcta.'],
+        ['Exclusión mutua.','No: la dan los dos.'],
+        ['Liberación automática al salir del bloque.','No: es al revés, eso lo tiene `synchronized`.'],
+        ['Reentrancia.','No: `synchronized` también es reentrante.']], c:0}},
+
+{id:'unlock-finally', tema:T.LOCK, src:'apunte',
+ q:'¿Dónde se debe llamar a `unlock()` y por qué?',
+ r:'En un bloque **`finally`**, después del `try` que contiene la sección crítica. Si la SC lanza una excepción y el `unlock()` no se ejecuta, el lock queda tomado para siempre, y todos los hilos que lo pidan se bloquean.\n\n`synchronized` no tiene este problema: libera el monitor automáticamente al salir del bloque, incluso por una excepción.',
+ k:['En el finally','Si no, una excepción deja el lock tomado para siempre','synchronized libera solo'],
+ vf:{q:'Si una excepción sale de una sección crítica protegida con `lock()`/`unlock()` sin `finally`, el lock se libera solo, igual que con `synchronized`.', v:false,
+     e:'Falso: el lock queda tomado. Por eso `unlock()` va en el `finally`.'}},
+
+{id:'rwlock', tema:T.LOCK, src:'apunte',
+ q:'¿Qué es un `ReadWriteLock` y en qué escenario conviene usarlo?',
+ r:'Tiene **dos** locks: uno de **lectura**, que pueden tener **varios** hilos a la vez, y uno de **escritura**, exclusivo (no admite otros escritores ni lectores).\n\nConviene cuando hay **muchas lecturas y pocas escrituras**, por ejemplo una base de datos que se consulta continuamente y se modifica de vez en cuando: ahí los lectores corren en paralelo de verdad. Si casi todo son escrituras, sale **más caro** que una sección crítica clásica.\n\nEs responsabilidad del programador no escribir con el lock de lectura tomado.',
+ k:['Lock de lectura compartido','Lock de escritura exclusivo','Conviene con muchas lecturas y pocas escrituras','Si no, es más caro que una SC clásica'],
+ mc:{q:'¿En cuál de estos escenarios conviene un `ReadWriteLock`?',
+     o:[['Una base de datos que se consulta continuamente y se modifica muy de vez en cuando.','Correcta: los lectores corren en paralelo.'],
+        ['Una base de precios que cambia continuamente y casi no se consulta.','No: casi todo es escritura exclusiva, y se paga el costo de administrar dos locks.'],
+        ['Un contador que todos los hilos incrementan.','No: incrementar es escribir.'],
+        ['En cualquier caso: siempre es más rápido que `synchronized`.','No: en el escenario equivocado es más caro.']], c:0}},
+
+{id:'fair', tema:T.LOCK, src:'apunte',
+ q:'¿Qué significa el modo fair de un `ReentrantLock` o de un `Semaphore`?',
+ r:'Con `fair = true`, cuando se libera el lock se le da al hilo que **hace más tiempo** que espera (orden de llegada). Con `false`, que es el valor por defecto, se elige uno **sin criterio**.\n\nFair evita la inanición pero cuesta más. No afecta a `tryLock()`, que no hace esperar a nadie.',
+ k:['fair: el que más tiempo espera','non-fair (por defecto): sin criterio','Evita inanición, cuesta más','No afecta a tryLock()'],
+ mc:{q:'¿A qué método **no** afecta el atributo `fair` de un `ReentrantLock`?',
+     o:[['`tryLock()`.','Correcta: no duerme al hilo, así que no hay cola que ordenar.'],
+        ['`lock()`.','No: `lock()` hace esperar, y fair decide el orden.'],
+        ['`unlock()`.','No: al liberar es cuando se elige a quién darle el lock.'],
+        ['`lockInterruptibly()`.','No: también hace esperar en la cola.']], c:0}},
+
+{id:'semaforo-n', tema:T.LOCK, src:'apunte',
+ q:'En la cola de impresión con tres impresoras, ¿para qué se usa un `Semaphore(3)` y para qué, además, un `Lock`?',
+ r:'El **semáforo de 3 permisos** limita a **tres** los hilos que imprimen a la vez, uno por impresora. El cuarto se duerme en `acquire()` hasta que alguien haga `release()`.\n\nPero el semáforo no dice **cuál** impresora está libre. Para elegirla se recorre y se modifica el arreglo `freePrinters`, y esa búsqueda es una sección crítica entre los hilos que pasaron el semáforo. Por eso se protege con un **`Lock`** aparte.\n\nEn una RdP, el semáforo es un lugar con 3 fichas.',
+ k:['Semaphore(3): hasta 3 hilos a la vez','No indica cuál impresora está libre','Elegir impresora es otra SC: Lock'],
+ mc:{q:'¿Por qué no alcanza el `Semaphore(3)` solo?',
+     o:[['Porque hasta tres hilos pueden estar a la vez eligiendo impresora en el mismo arreglo.','Correcta: esa búsqueda necesita su propia exclusión mutua.'],
+        ['Porque un semáforo sólo puede tener un permiso.','No: puede tener N.'],
+        ['Porque el semáforo no despierta a los hilos que esperan.','No: `release()` despierta a uno.'],
+        ['Porque `acquire()` no es atómico.','No: lo es.']], c:0}},
+
+{id:'semaforo-cero', tema:T.LOCK, src:'apunte',
+ q:'¿Para qué sirve un semáforo inicializado en 0?',
+ r:'Para la **señalización** entre hilos. El que debe esperar hace `acquire()` y se bloquea (no hay permisos), hasta que otro hilo hace `release()` para avisarle.\n\nFunciona porque los semáforos **no tienen dueño**: quien libera no tiene por qué ser quien adquirió. En una RdP es un lugar "señal" sin marca inicial, que una rama produce y la otra consume.',
+ k:['Señalización: uno espera, otro avisa','acquire() bloquea; release() de otro hilo lo despierta','Funciona porque no hay ownership'],
+ mc:{q:'¿Qué propiedad de los semáforos permite usar uno inicializado en 0 para avisar entre hilos?',
+     o:[['Que no tienen dueño: cualquier hilo puede hacer `release()`.','Correcta.'],
+        ['Que son reentrantes.','No: un semáforo no es reentrante.'],
+        ['Que son fair por defecto.','No: por defecto son non-fair.'],
+        ['Que `acquire()` nunca bloquea.','No: bloquea si no hay permisos.']], c:0}},
+
+{id:'tryacquire', tema:T.LOCK, src:'apunte',
+ q:'¿Qué diferencia hay entre `acquire()`, `tryAcquire()` y `acquireUninterruptibly()`?',
+ r:'- `acquire()`: toma un permiso o **bloquea** si no hay. Puede lanzar `InterruptedException`.\n- `tryAcquire()`: **no bloquea**. Devuelve `true` si lo tomó o `false` si no había.\n- `acquireUninterruptibly()`: bloquea, pero **ignora** las interrupciones.\n\nLas tres tienen versiones con un `int` para tomar varios permisos de una vez. Es la base de lectores/escritores con semáforos: el escritor pide todos los permisos.',
+ k:['acquire(): bloquea, interrumpible','tryAcquire(): no bloquea, devuelve boolean','acquireUninterruptibly(): ignora interrupciones','Versiones con int'],
+ vf:{q:'`tryAcquire()` bloquea al hilo hasta que haya un permiso disponible.', v:false,
+     e:'Falso: devuelve `false` en el acto si no hay permiso. Es lo que usa la barbería para que el cliente se vaya si no hay banco libre.'}},
+
+/* ---------- Lenguajes y autómatas ---------- */
+{id:'chomsky', tema:T.GRAM, src:'apunte',
+ q:'Enuncie la jerarquía de Chomsky: tipo de gramática, lenguaje y autómata que lo reconoce.',
+ r:'- **Tipo 0** (sin restricciones): lenguajes recursivamente enumerables. **Máquina de Turing**.\n- **Tipo 1** (sensibles al contexto, `α A β → α γ β`): **autómata lineal acotado**.\n- **Tipo 2** (libres de contexto, `A → γ`): **autómata de pila**.\n- **Tipo 3** (regulares, `A → aB` o `A → a`): **autómata finito**.\n\nCada clase está **incluida** en la anterior: tipo 3 ⊂ tipo 2 ⊂ tipo 1 ⊂ tipo 0.',
+ k:['Tipo 0: MT','Tipo 1: ALA','Tipo 2: autómata de pila','Tipo 3: autómata finito','Clases anidadas'],
+ mc:{q:'¿Qué autómata reconoce los lenguajes de tipo 2?',
+     o:[['El autómata de pila.','Correcta.'],
+        ['El autómata finito.','No: reconoce los de tipo 3.'],
+        ['El autómata lineal acotado.','No: reconoce los de tipo 1.'],
+        ['La máquina de Turing.','Reconoce los de tipo 2, pero no es el que les corresponde: es el de tipo 0.']], c:0}},
+
+{id:'afnd-afd-conv', tema:T.AUT, src:'apunte',
+ q:'¿Cómo se pasa de un AFND a un AFD? ¿Cuántos estados puede tener el resultado?',
+ r:'Con la **construcción de subconjuntos**: cada estado del AFD es un **conjunto** de estados del AFND (los que podrían estar activos a la vez). Se arranca con el estado inicial (y su clausura λ) y, para cada símbolo, se calcula el conjunto alcanzable. Son finales los conjuntos que contienen algún estado final del AFND.\n\nCon n estados, el AFD puede tener hasta **2^{n}** estados, aunque en general sólo se generan muchos menos accesibles.',
+ k:['Construcción de subconjuntos','Cada estado del AFD es un conjunto de estados del AFND','Finales: los que contienen un final','Hasta 2^n estados'],
+ mc:{q:'Un AFND tiene 4 estados. ¿Cuántos estados puede tener, como máximo, el AFD equivalente?',
+     o:[['16.','Correcta: 2^4 subconjuntos.'],
+        ['4.','No: puede necesitar más, uno por cada subconjunto alcanzable.'],
+        ['8.','No: el máximo es 2^n.'],
+        ['Infinitos.','No: el AFD siempre es finito.']], c:0}},
+
+{id:'er', tema:T.GRAM, src:'apunte',
+ q:'¿Qué es una expresión regular y qué relación tiene con los autómatas finitos?',
+ r:'Es una **descripción compacta** de un lenguaje regular, construida con los símbolos del alfabeto, λ, ∅ y tres operaciones: **unión** (`+` o `|`), **concatenación** y **clausura de Kleene** (`*`).\n\nPor el **teorema de Kleene**, los lenguajes que describen las ER son exactamente los que reconocen los autómatas finitos. De una ER se construye un AFND (con transiciones λ), y de un AF se obtiene una ER eliminando estados.',
+ k:['Describe un lenguaje regular','Unión, concatenación, clausura de Kleene','Equivalen a los autómatas finitos (Kleene)'],
+ mc:{q:'¿Cuál de estas cadenas pertenece al lenguaje de la ER `(a|b)*abb`?',
+     o:[['`babb`','Correcta: `b` lo genera `(a|b)*`, y sigue `abb`.'],
+        ['`abba`','No: tiene que terminar en `abb`.'],
+        ['`ab`','No: le falta una `b` al final.'],
+        ['`bbab`','No: termina en `ab`, no en `abb`.']], c:0}},
+
+{id:'church', tema:T.AUT, src:'apunte',
+ q:'¿Qué dice la tesis de Church (o de Church-Turing)?',
+ r:'Que todo lo **efectivamente computable** (calculable por un algoritmo) lo puede computar una **máquina de Turing**.\n\nNo es un teorema, porque "algoritmo" es una noción intuitiva que no se puede formalizar para demostrarlo. Es una tesis aceptada porque todos los modelos de cómputo propuestos resultaron equivalentes a la MT. Por eso se dice que todo programa tiene una MT asociada.',
+ k:['Todo lo computable lo computa una MT','Es una tesis, no un teorema','Todo programa tiene una MT asociada'],
+ vf:{q:'La tesis de Church es un teorema que demuestra que la máquina de Turing es el modelo de cómputo más potente.', v:false,
+     e:'Falso: es una tesis, no un teorema. No se puede demostrar porque la noción de algoritmo es intuitiva.'}},
+
+{id:'pda-nodet', tema:T.AUT, src:'apunte',
+ q:'¿Los autómatas de pila deterministas reconocen los mismos lenguajes que los no deterministas?',
+ r:'**No**, a diferencia de lo que pasa con los autómatas finitos. Los AP **no deterministas** reconocen todos los lenguajes libres de contexto; los **deterministas**, sólo un subconjunto propio. Ejemplo clásico: los palíndromos de longitud par, donde hay que "adivinar" dónde está la mitad.\n\nEn cambio, todo AFND tiene un AFD equivalente.',
+ k:['No','El AP no determinista reconoce todos los libres de contexto','El determinista, sólo una parte','Con AF sí son equivalentes'],
+ vf:{q:'Igual que con los autómatas finitos, todo autómata de pila no determinista tiene un autómata de pila determinista equivalente.', v:false,
+     e:'Falso: en los autómatas de pila el no determinismo sí agrega poder. Los palíndromos de longitud par necesitan un AP no determinista.'}},
+
+{id:'eda-reactivo', tema:T.GRAM, src:'apunte',
+ q:'¿Por qué los autómatas y los lenguajes formales están en Programación Concurrente?',
+ r:'Porque los sistemas concurrentes son casi siempre **reactivos**: reaccionan a **secuencias de eventos** del entorno. Un autómata modela eso exactamente, con un estado y transiciones disparadas por eventos (los símbolos del alfabeto). El conjunto de secuencias de eventos válidas es un **lenguaje**, y el autómata lo reconoce.\n\nEn una **arquitectura dirigida por eventos**, el sistema es un autómata que avanza con cada evento. Y el grafo de accesibilidad de una red de Petri **es** un autómata.',
+ k:['Los sistemas concurrentes son reactivos','Símbolo = evento; estado = situación del sistema','Secuencias válidas = lenguaje','El grafo de accesibilidad de una RdP es un autómata'],
+ mc:{q:'Al modelar un sistema reactivo con un autómata, ¿qué representa un símbolo del alfabeto?',
+     o:[['Un evento al que el sistema reacciona.','Correcta.'],
+        ['Una variable del programa.','No: las variables forman parte del estado.'],
+        ['Un hilo.','No.'],
+        ['Un estado del sistema.','No: los estados son los nodos; los símbolos etiquetan las transiciones.']], c:0}}
 ];
 
 /* ---------- Utilidades ---------- */
@@ -651,12 +1088,22 @@ function fmt(s) {
 }
 const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
+/* ---------- Configuración ----------
+   SIM: preguntas por simulacro. SIM_APUNTE: cuántas de esas salen del apunte (el resto, de parciales).
+   SIM_BLOQUES (opcional): {bloque: cantidad} para repartir el simulacro por bloque (lo usa el final). */
+const CONF = { KEY: 'pc-parcial1-hist', SIM: 10, SIM_APUNTE: 2 };
+
 /* Historial por pregunta, sólo en este navegador */
-const KEY = 'pc-parcial1-hist';
 let hist = {};
-try { hist = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { hist = {}; }
-function guardarHist() { try { localStorage.setItem(KEY, JSON.stringify(hist)); } catch (e) {} }
+try { hist = JSON.parse(localStorage.getItem(CONF.KEY)) || {}; } catch (e) { hist = {}; }
+function guardarHist() { try { localStorage.setItem(CONF.KEY, JSON.stringify(hist)); } catch (e) {} }
 const esFloja = id => hist[id] !== undefined && hist[id] < 1;
+
+/* Fuente: pregunta que salió en un parcial, o armada con el apunte/filminas */
+const deExamen = p => !/^(apunte|filmina|integradora)/i.test(p.src);
+const ORIGENES = { todas: 'Fuente: parciales + apunte', examen: 'Fuente: sólo parciales', apunte: 'Fuente: sólo apunte' };
+let origen = 'todas';
+const pasaOrigen = p => origen === 'todas' || (origen === 'examen') === deExamen(p);
 
 /* ---------- Estado ---------- */
 let modo = 'sim';
@@ -666,11 +1113,26 @@ let notas = {};   // idx -> puntaje 0 | 0.5 | 1
 
 function tieneMC(p) { return !!(p.mc || p.vf); }
 
+function elegirSimulacro(base) {
+  let elegidas = [];
+  if (CONF.SIM_BLOQUES) {
+    Object.entries(CONF.SIM_BLOQUES).forEach(([b, n]) =>
+      elegidas.push(...shuffle(base.filter(p => p.b === b)).slice(0, n)));
+  } else if (origen === 'todas') {
+    const ap = shuffle(base.filter(p => !deExamen(p))).slice(0, CONF.SIM_APUNTE);
+    const ex = shuffle(base.filter(deExamen)).slice(0, CONF.SIM - ap.length);
+    elegidas = [...ap, ...ex];
+  }
+  const resto = shuffle(base.filter(p => !elegidas.includes(p)));
+  elegidas.push(...resto.slice(0, Math.max(0, CONF.SIM - elegidas.length)));
+  return shuffle(elegidas);
+}
+
 function armarRonda(soloFlojas) {
-  let base = BANCO.filter(p => temasActivos.has(p.tema));
+  let base = BANCO.filter(p => temasActivos.has(p.tema) && pasaOrigen(p));
   if (modo === 'mc') base = base.filter(tieneMC);
   if (soloFlojas) base = base.filter(p => esFloja(p.id));
-  if (modo === 'sim' && !soloFlojas) base = shuffle(base).slice(0, 10);
+  if (modo === 'sim' && !soloFlojas) base = elegirSimulacro(base);
   else if (modo === 'mc' || soloFlojas) base = shuffle(base);
   ronda = base.map(p => {
     if (modo !== 'mc') return p;
@@ -695,8 +1157,9 @@ function render() {
 
 function cabecera(p, n, tipo) {
   return `<div class="qhead"><span class="num">${n + 1}.</span>
+    ${p.b ? `<span class="tag">${esc(p.b)}</span>` : ''}
     <span class="tag">${esc(p.tema)}</span>
-    <span class="tag">Parcial: ${esc(p.src)}</span>
+    <span class="tag"${deExamen(p) ? '' : ' style="border-style:dashed"'}>${deExamen(p) ? 'Parcial' : 'Fuente'}: ${esc(p.src)}</span>
     ${tipo ? `<span class="tag">${tipo}</span>` : ''}
     ${esFloja(p.id) ? '<span class="tag" style="color:var(--bad);border-color:var(--bad)">floja</span>' : ''}</div>`;
 }
@@ -824,7 +1287,7 @@ function chips() {
   c.innerHTML = '';
   Object.values(T).forEach(t => {
     const b = document.createElement('button');
-    const n = BANCO.filter(p => p.tema === t && (modo !== 'mc' || tieneMC(p))).length;
+    const n = BANCO.filter(p => p.tema === t && pasaOrigen(p) && (modo !== 'mc' || tieneMC(p))).length;
     b.className = 'chip' + (temasActivos.has(t) ? ' on' : '');
     b.textContent = `${t} (${n})`;
     b.onclick = () => {
@@ -840,6 +1303,13 @@ document.querySelectorAll('.tab').forEach(t => t.onclick = () => { modo = t.data
 $('#reset').onclick = () => armarRonda();
 $('#flojas').onclick = () => armarRonda(true);
 $('#borrar').onclick = () => { if (confirm('¿Borrar el historial de preguntas flojas?')) { hist = {}; guardarHist(); render(); } };
+$('#origen').textContent = ORIGENES[origen];
+$('#origen').onclick = () => {
+  const claves = Object.keys(ORIGENES);
+  origen = claves[(claves.indexOf(origen) + 1) % claves.length];
+  $('#origen').textContent = ORIGENES[origen];
+  armarRonda();
+};
 $('#theme').onclick = () => {
   const root = document.documentElement;
   const oscuroAhora = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
