@@ -448,21 +448,30 @@ Es el registro donde el SO agrupa toda la información que necesita saber de un 
 La lista es indicativa, porque cada SO agrega lo suyo.
 
 ## Hilos
-###### **Qué es un hilo y qué comparte**
-Un hilo permite que una misma aplicación realice varias tareas a la vez. Los hilos de un proceso comparten:
+###### **Qué es un hilo**
+> Un **hilo** (*thread*) es un flujo secuencial de ejecución dentro de un proceso. Es la unidad que el sistema operativo planifica y a la que le asigna el procesador.
 
-- El espacio de memoria (por lo tanto, todas las variables de instancia y estáticas).
-- Los archivos abiertos.
-- La autenticación y los permisos del proceso.
+Stallings lo explica separando dos características que en el modelo clásico venían juntas en el proceso. Una es ser **unidad de propiedad de recursos**, porque el proceso tiene su espacio de direcciones, sus archivos abiertos y sus permisos. La otra es ser **unidad de planificación**, es decir, una secuencia de instrucciones con su propio estado de ejecución que el SO puede interrumpir y reanudar. El hilo se queda con la segunda y el proceso conserva la primera. Por eso un proceso puede tener varios hilos que ejecutan partes distintas del mismo programa sobre los mismos datos (Stallings, cap. 4.1).
 
-Y lo que es propio de cada hilo es:
-- El contador de programa.
-- La pila de ejecución.
-- El estado de la CPU (el valor de los registros). 
+###### **Qué comparte y qué es propio de cada hilo**
+Los hilos de un proceso comparten todo lo que pertenece al proceso:
+
+- El espacio de direcciones, o sea el código, las variables globales y estáticas y el *heap*. En Java eso incluye todos los objetos con sus atributos, y cualquier hilo que tenga una referencia a un objeto puede leerlo y modificarlo.
+- Los archivos y sockets abiertos.
+- La identidad y los permisos del proceso.
+
+Cada hilo tiene, en cambio, lo necesario para ejecutar por su cuenta:
+
+- El contador de programa, que indica por qué instrucción va.
+- El valor de los registros de la CPU, que se salvan y se restauran cada vez que el hilo deja el procesador y lo vuelve a tomar.
+- Su propia pila, donde viven las variables locales y los parámetros de los métodos que está ejecutando.
+- Su estado (listo, en ejecución o bloqueado).
+
+Para saber si un dato es compartido, conviene preguntarse dónde vive. Una variable local está en la pila de un hilo y ningún otro la ve, mientras que un atributo de un objeto está en el *heap* y lo ve cualquier hilo que tenga la referencia.
 
 Al conjunto de hilos más los recursos que comparten se lo llama proceso, y el proceso sigue vivo mientras al menos uno de sus hilos siga activo.
 
-La consecuencia directa —y la razón de ser de toda la materia— es que cualquier hilo puede modificar los recursos compartidos, y cuando lo hace los demás ven el dato modificado inmediatamente. Ahí aparece la necesidad de exclusión mutua.
+La consecuencia directa, y la razón de ser de toda la materia, es que cualquier hilo puede modificar los datos compartidos sin pasar por el sistema operativo. Si dos hilos lo hacen a la vez pueden pisarse (una condición de carrera), y por eso hace falta exclusión mutua. Además, sin sincronización ni siquiera está garantizado que un hilo vea a tiempo lo que escribió otro, porque cada núcleo puede estar trabajando con una copia del dato en su caché. En Java, esa garantía de visibilidad la dan `synchronized`, los locks y `volatile`.
 
 ###### **Proceso vs hilo**
 
@@ -479,11 +488,13 @@ La consecuencia directa —y la razón de ser de toda la materia— es que cualq
 Por eso Windows y Linux tienen fama de hilos "baratos" y procesos "costosos", y por eso una aplicación que se descompone en unidades de ejecución relacionadas conviene implementarla como una colección de hilos y no de procesos separados (Stallings, cap. 4.1).
 
 ###### **Estados de un hilo**
-Los mismos tres estados básicos: 
+Los mismos tres estados básicos:
+
 - Ejecución.
 - Listo.
 - Bloqueado.
-Un hilo no tiene los estados de suspensión, porque suspender es una operación a nivel de proceso. 
+
+Un hilo no tiene los estados de suspensión, porque suspender es una operación a nivel de proceso.
 
 Las transiciones:
 
