@@ -113,7 +113,7 @@ public class Verificador {
 
     private static void titulo(String texto) {
         System.out.println();
-        System.out.println("=== " + texto + " ===");
+        System.out.println("=== " + legible(texto) + " ===");
         System.out.println();
         Thread.setDefaultUncaughtExceptionHandler((hilo, e) -> {
             synchronized (MUERTES) {
@@ -182,7 +182,7 @@ public class Verificador {
         }
         synchronized (MUERTES) {
             for (String nota : NOTAS) {
-                System.out.println("           " + nota);
+                System.out.println("           " + legible(nota));
             }
             NOTAS.clear();
         }
@@ -215,12 +215,60 @@ public class Verificador {
     }
 
     private static void informar(String etiqueta, String nombre, String detalle) {
-        System.out.printf("%-10s %s%n", etiqueta, nombre);
+        System.out.printf("%-10s %s%n", etiqueta, legible(nombre));
         if (detalle != null) {
             for (String linea : detalle.split("\n")) {
-                System.out.println("           " + linea);
+                System.out.println("           " + legible(linea));
             }
         }
+    }
+
+    /**
+     * Si la consola no puede mostrar algún símbolo (λ, ∅, →, α...), lo cambia por una versión en ASCII,
+     * para que no salga como '?'. Con una consola en UTF-8 el texto queda igual.
+     */
+    private static String legible(String texto) {
+        java.nio.charset.CharsetEncoder codificador = System.out.charset().newEncoder();
+        if (texto == null || codificador.canEncode(texto)) {
+            return texto;
+        }
+        StringBuilder resultado = new StringBuilder();
+        for (char c : texto.toCharArray()) {
+            if (codificador.canEncode(c)) {
+                resultado.append(c);
+                continue;
+            }
+            resultado.append(switch (c) {
+                case 'λ' -> "lambda";
+                case '∅' -> "{}";
+                case '→' -> "->";
+                case '⇒' -> "=>";
+                case '⊢' -> "|-";
+                case '∈' -> "en";
+                case '∉' -> "no en";
+                case '∪' -> "U";
+                case '∧' -> "y";
+                case '−' -> "-";
+                case '≤' -> "<=";
+                case '≥' -> ">=";
+                case '≠' -> "!=";
+                case '∞' -> "infinito";
+                case 'α' -> "alfa";
+                case 'β' -> "beta";
+                case '⁰' -> "^0";
+                case '¹' -> "^1";
+                case '²' -> "^2";
+                case '³' -> "^3";
+                case '⁴' -> "^4";
+                case '⁺' -> "^+";
+                case 'ⁱ' -> "^i";
+                case 'ⁿ' -> "^n";
+                case 'ᵐ' -> "^m";
+                case 'ᵀ' -> "^T";
+                default -> "?";
+            });
+        }
+        return resultado.toString();
     }
 
     /** Muestra un dato informativo debajo del resultado del caso (no cuenta como caso). */

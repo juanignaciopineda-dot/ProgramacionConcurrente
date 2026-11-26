@@ -84,6 +84,10 @@ Nivel: ★ (calentamiento) a ★★★★★ (tipo TP).
 | [3. Locks y semáforos](U3_Locks_y_semaforos/README.md)       | `ReentrantLock`, `tryLock`, `ReadWriteLock`, fairness, semáforo binario y de N permisos, deadlock y orden global de adquisición (filósofos) | 5 (★★ a ★★★★)     | ✅ Disponible  |
 | [4. Herramientas de alto nivel](U4_Herramientas_de_alto_nivel/README.md) | `CountDownLatch`, `ThreadFactory`, `Executors` y `ThreadPoolExecutor`, `Callable`/`Future`, `shutdown` vs `shutdownNow`, `Phaser` | 5 (★★ a ★★★)      | ✅ Disponible  |
 | [5. Monitores](U5_Monitores/README.md)                       | Estructura de un monitor, colas de condición con semáforos, señalización *signal and continue*, *signal and exit* y *signal and urgent wait* (cola de cortesía), políticas, postergación indefinida | 5 (★★ a ★★★★)     | ✅ Disponible  |
-| 6. Redes de Petri en Java                                    | Matriz de incidencia, sensibilizado y disparo con la ecuación de estado, P-invariantes en cada disparo, conflictos y políticas, transiciones temporales | —                 | 🔜 Próximamente |
-| 7. Lenguajes y expresiones regulares                         | Autómatas finitos, Moore y Mealy, `Pattern`/`Matcher`, análisis de T-invariantes en un log                      | —                 | 🔜 Próximamente |
+| [6. Lenguajes y autómatas](U6_Lenguajes_y_automatas/README.md) | Operaciones sobre lenguajes, gramáticas y jerarquía de Chomsky, autómata finito, Moore y Mealy (con un sistema reactivo), autómata de pila, AFND y construcción de subconjuntos, expresiones regulares en Java (`Pattern`/`Matcher`) | 7 (★ a ★★★★)      | ✅ Disponible  |
+| [7. Redes de Petri en Java](U7_Redes_de_Petri/README.md)     | Matriz de incidencia, sensibilizado y disparo con la ecuación de estado, P-invariantes en cada disparo, grafo de alcanzabilidad, transiciones temporales, el monitor de la red y, al final, el análisis de T-invariantes del log con regex | 6 (★★ a ★★★★)     | ✅ Disponible  |
 | 8. Integradores                                              | Mini TP1 (etapas con recursos compartidos) y mini TP final (monitor de RdP con política y tiempo)              | —                 | 🔜 Próximamente |
+
+Las unidades siguen el orden de la materia. La implementación de redes de Petri con monitores y el
+análisis de T-invariantes con expresiones regulares son lo último, así que la Unidad 7 va después de
+lenguajes y autómatas, y la 8 junta todo.

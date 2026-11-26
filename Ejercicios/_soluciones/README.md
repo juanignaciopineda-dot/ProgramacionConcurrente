@@ -54,3 +54,16 @@ java src/Verificador.java
 | 5 | [5.3 Monitor con signal and exit](U5_Monitores/E5_3_monitor_signal_and_exit/src) | `ColaDeCondicion`, `SalaDeImpresion` |
 | 5 | [5.4 Monitor de Hoare](U5_Monitores/E5_4_monitor_de_hoare/src) | `MonitorHoare`, `BufferHoare` |
 | 5 | [5.5 Ventanilla con política](U5_Monitores/E5_5_ventanilla_con_politica/src) | `PoliticaPrioridad`, `PoliticaAlternada`, `Ventanilla` |
+| 6 | [6.1 Cadenas y lenguajes](U6_Lenguajes_y_automatas/E6_1_cadenas_y_lenguajes/src) | `Lenguajes` |
+| 6 | [6.2 Gramáticas y la jerarquía de Chomsky](U6_Lenguajes_y_automatas/E6_2_gramaticas_y_chomsky/src) | `Gramatica` |
+| 6 | [6.3 Autómata finito determinista](U6_Lenguajes_y_automatas/E6_3_automata_finito/src) | `AFD`, `Automatas` |
+| 6 | [6.4 Moore, Mealy y un sistema reactivo](U6_Lenguajes_y_automatas/E6_4_moore_y_mealy/src) | `MaquinaMealy`, `MaquinaMoore`, `Detectores`, `Conversion`, `DetectorReactivo` |
+| 6 | [6.5 Autómata de pila](U6_Lenguajes_y_automatas/E6_5_automata_de_pila/src) | `AutomataDePila`, `AutomatasDePila` |
+| 6 | [6.6 AFND, subconjuntos y gramáticas regulares](U6_Lenguajes_y_automatas/E6_6_afnd_y_subconjuntos/src) | `AFND`, `ALaMano` |
+| 6 | [6.7 Expresiones regulares en Java](U6_Lenguajes_y_automatas/E6_7_expresiones_regulares_en_java/src) | `ExpresionesRegulares` |
+| 7 | [7.1 La red y la ecuación de estado](U7_Redes_de_Petri/E7_1_red_y_ecuacion_de_estado/src) | `RedDePetri` |
+| 7 | [7.2 Invariantes](U7_Redes_de_Petri/E7_2_invariantes/src) | `Invariantes`, `RedVigilada` |
+| 7 | [7.3 Grafo de alcanzabilidad](U7_Redes_de_Petri/E7_3_grafo_de_alcanzabilidad/src) | `Explorador` |
+| 7 | [7.4 Red con tiempo](U7_Redes_de_Petri/E7_4_red_temporizada/src) | `RedTemporizada` |
+| 7 | [7.5 El monitor de la red](U7_Redes_de_Petri/E7_5_monitor_de_la_red/src) | `ProductorConsumidor`, `MonitorDeRed`, `Productor`, `Consumidor` |
+| 7 | [7.6 T-invariantes en el log](U7_Redes_de_Petri/E7_6_t_invariantes_en_un_log/src) | `AnalizadorDeLog` |
