@@ -29,3 +29,7 @@ Ejercicios/**/out/
 *.bmp
 *.ppt
 *.pptx
+
+# Configuración local de los editores
+.idea/
+.obsidian/
