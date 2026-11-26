@@ -1,9 +1,0 @@
-- Agregar RDP en red de petri pura
-- Agregar RDP en red de petri de libre de conflicto
-- Agregar RDP  en red de petri de libre eleccion 
-- Agregar RDP  en red de petri de libre eleccion extendida
-- Agregar RDP  en red de petri simple 
-- Agregar RDP  en red de petri simple extendida
-- Cambiar el termino grafo de accesibilidad, por grafo de alcanzabilidad
-- Falta la red de petri de los filosofos
-- 
