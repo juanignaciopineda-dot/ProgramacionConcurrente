@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="720" viewBox="0 0 720 720" version="1.1">
+<style>text { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; }</style>
+<defs><marker id="ah-78829a" markerWidth="9" markerHeight="7" refX="8.5" refY="3.5" orient="auto" markerUnits="userSpaceOnUse"><polygon points="0 0, 9 3.5, 0 7" fill="#78829a"/></marker></defs>
+<circle cx="233.6261707571183" cy="186.0613462093863" r="18" fill="none" stroke="#ff6b6b" stroke-width="1.8"/>
+<text x="216.0" y="165.8" text-anchor="end" style="font-size:11.5px;fill:#ff6b6b">tenedor 0</text>
+<circle cx="486.3738292428817" cy="186.0613462093863" r="18" fill="none" stroke="#ff6b6b" stroke-width="1.8"/>
+<text x="504.0" y="165.8" text-anchor="start" style="font-size:11.5px;fill:#ff6b6b">tenedor 1</text>
+<circle cx="564.477151003458" cy="426.43865379061367" r="18" fill="none" stroke="#ff6b6b" stroke-width="1.8"/>
+<text x="593.0" y="439.7" text-anchor="start" style="font-size:11.5px;fill:#ff6b6b">tenedor 2</text>
+<circle cx="360.0" cy="575.0" r="18" fill="none" stroke="#ff6b6b" stroke-width="1.8"/>
+<text x="360.0" y="615.0" text-anchor="middle" style="font-size:11.5px;fill:#ff6b6b">tenedor 3</text>
+<circle cx="155.522848996542" cy="426.4386537906137" r="18" fill="none" stroke="#ff6b6b" stroke-width="1.8"/>
+<text x="127.0" y="439.7" text-anchor="end" style="font-size:11.5px;fill:#ff6b6b">tenedor 4</text>
+<circle cx="326.0" cy="120.0" r="16" fill="none" stroke="#3fb950" stroke-width="1.8"/>
+<rect x="311.0" y="180.0" width="30" height="10" fill="none" stroke="#f0883e" stroke-width="2.2"/>
+<circle cx="360.0" cy="235.0" r="16" fill="none" stroke="#ff6b6b" stroke-width="1.8"/>
+<circle cx="360.0" cy="235.0" r="5" fill="#4c8dff"/>
+<rect x="379.0" y="180.0" width="30" height="10" fill="none" stroke="#f0883e" stroke-width="2.2"/>
+<circle cx="394.0" cy="120.0" r="16" fill="none" stroke="#4c8dff" stroke-width="1.8"/>
+<rect x="345.0" y="55.0" width="30" height="10" fill="none" stroke="#f0883e" stroke-width="2.2"/>
+<text x="360.0" y="36.0" text-anchor="middle" style="font-size:11.5px;fill:#f0883e">suelta 0</text>
+<path d="M 326.0 136.0 L 326.0 180.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 329.4 190.0 L 351.0 221.8" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 369.0 221.8 L 390.6 190.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 394.0 180.0 L 394.0 136.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 386.1 106.1 L 362.8 65.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 357.2 65.0 L 333.9 106.1" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 251.6 185.9 L 311.0 185.2" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 468.4 185.9 L 409.0 185.2" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 355.0 65.0 L 246.4 173.3" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 365.0 65.0 L 473.6 173.3" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<text x="360.0" y="124.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">0</text>
+<circle cx="577.7469861020886" cy="253.49999979597743" r="16" fill="none" stroke="#3fb950" stroke-width="1.8"/>
+<rect x="500.9" y="268.6" width="30" height="10" fill="none" stroke="#f0883e" stroke-width="2.2" transform="rotate(72.0 515.9283125429035 273.586104430349)"/>
+<circle cx="478.8820645368942" cy="321.37287570313157" r="16" fill="none" stroke="#ff6b6b" stroke-width="1.8"/>
+<circle cx="478.8820645368942" cy="321.37287570313157" r="5" fill="#4c8dff"/>
+<rect x="521.9" y="333.3" width="30" height="10" fill="none" stroke="#f0883e" stroke-width="2.2" transform="rotate(72.0 536.9414681604001 338.25794753841944)"/>
+<circle cx="598.7601417195851" cy="318.1718429040479" r="16" fill="none" stroke="#4c8dff" stroke-width="1.8"/>
+<rect x="630.3" y="262.3" width="30" height="10" fill="none" stroke="#f0883e" stroke-width="2.2" transform="rotate(72.0 645.316954888546 267.2949016875158)"/>
+<text x="670.0" y="263.3" text-anchor="start" style="font-size:11.5px;fill:#f0883e">suelta 1</text>
+<path d="M 562.5 258.4 L 520.7 272.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 512.2 278.4 L 488.7 308.7" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 494.2 325.8 L 531.1 336.6" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 541.7 336.7 L 583.5 323.1" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 609.6 306.4 L 641.4 271.5" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 639.7 266.1 L 593.4 256.7" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 492.1 203.1 L 511.1 259.4" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 559.1 409.3 L 541.4 352.6" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 639.0 264.1 L 502.4 194.3" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 642.1 273.6 L 572.6 410.4" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<text x="588.3" y="289.8" text-anchor="middle" style="font-size:11.5px;fill:#78829a">1</text>
+<circle cx="528.5750383589418" cy="534.1793800720434" r="16" fill="none" stroke="#3fb950" stroke-width="1.8"/>
+<rect x="475.4" y="476.6" width="30" height="10" fill="none" stroke="#f0883e" stroke-width="2.2" transform="rotate(144.0 490.368996959931 481.59327543767176)"/>
+<circle cx="433.47315653655915" cy="461.12712429686843" r="16" fill="none" stroke="#ff6b6b" stroke-width="1.8"/>
+<circle cx="433.47315653655915" cy="461.12712429686843" r="5" fill="#4c8dff"/>
+<rect x="420.4" y="516.6" width="30" height="10" fill="none" stroke="#f0883e" stroke-width="2.2" transform="rotate(144.0 435.3558413424346 521.5626725935599)"/>
+<circle cx="473.56188274144534" cy="574.1487772279315" r="16" fill="none" stroke="#4c8dff" stroke-width="1.8"/>
+<rect x="521.3" y="597.7" width="30" height="10" fill="none" stroke="#f0883e" stroke-width="2.2" transform="rotate(144.0 536.335575687742 602.7050983124842)"/>
+<text x="551.6" y="627.7" text-anchor="start" style="font-size:11.5px;fill:#f0883e">suelta 2</text>
+<path d="M 519.2 521.2 L 493.3 485.6" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 484.7 479.5 L 448.5 466.5" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 434.0 477.1 L 435.2 515.5" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 438.3 525.6 L 464.2 561.2" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 488.1 580.8 L 531.1 600.3" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 535.7 597.0 L 530.4 550.1" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 550.0 437.2 L 502.4 472.6" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 374.7 564.6 L 423.1 530.2" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 537.5 595.7 L 561.6 444.2" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 529.3 601.6 L 377.8 577.8" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<text x="501.1" y="558.2" text-anchor="middle" style="font-size:11.5px;fill:#78829a">2</text>
+<circle cx="246.43811725855468" cy="574.1487772279315" r="16" fill="none" stroke="#3fb950" stroke-width="1.8"/>
+<rect x="269.6" y="516.6" width="30" height="10" fill="none" stroke="#f0883e" stroke-width="2.2" transform="rotate(216.0 284.6441586575654 521.5626725935599)"/>
+<circle cx="286.52684346344085" cy="461.12712429686843" r="16" fill="none" stroke="#ff6b6b" stroke-width="1.8"/>
+<circle cx="286.52684346344085" cy="461.12712429686843" r="5" fill="#4c8dff"/>
+<rect x="214.6" y="476.6" width="30" height="10" fill="none" stroke="#f0883e" stroke-width="2.2" transform="rotate(216.0 229.631003040069 481.59327543767176)"/>
+<circle cx="191.42496164105827" cy="534.1793800720434" r="16" fill="none" stroke="#4c8dff" stroke-width="1.8"/>
+<rect x="168.7" y="597.7" width="30" height="10" fill="none" stroke="#f0883e" stroke-width="2.2" transform="rotate(216.0 183.6644243122581 602.7050983124842)"/>
+<text x="168.4" y="627.7" text-anchor="end" style="font-size:11.5px;fill:#f0883e">suelta 3</text>
+<path d="M 255.8 561.2 L 281.7 525.6" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 284.8 515.5 L 286.0 477.1" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 271.5 466.5 L 235.3 479.5" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 226.7 485.6 L 200.8 521.2" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 189.6 550.1 L 184.3 597.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 188.9 600.3 L 231.9 580.8" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 345.3 564.6 L 296.9 530.2" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 170.0 437.2 L 217.6 472.6" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 190.7 601.6 L 342.2 577.8" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 182.5 595.7 L 158.4 444.2" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<text x="218.9" y="558.2" text-anchor="middle" style="font-size:11.5px;fill:#78829a">3</text>
+<circle cx="121.23985828041492" cy="318.1718429040479" r="16" fill="none" stroke="#3fb950" stroke-width="1.8"/>
+<rect x="168.1" y="333.3" width="30" height="10" fill="none" stroke="#f0883e" stroke-width="2.2" transform="rotate(288.0 183.0585318395999 338.25794753841944)"/>
+<circle cx="241.1179354631058" cy="321.37287570313157" r="16" fill="none" stroke="#ff6b6b" stroke-width="1.8"/>
+<circle cx="241.1179354631058" cy="321.37287570313157" r="5" fill="#4c8dff"/>
+<rect x="189.1" y="268.6" width="30" height="10" fill="none" stroke="#f0883e" stroke-width="2.2" transform="rotate(288.0 204.07168745709632 273.586104430349)"/>
+<circle cx="142.25301389791133" cy="253.49999979597743" r="16" fill="none" stroke="#4c8dff" stroke-width="1.8"/>
+<rect x="59.7" y="262.3" width="30" height="10" fill="none" stroke="#f0883e" stroke-width="2.2" transform="rotate(288.0 74.68304511145391 267.2949016875158)"/>
+<text x="50.0" y="263.3" text-anchor="end" style="font-size:11.5px;fill:#f0883e">suelta 4</text>
+<path d="M 136.5 323.1 L 178.3 336.7" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 188.9 336.6 L 225.8 325.8" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 231.3 308.7 L 207.8 278.4" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 199.3 272.0 L 157.5 258.4" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 126.6 256.7 L 80.3 266.1" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 78.6 271.5 L 110.4 306.4" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 160.9 409.3 L 178.6 352.6" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 227.9 203.1 L 208.9 259.4" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 77.9 273.6 L 147.4 410.4" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 81.0 264.1 L 217.6 194.3" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<text x="131.7" y="289.8" text-anchor="middle" style="font-size:11.5px;fill:#78829a">4</text>
+<text x="20.0" y="672.0" text-anchor="start" style="font-size:11.5px;fill:#ff6b6b">Marcado de deadlock: los cinco filósofos tomaron el tenedor de su lado izquierdo.</text>
+<text x="20.0" y="690.0" text-anchor="start" style="font-size:11.5px;fill:#78829a">No quedan tenedores libres, así que ninguna toma derecha puede disparar.</text>
+<text x="20.0" y="708.0" style="font-size:11.5px"><tspan style="fill:#78829a">Plazas de cada filósofo: </tspan><tspan style="fill:#3fb950">pensando</tspan><tspan style="fill:#78829a">, </tspan><tspan style="fill:#ff6b6b">con uno</tspan><tspan style="fill:#78829a"> (al centro) y </tspan><tspan style="fill:#4c8dff">comiendo</tspan><tspan style="fill:#78829a">.</tspan></text>
+</svg>

@@ -1,65 +1,38 @@
-<?xml version="1.0" encoding="utf-8" standalone="no"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="620" height="300" viewBox="0 0 620 300" version="1.1">
-  <style>
-    text { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; fill: #78829a; }
-    .tit { font-size: 13.5px; font-weight: 600; }
-    .cap { font-size: 11.5px; }
-    .lb  { font-size: 12.5px; text-anchor: middle; }
-    .pl  { fill: none; stroke: #78829a; stroke-width: 1.8; }
-    .tr  { fill: none; stroke: #f0883e; stroke-width: 2.2; }
-    .tk  { fill: #4c8dff; }
-    .edge { fill: none; stroke: #78829a; stroke-width: 1.6; marker-end: url(#ah); }
-  </style>
-  <defs>
-    <marker id="ah" markerWidth="9" markerHeight="7" refX="8.5" refY="3.5" orient="auto">
-      <polygon points="0 0, 9 3.5, 0 7" fill="#78829a"/>
-    </marker>
-  </defs>
-
-  <text class="tit" x="20" y="28" fill="#3fb950">Antes del disparo — T1 está sensibilizada</text>
-
-  <circle class="pl" cx="60" cy="90" r="24"/>
-  <circle class="tk" cx="60" cy="90" r="5"/>
-  <text class="lb" x="60" y="52">P1</text>
-
-  <circle class="pl" cx="60" cy="190" r="24"/>
-  <circle class="tk" cx="52" cy="190" r="5"/>
-  <circle class="tk" cx="68" cy="190" r="5"/>
-  <text class="lb" x="60" y="230">P2</text>
-
-  <rect class="tr" x="152" y="98" width="13" height="84"/>
-  <text class="lb" x="158" y="90" fill="#f0883e">T1</text>
-
-  <line class="edge" x1="86" y1="98" x2="146" y2="130"/>
-  <line class="edge" x1="86" y1="182" x2="146" y2="150"/>
-  <text class="lb" x="106" y="176">2</text>
-
-  <circle class="pl" cx="250" cy="140" r="24"/>
-  <text class="lb" x="250" y="102">P3</text>
-  <line class="edge" x1="171" y1="140" x2="220" y2="140"/>
-
-  <line x1="300" y1="40" x2="300" y2="250" stroke="#78829a" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
-
-  <text class="tit" x="330" y="28" fill="#ff6b6b">Después del disparo</text>
-
-  <circle class="pl" cx="370" cy="90" r="24"/>
-  <text class="lb" x="370" y="52">P1</text>
-
-  <circle class="pl" cx="370" cy="190" r="24"/>
-  <text class="lb" x="370" y="230">P2</text>
-
-  <rect class="tr" x="462" y="98" width="13" height="84"/>
-  <text class="lb" x="468" y="90" fill="#f0883e">T1</text>
-
-  <line class="edge" x1="396" y1="98" x2="456" y2="130"/>
-  <line class="edge" x1="396" y1="182" x2="456" y2="150"/>
-  <text class="lb" x="416" y="176">2</text>
-
-  <circle class="pl" cx="560" cy="140" r="24"/>
-  <circle class="tk" cx="560" cy="140" r="5"/>
-  <text class="lb" x="560" y="102">P3</text>
-  <line class="edge" x1="481" y1="140" x2="530" y2="140"/>
-
-  <text class="cap" x="20" y="270">Sensibilizada: cada lugar de entrada tiene al menos tantas fichas como el peso de su arco (P1 necesita 1, P2 necesita 2).</text>
-  <text class="cap" x="20" y="290">Al disparar, T1 consume las fichas de TODAS sus entradas y produce en TODAS sus salidas. El disparo es indivisible y de duración cero.</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="340" viewBox="0 0 640 340" version="1.1">
+<style>text { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; }</style>
+<defs><marker id="ah-78829a" markerWidth="9" markerHeight="7" refX="8.5" refY="3.5" orient="auto" markerUnits="userSpaceOnUse"><polygon points="0 0, 9 3.5, 0 7" fill="#78829a"/></marker></defs>
+<text x="20.0" y="28.0" text-anchor="start" style="font-size:13.5px;fill:#78829a;font-weight:600">Antes del disparo: T1 está sensibilizada</text>
+<circle cx="70" cy="95" r="20" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<circle cx="70" cy="95" r="5" fill="#4c8dff"/>
+<text x="70.0" y="67.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">P1</text>
+<circle cx="70" cy="215" r="20" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<circle cx="63" cy="215" r="4.3" fill="#4c8dff"/>
+<circle cx="77" cy="215" r="4.3" fill="#4c8dff"/>
+<text x="70.0" y="251.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">P2</text>
+<rect x="175.0" y="127.0" width="10" height="56" fill="none" stroke="#f0883e" stroke-width="2.2"/>
+<text x="180.0" y="119.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">T1</text>
+<circle cx="270" cy="155" r="20" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<text x="270.0" y="127.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">P3</text>
+<path d="M 87.6 104.6 L 175.0 152.3" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 87.6 205.4 L 175.0 157.7" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<text x="122.1" y="179.2" text-anchor="middle" style="font-size:11.5px;fill:#78829a">2</text>
+<path d="M 185.0 155.0 L 250.0 155.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<text x="340.0" y="28.0" text-anchor="start" style="font-size:13.5px;fill:#78829a;font-weight:600">Después del disparo</text>
+<circle cx="390" cy="95" r="20" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<text x="390.0" y="67.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">P1</text>
+<circle cx="390" cy="215" r="20" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<text x="390.0" y="251.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">P2</text>
+<rect x="495.0" y="127.0" width="10" height="56" fill="none" stroke="#f0883e" stroke-width="2.2"/>
+<text x="500.0" y="119.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">T1</text>
+<circle cx="590" cy="155" r="20" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<circle cx="590" cy="155" r="5" fill="#4c8dff"/>
+<text x="590.0" y="127.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">P3</text>
+<path d="M 407.6 104.6 L 495.0 152.3" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 407.6 205.4 L 495.0 157.7" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<text x="442.1" y="179.2" text-anchor="middle" style="font-size:11.5px;fill:#78829a">2</text>
+<path d="M 505.0 155.0 L 570.0 155.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<line x1="320.0" y1="45.0" x2="320.0" y2="255.0" stroke="#78829a" stroke-width="1.2" stroke-dasharray="4 4"/>
+<text x="20.0" y="285.0" text-anchor="start" style="font-size:11.5px;fill:#78829a">Sensibilizada: cada plaza de entrada tiene al menos tantas fichas como el peso de su arco (P1 necesita 1 y P2</text>
+<text x="20.0" y="302.2" text-anchor="start" style="font-size:11.5px;fill:#78829a">necesita 2). Al disparar, T1 consume las fichas de todas sus entradas y produce en todas sus salidas. El disparo es</text>
+<text x="20.0" y="319.5" text-anchor="start" style="font-size:11.5px;fill:#78829a">indivisible y dura cero.</text>
 </svg>

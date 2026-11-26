@@ -60,6 +60,22 @@ que los seis estados aparezcan en orden.
 5. Creá dos hilos con prioridades 1 y 10 que cuenten lo más rápido posible durante un segundo.
    ¿El de prioridad 10 cuenta siempre más? Corrélo varias veces.
 
+### Más para pensar: predecir el LOG
+
+El apunte práctico sigue los estados de 10 hilos `Calculator` (que cuentan primos) escribiendo en un
+LOG cada cambio de estado. Antes de correr ese ejemplo, respondé:
+
+1. ¿En qué estado están los 10 hilos en el primer bloque de escritura, antes de los `start()`?
+2. Si la máquina tiene 8 núcleos y se lanzan 10 hilos, ¿cuántos pueden estar en `RUNNABLE` a la vez?
+   ¿Y cuántos efectivamente sobre un procesador?
+3. Si a `Calculator` se le agrega un `Thread.sleep(100)` dentro del bucle, ¿qué estado nuevo va a
+   aparecer en el LOG?
+4. ¿Por qué nunca vas a ver `BLOCKED` en ese ejemplo tal como está?
+
+> [!tip]- Pista para la 4
+> `BLOCKED` es específicamente "esperando un monitor". Fijate si en ese programa hay algún
+> `synchronized`.
+
 ## Pistas
 
 > [!tip]- Pista 1: el estado `RUNNABLE`

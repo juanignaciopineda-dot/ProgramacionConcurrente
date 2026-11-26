@@ -122,7 +122,7 @@ lo controla).
 
 ## Conexión con la teoría y los TPs
 
-- Apuntes: "El monitor de la materia": la tabla de componentes (mutex, red, colas, política, gestor) y
+- Apuntes: "Un monitor guiado por una red de Petri" (apunte teórico): la tabla de componentes (mutex, red, colas, política, gestor) y
   el paso de `seleccionarHilo(m)` del algoritmo.
 - Parciales: "¿Qué resuelven las políticas de las colas de condición?" y "¿Cómo se relacionan las
   transiciones con las variables de condición?".

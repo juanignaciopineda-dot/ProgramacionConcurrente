@@ -1,93 +1,60 @@
-<?xml version="1.0" encoding="utf-8" standalone="no"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="620" height="360" viewBox="0 0 620 360" version="1.1">
-  <style>
-    text { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; fill: #78829a; }
-    .tit { font-size: 13.5px; font-weight: 600; }
-    .cap { font-size: 11.5px; }
-    .lb  { font-size: 11.5px; text-anchor: middle; }
-    .pl  { fill: none; stroke: #78829a; stroke-width: 1.8; }
-    .tr  { fill: none; stroke: #f0883e; stroke-width: 2.2; }
-    .tk  { fill: #4c8dff; }
-    .edge { fill: none; stroke: #78829a; stroke-width: 1.5; marker-end: url(#ah); }
-  </style>
-  <defs>
-    <marker id="ah" markerWidth="9" markerHeight="7" refX="8.5" refY="3.5" orient="auto">
-      <polygon points="0 0, 9 3.5, 0 7" fill="#78829a"/>
-    </marker>
-  </defs>
-
-  <text class="tit" x="20" y="28" fill="#ff6b6b">Exclusión mutua con N recursos</text>
-  <text class="cap" x="20" y="46">Es exactamente el semáforo de N permisos</text>
-
-  <circle class="pl" cx="60" cy="100" r="20"/>
-  <circle class="tk" cx="60" cy="100" r="5"/>
-  <text class="lb" x="60" y="74">fuera</text>
-
-  <rect class="tr" x="46" y="146" width="28" height="9"/>
-  <circle class="pl" cx="60" cy="200" r="20"/>
-  <text class="lb" x="22" y="204">SC</text>
-  <rect class="tr" x="46" y="246" width="28" height="9"/>
-
-  <circle class="pl" cx="160" cy="175" r="22"/>
-  <circle class="tk" cx="152" cy="169" r="4.5"/>
-  <circle class="tk" cx="168" cy="169" r="4.5"/>
-  <circle class="tk" cx="160" cy="183" r="4.5"/>
-  <text class="lb" x="160" y="140">recursos</text>
-
-  <circle class="pl" cx="260" cy="100" r="20"/>
-  <circle class="tk" cx="260" cy="100" r="5"/>
-  <text class="lb" x="260" y="74">fuera</text>
-
-  <rect class="tr" x="246" y="146" width="28" height="9"/>
-  <circle class="pl" cx="260" cy="200" r="20"/>
-  <text class="lb" x="298" y="204">SC</text>
-  <rect class="tr" x="246" y="246" width="28" height="9"/>
-
-  <line class="edge" x1="60" y1="122" x2="60" y2="140"/>
-  <line class="edge" x1="60" y1="157" x2="60" y2="176"/>
-  <line class="edge" x1="60" y1="222" x2="60" y2="240"/>
-  <path class="edge" d="M 44 250 Q 8 175 44 106"/>
-
-  <line class="edge" x1="260" y1="122" x2="260" y2="140"/>
-  <line class="edge" x1="260" y1="157" x2="260" y2="176"/>
-  <line class="edge" x1="260" y1="222" x2="260" y2="240"/>
-  <path class="edge" d="M 276 250 Q 312 175 276 106"/>
-
-  <line class="edge" x1="140" y1="167" x2="78" y2="152"/>
-  <line class="edge" x1="180" y1="167" x2="242" y2="152"/>
-  <path class="edge" d="M 76 252 Q 120 232 146 190"/>
-  <path class="edge" d="M 244 252 Q 200 232 174 190"/>
-
-  <text class="cap" x="20" y="300">Con 1 ficha: exclusión mutua estricta, un solo proceso en la sección crítica.</text>
-  <text class="cap" x="20" y="318">Con 3 fichas: hasta tres procesos a la vez, y un mismo proceso puede tomar varias.</text>
-  <text class="cap" x="20" y="340" fill="#3fb950">Invariante: M(SC izq) + M(SC der) + M(recursos) = 3</text>
-
-  <line x1="340" y1="20" x2="340" y2="350" stroke="#78829a" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
-
-  <text class="tit" x="370" y="28" fill="#c86bd8">Buffer acotado</text>
-  <text class="cap" x="370" y="46">Productor / consumidor con capacidad 3</text>
-
-  <circle class="pl" cx="410" cy="140" r="22"/>
-  <circle class="tk" cx="402" cy="134" r="4.5"/>
-  <circle class="tk" cx="418" cy="134" r="4.5"/>
-  <circle class="tk" cx="410" cy="148" r="4.5"/>
-  <text class="lb" x="410" y="104">libres</text>
-
-  <circle class="pl" cx="560" cy="140" r="22"/>
-  <text class="lb" x="560" y="104">ocupados</text>
-
-  <rect class="tr" x="481" y="126" width="9" height="28"/>
-  <text class="lb" x="485" y="116" fill="#f0883e">producir</text>
-
-  <rect class="tr" x="481" y="236" width="9" height="28"/>
-  <text class="lb" x="485" y="286" fill="#f0883e">consumir</text>
-
-  <line class="edge" x1="432" y1="140" x2="475" y2="140"/>
-  <line class="edge" x1="491" y1="140" x2="534" y2="140"/>
-
-  <path class="edge" d="M 566 162 Q 560 250 496 250"/>
-  <path class="edge" d="M 476 250 Q 410 250 408 164"/>
-
-  <text class="cap" x="370" y="318">"producir" sólo dispara si hay lugar libre;</text>
-  <text class="cap" x="370" y="336">"consumir" sólo si hay algo ocupado.</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="400" viewBox="0 0 700 400" version="1.1">
+<style>text { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; }</style>
+<defs><marker id="ah-78829a" markerWidth="9" markerHeight="7" refX="8.5" refY="3.5" orient="auto" markerUnits="userSpaceOnUse"><polygon points="0 0, 9 3.5, 0 7" fill="#78829a"/></marker></defs>
+<text x="20.0" y="28.0" text-anchor="start" style="font-size:13.5px;fill:#78829a;font-weight:600">Exclusión mutua con N recursos</text>
+<text x="20.0" y="48.0" text-anchor="start" style="font-size:11.5px;fill:#78829a">Es exactamente el semáforo de N permisos</text>
+<circle cx="80" cy="100" r="20" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<circle cx="80" cy="100" r="5" fill="#4c8dff"/>
+<text x="80.0" y="72.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">fuera</text>
+<rect x="65.0" y="155.0" width="30" height="10" fill="none" stroke="#f0883e" stroke-width="2.2"/>
+<circle cx="80" cy="220" r="20" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<text x="80.0" y="225.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">SC</text>
+<rect x="65.0" y="275.0" width="30" height="10" fill="none" stroke="#f0883e" stroke-width="2.2"/>
+<circle cx="180" cy="190" r="22" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<circle cx="173" cy="185" r="4.3" fill="#4c8dff"/>
+<circle cx="187" cy="185" r="4.3" fill="#4c8dff"/>
+<circle cx="180" cy="197" r="4.3" fill="#4c8dff"/>
+<text x="180.0" y="160.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">recursos</text>
+<circle cx="280" cy="100" r="20" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<circle cx="280" cy="100" r="5" fill="#4c8dff"/>
+<text x="280.0" y="72.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">fuera</text>
+<rect x="265.0" y="155.0" width="30" height="10" fill="none" stroke="#f0883e" stroke-width="2.2"/>
+<circle cx="280" cy="220" r="20" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<text x="280.0" y="225.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">SC</text>
+<rect x="265.0" y="275.0" width="30" height="10" fill="none" stroke="#f0883e" stroke-width="2.2"/>
+<path d="M 80.0 120.0 L 80.0 155.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 80.0 165.0 L 80.0 200.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 80.0 240.0 L 80.0 275.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 280.0 120.0 L 280.0 155.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 280.0 165.0 L 280.0 200.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 280.0 240.0 L 280.0 275.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 158.9 183.7 L 95.0 164.5" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 201.1 183.7 L 265.0 164.5" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 85.6 275.0 L 163.6 204.7" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 274.4 275.0 L 196.4 204.7" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 65.0 280.0 L 40.0 280.0 L 40.0 100.0 L 60.0 100.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 295.0 280.0 L 320.0 280.0 L 320.0 100.0 L 300.0 100.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<text x="20.0" y="320.0" text-anchor="start" style="font-size:11.5px;fill:#78829a">Con 1 ficha: exclusión mutua estricta. Con 3 fichas, hasta</text>
+<text x="20.0" y="337.2" text-anchor="start" style="font-size:11.5px;fill:#78829a">tres procesos a la vez. Invariante: M(SC izq) + M(SC der) +</text>
+<text x="20.0" y="354.5" text-anchor="start" style="font-size:11.5px;fill:#78829a">M(recursos) = 3.</text>
+<line x1="355.0" y1="20.0" x2="355.0" y2="385.0" stroke="#78829a" stroke-width="1.2" stroke-dasharray="4 4"/>
+<text x="375.0" y="28.0" text-anchor="start" style="font-size:13.5px;fill:#78829a;font-weight:600">Buffer acotado</text>
+<text x="375.0" y="48.0" text-anchor="start" style="font-size:11.5px;fill:#78829a">Productor/consumidor con capacidad 3</text>
+<circle cx="420" cy="170" r="22" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<circle cx="413" cy="165" r="4.3" fill="#4c8dff"/>
+<circle cx="427" cy="165" r="4.3" fill="#4c8dff"/>
+<circle cx="420" cy="177" r="4.3" fill="#4c8dff"/>
+<text x="420.0" y="140.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">libres</text>
+<rect x="520.0" y="155.0" width="10" height="30" fill="none" stroke="#f0883e" stroke-width="2.2"/>
+<text x="525.0" y="147.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">producir</text>
+<circle cx="630" cy="170" r="22" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<text x="630.0" y="140.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">ocupados</text>
+<rect x="520.0" y="265.0" width="10" height="30" fill="none" stroke="#f0883e" stroke-width="2.2"/>
+<text x="525.0" y="311.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">consumir</text>
+<path d="M 442.0 170.0 L 520.0 170.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 530.0 170.0 L 608.0 170.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 623.5 191.0 Q 605.0 251.2 530.0 278.2" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 520.0 278.2 Q 445.0 251.2 426.5 191.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<text x="375.0" y="350.0" text-anchor="start" style="font-size:11.5px;fill:#78829a">«producir» sólo dispara si queda un hueco libre en el</text>
+<text x="375.0" y="367.2" text-anchor="start" style="font-size:11.5px;fill:#78829a">buffer; «consumir», sólo si hay algo ocupado.</text>
 </svg>

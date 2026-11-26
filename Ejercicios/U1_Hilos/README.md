@@ -16,6 +16,6 @@ ningún dato es escrito por dos hilos a la vez, así que todavía no hace falta 
 **Herramientas permitidas en toda la unidad:** `Thread`, `Runnable`, lambdas y colecciones comunes.
 Nada de `java.util.concurrent`.
 
-**Teoría:** en los apuntes, los capítulos "Ejercicio 1 — Threads", "Threads en Java — atributos,
+**Teoría:** en el apunte práctico, los capítulos "Primer hilo: `start()` vs `run()`", "Threads en Java — atributos,
 estados y prioridades", "Interrupción, sleep y join de hilos" y "Excepciones no controladas, hilos
 daemon, variables locales de hilo y CountDownLatch" (filminas 3, 10 y 15).

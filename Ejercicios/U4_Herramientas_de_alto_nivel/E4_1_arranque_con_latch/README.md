@@ -4,7 +4,7 @@
 
 ## Objetivo
 
-Es la actividad "Combinar los cuatro mecanismos" de los apuntes:
+Combina el `CountDownLatch`, un hilo daemon, la interrupción y el manejo de excepciones:
 - Cinco módulos se inicializan en paralelo, cada uno en su hilo y con tiempos distintos.
 - El tablero no puede empezar hasta que **todos** terminaron, y después informa periódicamente
   hasta que lo interrumpan.
@@ -61,7 +61,7 @@ tampoco `getCount()` (el verificador lo controla).
 ## Para pensar
 
 1. Sacá el `finally` de `Modulo.run` (dejá el `countDown()` después de `inicializar()`). ¿Qué caso
-   falla? Es la pregunta (c) de la actividad de los apuntes.
+   falla? Si un módulo lanza una excepción, ¿qué pasa con su `countDown()`?
 2. ¿Por qué el tablero tiene que ser daemon? ¿Qué pasaría al terminar `main` si no lo fuera? Pensá
    en la pregunta del parcial: "un programa con un hilo main, productores y dos hilos daemon,
    ¿cuándo termina?".
@@ -100,6 +100,5 @@ tampoco `getCount()` (el verificador lo controla).
 ## Conexión con la teoría y los TPs
 
 - Apuntes: "Esperar múltiples eventos concurrentes: `CountDownLatch`" (la videoconferencia, los
-  detalles que hay que saber y la tabla contra `join()`), "Hilos daemon" y la actividad "Combinar los
-  cuatro mecanismos".
+  detalles que hay que saber y la tabla contra `join()`), y "Hilos daemon".
 - Redes de Petri: co-begin y co-end en "Modelos básicos".

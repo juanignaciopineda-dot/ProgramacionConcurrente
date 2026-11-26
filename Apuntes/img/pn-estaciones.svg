@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="380" viewBox="0 0 420 380" version="1.1">
+<style>text { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; }</style>
+<defs><marker id="ah-78829a" markerWidth="9" markerHeight="7" refX="8.5" refY="3.5" orient="auto" markerUnits="userSpaceOnUse"><polygon points="0 0, 9 3.5, 0 7" fill="#78829a"/></marker></defs>
+<text x="20.0" y="28.0" text-anchor="start" style="font-size:13.5px;fill:#78829a;font-weight:600">Ciclo estacional</text>
+<text x="20.0" y="48.0" text-anchor="start" style="font-size:11.5px;fill:#78829a">Una plaza por estación y una ficha: la estación actual.</text>
+<circle cx="210" cy="105" r="20" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<circle cx="210" cy="105" r="5" fill="#4c8dff"/>
+<text x="210.0" y="77.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">primavera</text>
+<circle cx="305" cy="200" r="20" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<text x="331.0" y="204.0" text-anchor="start" style="font-size:11.5px;fill:#78829a">verano</text>
+<circle cx="210" cy="295" r="20" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<text x="210.0" y="331.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">otoño</text>
+<circle cx="115" cy="200" r="20" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<text x="89.0" y="204.0" text-anchor="end" style="font-size:11.5px;fill:#78829a">invierno</text>
+<rect x="263.4" y="126.6" width="30" height="10" fill="none" stroke="#f0883e" stroke-width="2.2" transform="rotate(45 278.4 131.60000000000002)"/>
+<text x="294.4" y="119.6" text-anchor="start" style="font-size:11.5px;fill:#78829a">T1</text>
+<rect x="263.4" y="263.4" width="30" height="10" fill="none" stroke="#f0883e" stroke-width="2.2" transform="rotate(-45 278.4 268.4)"/>
+<text x="294.4" y="288.4" text-anchor="start" style="font-size:11.5px;fill:#78829a">T2</text>
+<rect x="126.6" y="263.4" width="30" height="10" fill="none" stroke="#f0883e" stroke-width="2.2" transform="rotate(45 141.60000000000002 268.4)"/>
+<text x="125.6" y="288.4" text-anchor="end" style="font-size:11.5px;fill:#78829a">T3</text>
+<rect x="126.6" y="126.6" width="30" height="10" fill="none" stroke="#f0883e" stroke-width="2.2" transform="rotate(-45 141.60000000000002 131.60000000000002)"/>
+<text x="125.6" y="119.6" text-anchor="end" style="font-size:11.5px;fill:#78829a">T4</text>
+<path d="M 228.6 112.2 L 266.8 127.1" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 282.9 143.2 L 297.8 181.4" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 297.8 218.6 L 282.9 256.8" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 266.8 272.9 L 228.6 287.8" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 191.4 287.8 L 153.2 272.9" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 137.1 256.8 L 122.2 218.6" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 122.2 181.4 L 137.1 143.2" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 153.2 127.1 L 191.4 112.2" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<text x="20.0" y="352.0" text-anchor="start" style="font-size:11.5px;fill:#78829a">P-invariante: M(primavera) + M(verano) + M(otoño) + M(invierno) = 1.</text>
+</svg>

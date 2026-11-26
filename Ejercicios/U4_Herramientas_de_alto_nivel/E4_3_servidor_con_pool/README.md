@@ -66,11 +66,27 @@ un pool que crea un hilo por pedido tardaría 100 ms y usaría 12 hilos.
    pero un caso falla: ¿por qué le importa al pool esa marca, si la tarea ya terminó?
 3. Sin el `RegistroDeRechazos`, ¿qué excepción recibe quien llama a `atender()` con el pool cerrado,
    y en qué hilo? ¿En qué hilo se ejecuta `rejectedExecution`?
-4. Respondé la actividad "Pool fijo y tareas rechazadas" de los apuntes para una máquina de 4 núcleos.
+4. Respondé "Pool fijo y tareas rechazadas", más abajo, para una máquina de 4 núcleos.
    ¿Cuánto vale `getPoolSize()` después de la tarea 10 y de la 100? ¿Puede `getActiveCount()` pasar
    de 4? ¿Y `getTaskCount()`?
 5. ¿Qué pasaría si `main` termina sin llamar a `cerrar()`? ¿Por qué el programa no termina, si ya no
    queda ningún pedido?
+
+### Más para pensar: pool fijo y tareas rechazadas
+
+Con el servidor del apunte práctico (100 pedidos a un `newFixedThreadPool` del tamaño de la
+cantidad de núcleos), en una máquina de 4 núcleos:
+
+1. ¿Cuánto vale `Pool Size` después de la tarea 10? ¿Y después de la 100?
+2. Justo después de enviar la tarea 100, ¿puede `Active Count` ser mayor que 4? ¿Y `Task Count`?
+3. Si en `endServer()` se usa `shutdownNow()` en lugar de `shutdown()`, ¿qué cambia en la salida?
+   ¿Las tareas que estaban en `sleep` terminan su mensaje de *Finished*?
+4. Modificá `Server` para que use `MyThreadFactory` (hay un `newFixedThreadPool(n, threadFactory)`)
+   y explicá qué cambia en los nombres de los hilos.
+
+> [!tip]- Pista para la 3
+> `shutdownNow()` interrumpe a los hilos activos, y el `catch` de `Task` solo imprime el stack trace
+> y sigue.
 
 ## Pistas
 
@@ -100,7 +116,6 @@ un pool que crea un hilo por pedido tardaría 100 ms y usaría 12 hilos.
 ## Conexión con la teoría y los TPs
 
 - Apuntes: "Executors: un pool de hilos administrado" (el ciclo de uso, la tabla de métodos y el
-  servidor de 100 pedidos con `RejectedTaskController`), "Executor vs hilos a mano" y la actividad
-  "Pool fijo y tareas rechazadas".
+  servidor de 100 pedidos con `RejectedTaskController`), y "Executor vs hilos a mano".
 - TP1: el enunciado permitía `Executor`, `ExecutorService`, `Executors` y `ThreadPoolExecutor`, y
   pedía terminar "sin dejar hilos activos". Con un pool, eso es `shutdown()` más `awaitTermination()`.

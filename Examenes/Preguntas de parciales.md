@@ -848,7 +848,7 @@ Puede haber **sincronizaciones** (transiciones con varias entradas), pero no con
 
 Puntos clave: No · Cada plaza: una transición de entrada y una de salida · El conflicto necesita una plaza con varias salidas
 
-> **Ojo con la corrección:** No confundas "**grafo marcado**" (una clase de RdP: el grafo de eventos) con el "**grafo de marcado**" o de marcas (el grafo de accesibilidad). En 2021 contestaron describiendo el grafo de accesibilidad y sacaron 0. Ojo: la cátedra usa "grafo de marcado" para las dos cosas; acá "una red **que es** un grafo de marcado" es la clase de red.
+> **Ojo con la corrección:** No confundas "**grafo marcado**" (una clase de RdP: el grafo de eventos) con el "**grafo de marcado**" o de marcas (el grafo de alcanzabilidad). En 2021 contestaron describiendo el grafo de alcanzabilidad y sacaron 0. Ojo: la cátedra usa "grafo de marcado" para las dos cosas; acá "una red **que es** un grafo de marcado" es la clase de red.
 
 #### ¿Qué caracteriza a una Red de Petri de libre elección extendida? (relación plaza-transición, conflicto)
 
@@ -1083,7 +1083,7 @@ Puntos clave: Sí · Plaza de control · Arco lector a la transición que se qui
 
 *Salió en: 2020, 2021, 2023*
 
-**Sí.** El grafo de marcado (de accesibilidad) contiene todas las marcas alcanzables y todos los disparos posibles, así que sobre él se leen las propiedades de comportamiento.
+**Sí.** El grafo de marcado (de alcanzabilidad) contiene todas las marcas alcanzables y todos los disparos posibles, así que sobre él se leen las propiedades de comportamiento.
 
 **Acotada**: se recorren **todos los nodos** (marcas) y, para cada plaza, se busca el **máximo** número de marcas. Si el grafo es finito y ese máximo existe para todas las plazas, la red es **k-acotada**, con k el mayor de esos máximos. (Si al construirlo aparece ω en el árbol de cobertura, la red no está acotada.)
 

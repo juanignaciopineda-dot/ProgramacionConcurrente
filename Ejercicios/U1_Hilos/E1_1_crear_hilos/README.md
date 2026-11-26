@@ -54,6 +54,18 @@ java src/Verificador.java
 5. `ejecutadaPor` en `Tarea` no está sincronizado ni es `volatile`. ¿Por qué el hilo principal igual
    ve el valor correcto? ¿Qué podría ver si lo leyera **antes** del `join()`?
 
+### Más para pensar: debug y diagramas
+
+Con el ejercicio terminado:
+
+1. Poné un breakpoint adentro de `run()` y corré en modo debug con `start()`. En el panel de hilos
+   tendrían que aparecer dos hilos vivos, `main` y el nuevo. ¿Qué pasa con `main` mientras el otro
+   está detenido en el breakpoint?
+2. Repetí el debug llamando a `run()`. ¿Cuántos hilos hay ahora? Mirá la pila de llamadas: ¿qué
+   método aparece debajo de `run()` en cada caso?
+3. Dibujá el diagrama de clases y el diagrama de secuencia del ejercicio. ¿Qué tipo de mensaje
+   (sincrónico o asincrónico) es `start()`? ¿Y `run()`?
+
 ## Pistas
 
 > [!tip]- Pista 1: ¿cómo le pongo nombre al hilo?
@@ -71,7 +83,7 @@ java src/Verificador.java
 
 ## Conexión con la teoría y los TPs
 
-- Apuntes: "Ejercicio 1 — Threads" (la pregunta de `h1.start()` vs `h1.run()`) y "Threads en Java —
+- Apunte práctico: "Primer hilo: `start()` vs `run()`" (la pregunta de `h1.start()` vs `h1.run()`) y "Threads en Java —
   Creación de hilos".
 - TP1: `ConcurrentSimulation` arranca **todos** los workers al principio y después los espera con
   `join()`, etapa por etapa. Es `ejecutarConStart`: si se hubiera hecho `start` y `join` en el mismo

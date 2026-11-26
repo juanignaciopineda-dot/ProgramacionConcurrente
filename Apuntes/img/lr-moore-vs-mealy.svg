@@ -1,96 +1,55 @@
-<?xml version="1.0" encoding="utf-8" standalone="no"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="620" height="600" viewBox="0 0 620 600" version="1.1">
-  <style>
-    text { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; fill: #78829a; }
-    .tit { font-size: 14px; font-weight: 600; }
-    .cap { font-size: 11.5px; }
-    .st  { font-size: 13px; text-anchor: middle; }
-    .lb  { font-size: 13px; text-anchor: middle; }
-    .in  { fill: #4c8dff; }
-    .out { fill: #f0883e; }
-    .edge { fill: none; stroke: #78829a; stroke-width: 1.6; marker-end: url(#ah); }
-    .node { fill: none; stroke: #78829a; stroke-width: 1.8; }
-  </style>
-  <defs>
-    <marker id="ah" markerWidth="9" markerHeight="7" refX="8.5" refY="3.5" orient="auto">
-      <polygon points="0 0, 9 3.5, 0 7" fill="#78829a"/>
-    </marker>
-  </defs>
-
-  <!-- ============ MEALY ============ -->
-  <text class="tit" x="24" y="30" fill="#f0883e">Mealy — la salida está en el ARCO</text>
-  <text class="cap" x="24" y="50">g : E × Q → S    ·    la salida depende del estado y de la entrada</text>
-
-  <line class="edge" x1="72" y1="150" x2="112" y2="150"/>
-  <text class="cap" x="60" y="140" text-anchor="middle">inicio</text>
-
-  <circle class="node" cx="150" cy="150" r="30"/>
-  <text class="st" x="150" y="155">q0</text>
-  <circle class="node" cx="330" cy="150" r="30"/>
-  <text class="st" x="330" y="155">q1</text>
-
-  <path class="edge" d="M 176 134 Q 240 96 304 134"/>
-  <text class="lb" x="240" y="88"><tspan class="in">a</tspan> / <tspan class="out">0</tspan></text>
-
-  <path class="edge" d="M 304 166 Q 240 204 176 166"/>
-  <text class="lb" x="240" y="224"><tspan class="in">b</tspan> / <tspan class="out">1</tspan></text>
-
-  <path class="edge" d="M 133 124 C 118 78 182 78 167 124"/>
-  <text class="lb" x="150" y="70"><tspan class="in">b</tspan> / <tspan class="out">0</tspan></text>
-
-  <path class="edge" d="M 313 124 C 298 78 362 78 347 124"/>
-  <text class="lb" x="330" y="70"><tspan class="in">a</tspan> / <tspan class="out">0</tspan></text>
-
-  <text class="cap" x="410" y="146">Emite 1 en el instante</text>
-  <text class="cap" x="410" y="164">en que llega la b que</text>
-  <text class="cap" x="410" y="182">completa “ab”.</text>
-  <text class="cap" x="410" y="206" fill="#3fb950">2 estados</text>
-
-  <line x1="24" y1="258" x2="596" y2="258" stroke="#78829a" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
-
-  <!-- ============ MOORE ============ -->
-  <text class="tit" x="24" y="296" fill="#4c8dff">Moore — la salida está en el ESTADO</text>
-  <text class="cap" x="24" y="316">g : Q → S    ·    la salida depende sólo del estado en que se está</text>
-
-  <line class="edge" x1="46" y1="410" x2="86" y2="410"/>
-  <text class="cap" x="40" y="400" text-anchor="middle">inicio</text>
-
-  <circle class="node" cx="120" cy="410" r="32"/>
-  <text class="st" x="120" y="408">q0 /</text>
-  <text class="st" x="120" y="424"><tspan class="out">0</tspan></text>
-
-  <circle class="node" cx="280" cy="410" r="32"/>
-  <text class="st" x="280" y="408">q1 /</text>
-  <text class="st" x="280" y="424"><tspan class="out">0</tspan></text>
-
-  <circle class="node" cx="440" cy="410" r="32"/>
-  <circle class="node" cx="440" cy="410" r="26"/>
-  <text class="st" x="440" y="408">q2 /</text>
-  <text class="st" x="440" y="424"><tspan class="out">1</tspan></text>
-
-  <line class="edge" x1="153" y1="410" x2="245" y2="410"/>
-  <text class="lb" x="199" y="400"><tspan class="in">a</tspan></text>
-
-  <line class="edge" x1="313" y1="410" x2="405" y2="410"/>
-  <text class="lb" x="359" y="400"><tspan class="in">b</tspan></text>
-
-  <path class="edge" d="M 103 385 C 88 339 152 339 137 385"/>
-  <text class="lb" x="120" y="332"><tspan class="in">b</tspan></text>
-
-  <path class="edge" d="M 263 436 C 248 482 312 482 297 436"/>
-  <text class="lb" x="280" y="500"><tspan class="in">a</tspan></text>
-
-  <path class="edge" d="M 421 384 Q 360 336 299 384"/>
-  <text class="lb" x="360" y="328"><tspan class="in">a</tspan></text>
-
-  <path class="edge" d="M 432 441 Q 280 580 128 441"/>
-  <text class="lb" x="280" y="556"><tspan class="in">b</tspan></text>
-
-  <text class="cap" x="500" y="392">Hace falta un</text>
-  <text class="cap" x="500" y="410">estado extra (q2)</text>
-  <text class="cap" x="500" y="428">para colgarle la</text>
-  <text class="cap" x="500" y="446">salida 1.</text>
-  <text class="cap" x="500" y="470" fill="#ff6b6b">3 estados</text>
-
-  <text class="cap" x="24" y="588">Las dos máquinas son igualmente expresivas: ambas reconocen exactamente los lenguajes regulares.</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="585" viewBox="0 0 640 585" version="1.1">
+<style>text { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; }</style>
+<defs><marker id="ah-78829a" markerWidth="9" markerHeight="7" refX="8.5" refY="3.5" orient="auto" markerUnits="userSpaceOnUse"><polygon points="0 0, 9 3.5, 0 7" fill="#78829a"/></marker></defs>
+<text x="20.0" y="26.0" text-anchor="start" style="font-size:13.5px;fill:#78829a;font-weight:600">Mealy: la salida está en el ARCO</text>
+<text x="20.0" y="46.0" text-anchor="start" style="font-size:11.5px;fill:#78829a">g : E × Q → S · la salida depende del estado y de la entrada</text>
+<circle cx="150" cy="150" r="22" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<text x="150" y="155" text-anchor="middle" style="font-size:13px;fill:#78829a">m0</text>
+<circle cx="360" cy="150" r="22" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<text x="360" y="155" text-anchor="middle" style="font-size:13px;fill:#78829a">m1</text>
+<line x1="82" y1="150" x2="128" y2="150" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<text x="84.0" y="140.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">inicio</text>
+<path d="M 139.7 130.6 C 111.1 94.2 188.9 94.2 160.3 130.6" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<text x="135.7" y="96.3" style="font-size:12.5px"><tspan style="fill:#4c8dff">b</tspan><tspan style="fill:#78829a"> / </tspan><tspan style="fill:#f0883e">0</tspan></text>
+<path d="M 349.7 130.6 C 321.1 94.2 398.9 94.2 370.3 130.6" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<text x="345.7" y="96.3" style="font-size:12.5px"><tspan style="fill:#4c8dff">a</tspan><tspan style="fill:#78829a"> / </tspan><tspan style="fill:#f0883e">0</tspan></text>
+<path d="M 170.4 141.8 Q 255.0 108.0 339.6 141.8" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<text x="240.8" y="116.9" style="font-size:12.5px"><tspan style="fill:#4c8dff">a</tspan><tspan style="fill:#78829a"> / </tspan><tspan style="fill:#f0883e">0</tspan></text>
+<path d="M 339.6 158.2 Q 255.0 192.0 170.4 158.2" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<text x="240.5" y="193.1" style="font-size:12.5px"><tspan style="fill:#4c8dff">b</tspan><tspan style="fill:#78829a"> / </tspan><tspan style="fill:#f0883e">1</tspan></text>
+<text x="440.0" y="140.0" text-anchor="start" style="font-size:11.5px;fill:#78829a">Emite 1 en el instante en que llega</text>
+<text x="440.0" y="157.2" text-anchor="start" style="font-size:11.5px;fill:#78829a">la b que completa «ab».</text>
+<text x="440.0" y="178.5" text-anchor="start" style="font-size:11.5px;fill:#78829a">Usa 2 estados.</text>
+<line x1="20.0" y1="255.0" x2="620.0" y2="255.0" stroke="#78829a" stroke-width="1.2" stroke-dasharray="4 4"/>
+<text x="20.0" y="285.0" text-anchor="start" style="font-size:13.5px;fill:#78829a;font-weight:600">Moore: la salida está en el ESTADO</text>
+<text x="20.0" y="305.0" text-anchor="start" style="font-size:11.5px;fill:#78829a">g : Q → S · la salida depende sólo del estado en que se está</text>
+<circle cx="130" cy="420" r="22" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<text x="130" y="418" text-anchor="middle" style="font-size:12.5px;fill:#78829a">q0</text>
+<text x="130" y="434" text-anchor="middle" style="font-size:12.5px;fill:#f0883e">0</text>
+<circle cx="290" cy="420" r="22" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<text x="290" y="418" text-anchor="middle" style="font-size:12.5px;fill:#78829a">q1</text>
+<text x="290" y="434" text-anchor="middle" style="font-size:12.5px;fill:#f0883e">0</text>
+<circle cx="450" cy="420" r="22" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<circle cx="450" cy="420" r="26" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<text x="450" y="418" text-anchor="middle" style="font-size:12.5px;fill:#78829a">q2</text>
+<text x="450" y="434" text-anchor="middle" style="font-size:12.5px;fill:#f0883e">1</text>
+<line x1="68" y1="420" x2="108" y2="420" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<text x="70.0" y="410.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">inicio</text>
+<path d="M 119.7 400.6 C 91.1 364.2 168.9 364.2 140.3 400.6" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<text x="130.0" y="366.3" text-anchor="middle" style="font-size:12.5px;fill:#4c8dff">b</text>
+<path d="M 300.3 439.4 C 328.9 475.8 251.1 475.8 279.7 439.4" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<text x="290.0" y="482.7" text-anchor="middle" style="font-size:12.5px;fill:#4c8dff">a</text>
+<path d="M 152.0 420.0 L 268.0 420.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<text x="210.0" y="412.0" text-anchor="middle" style="font-size:12.5px;fill:#4c8dff">a</text>
+<path d="M 312.0 420.0 L 424.0 420.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<text x="368.0" y="412.0" text-anchor="middle" style="font-size:12.5px;fill:#4c8dff">b</text>
+<path d="M 428.7 405.1 Q 370.0 364.0 308.0 407.4" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<text x="368.7" y="377.1" text-anchor="middle" style="font-size:12.5px;fill:#4c8dff">a</text>
+<path d="M 431.6 438.4 Q 290.0 580.0 145.6 435.6" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<text x="288.8" y="526.5" text-anchor="middle" style="font-size:12.5px;fill:#4c8dff">b</text>
+<text x="500.0" y="400.0" text-anchor="start" style="font-size:11.5px;fill:#78829a">Hace falta un estado</text>
+<text x="500.0" y="417.2" text-anchor="start" style="font-size:11.5px;fill:#78829a">extra (q2) para colgarle</text>
+<text x="500.0" y="434.5" text-anchor="start" style="font-size:11.5px;fill:#78829a">la salida 1.</text>
+<text x="500.0" y="455.8" text-anchor="start" style="font-size:11.5px;fill:#78829a">Usa 3 estados.</text>
+<text x="20.0" y="570.0" text-anchor="start" style="font-size:11.5px;fill:#78829a">Las dos máquinas son igualmente expresivas: ambas reconocen exactamente los lenguajes regulares.</text>
 </svg>

@@ -72,6 +72,13 @@ verificador lo controla).
 5. Mirá `ConditionQueues` y `Monitor` del TP final. ¿Qué parte de este ejercicio es cada método?
    ¿Dónde está el "le paso el mutex y no lo suelto"?
 
+### Más para pensar: varios hilos que se pueden despertar
+
+En el monitor guiado por una red de Petri hay 2 productores y 2 consumidores. En un momento hay un
+productor y un consumidor esperando, y después de un disparo las transiciones de los dos quedan
+sensibilizadas. ¿Quién decide a cuál se despierta? Proponé dos políticas distintas y explicá qué
+propiedad favorece cada una (el ejercicio 5.5 implementa una).
+
 ## Pistas
 
 > [!tip]- Pista 1: `ColaDeCondicion`
@@ -115,7 +122,7 @@ verificador lo controla).
 
 ## Conexión con la teoría y los TPs
 
-- Apuntes: "El monitor de la materia: un monitor guiado por una red de Petri" (el algoritmo de
+- Apuntes: "Un monitor guiado por una red de Petri" (apunte teórico) (el algoritmo de
   `dispararTransicion` y el mutex que pasa "de mano en mano") y la tabla de políticas.
 - Parciales: "Las acciones ... ¿se realizan adentro o afuera del monitor?" (afuera, para no
   serializar) y "¿Cómo deben ejecutarse los métodos de un monitor?" (en exclusión mutua).

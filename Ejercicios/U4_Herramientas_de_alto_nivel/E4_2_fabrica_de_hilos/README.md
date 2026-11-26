@@ -86,6 +86,6 @@ colecciones concurrentes ni `Collections.synchronized...` (el verificador lo con
 ## Conexión con la teoría y los TPs
 
 - Apuntes: "El patrón Factory" (las facturas) y "`ThreadFactory`: crear hilos con una fábrica"
-  (`MyThreadFactory`), y la actividad "Pool fijo y tareas rechazadas", punto (d).
+  (`MyThreadFactory`), y la pregunta 4 de "Pool fijo y tareas rechazadas" del ejercicio 4.3.
 - TP1: el enunciado permitía `Executors`. Con una fábrica propia, los hilos del pool tendrían
   nombres que se entienden en el log de eventos.

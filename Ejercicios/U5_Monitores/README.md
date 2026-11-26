@@ -30,5 +30,5 @@ qué se puede usar en ese ejercicio, y el verificador lo revisa.
 
 **Teoría:** en los apuntes, el capítulo "Monitores" completo: por qué no alcanza con semáforos, la
 definición y la cola de entrada, las variables de condición, la clasificación y las políticas de
-señalización, y "El monitor de la materia". En "Preguntas de parciales", la sección "Monitores" tiene
+señalización, y "Un monitor guiado por una red de Petri". En "Preguntas de parciales", la sección "Monitores" tiene
 las preguntas que los ejercicios ayudan a responder.

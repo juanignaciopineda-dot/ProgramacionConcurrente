@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="400" viewBox="0 0 680 400" version="1.1">
+<style>text { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; }</style>
+<defs><marker id="ah-78829a" markerWidth="9" markerHeight="7" refX="8.5" refY="3.5" orient="auto" markerUnits="userSpaceOnUse"><polygon points="0 0, 9 3.5, 0 7" fill="#78829a"/></marker><marker id="ah-ff6b6b" markerWidth="9" markerHeight="7" refX="8.5" refY="3.5" orient="auto" markerUnits="userSpaceOnUse"><polygon points="0 0, 9 3.5, 0 7" fill="#ff6b6b"/></marker></defs>
+<text x="20.0" y="28.0" text-anchor="start" style="font-size:13.5px;fill:#3fb950;font-weight:600">✓ Simple</text>
+<text x="20.0" y="312.0" text-anchor="start" style="font-size:11.5px;fill:#78829a">El único conflicto es ⟨P1, {T1, T2}⟩. P2 tiene una sola</text>
+<text x="20.0" y="329.2" text-anchor="start" style="font-size:11.5px;fill:#78829a">salida, así que T2 está en un solo conflicto. No es de</text>
+<text x="20.0" y="346.5" text-anchor="start" style="font-size:11.5px;fill:#78829a">libre elección extendida.</text>
+<circle cx="115" cy="95" r="20" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<circle cx="115" cy="95" r="5" fill="#4c8dff"/>
+<text x="115.0" y="67.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">P1</text>
+<circle cx="255" cy="95" r="20" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<circle cx="255" cy="95" r="5" fill="#4c8dff"/>
+<text x="255.0" y="67.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">P2</text>
+<rect x="45.0" y="170.0" width="30" height="10" fill="none" stroke="#f0883e" stroke-width="2.2"/>
+<text x="39.0" y="179.0" text-anchor="end" style="font-size:11.5px;fill:#78829a">T1</text>
+<rect x="170.0" y="170.0" width="30" height="10" fill="none" stroke="#f0883e" stroke-width="2.2"/>
+<text x="206.0" y="179.0" text-anchor="start" style="font-size:11.5px;fill:#78829a">T2</text>
+<circle cx="60" cy="250" r="20" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<text x="60.0" y="286.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">P3</text>
+<circle cx="185" cy="250" r="20" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<text x="185.0" y="286.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">P4</text>
+<path d="M 103.7 111.5 L 63.4 170.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 128.2 110.1 L 180.6 170.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 241.8 110.1 L 189.4 170.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 60.0 180.0 L 60.0 230.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 185.0 180.0 L 185.0 230.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<line x1="340.0" y1="15.0" x2="340.0" y2="385.0" stroke="#78829a" stroke-width="1.2" stroke-dasharray="4 4"/>
+<text x="360.0" y="28.0" text-anchor="start" style="font-size:13.5px;fill:#ff6b6b;font-weight:600">✗ No es simple</text>
+<text x="360.0" y="312.0" text-anchor="start" style="font-size:11.5px;fill:#78829a">T2 está en dos conflictos: ⟨P1, {T1, T2}⟩ y ⟨P2, {T2,</text>
+<text x="360.0" y="329.2" text-anchor="start" style="font-size:11.5px;fill:#78829a">T3}⟩. Tampoco es simple extendida, porque los conjuntos</text>
+<text x="360.0" y="346.5" text-anchor="start" style="font-size:11.5px;fill:#78829a">de salida se cruzan.</text>
+<circle cx="450" cy="95" r="20" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<circle cx="450" cy="95" r="5" fill="#4c8dff"/>
+<text x="450.0" y="67.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">P1</text>
+<circle cx="570" cy="95" r="20" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<circle cx="570" cy="95" r="5" fill="#4c8dff"/>
+<text x="570.0" y="67.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">P2</text>
+<rect x="375.0" y="170.0" width="30" height="10" fill="none" stroke="#f0883e" stroke-width="2.2"/>
+<text x="369.0" y="179.0" text-anchor="end" style="font-size:11.5px;fill:#78829a">T1</text>
+<rect x="495.0" y="170.0" width="30" height="10" fill="none" stroke="#ff6b6b" stroke-width="2.2"/>
+<text x="498.0" y="195.0" text-anchor="end" style="font-size:11.5px;fill:#78829a">T2</text>
+<rect x="615.0" y="170.0" width="30" height="10" fill="none" stroke="#f0883e" stroke-width="2.2"/>
+<text x="651.0" y="179.0" text-anchor="start" style="font-size:11.5px;fill:#78829a">T3</text>
+<circle cx="390" cy="250" r="20" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<text x="390.0" y="286.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">P3</text>
+<circle cx="510" cy="250" r="20" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<text x="536.0" y="254.0" text-anchor="start" style="font-size:11.5px;fill:#78829a">P4</text>
+<circle cx="630" cy="250" r="20" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<text x="630.0" y="286.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">P5</text>
+<path d="M 438.0 111.0 L 393.8 170.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 462.0 111.0 L 506.2 170.0" fill="none" stroke="#ff6b6b" stroke-width="1.5" marker-end="url(#ah-ff6b6b)"/>
+<path d="M 558.0 111.0 L 513.8 170.0" fill="none" stroke="#ff6b6b" stroke-width="1.5" marker-end="url(#ah-ff6b6b)"/>
+<path d="M 582.0 111.0 L 626.2 170.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 390.0 180.0 L 390.0 230.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 510.0 180.0 L 510.0 230.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 630.0 180.0 L 630.0 230.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+</svg>

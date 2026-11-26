@@ -63,8 +63,8 @@ Solo `ReentrantReadWriteLock` y colecciones comunes. Nada de `synchronized`, `Se
 
 1. Cambiá `precio` para que use el candado de escritura. ¿Qué caso falla y con qué tiempo? ¿Qué
    resultado sigue siendo correcto?
-2. Agregá un método que sume 1 a un precio usando el candado de **lectura** (la actividad "Romper el
-   `ReadWriteLock`" de los apuntes). Con 5 hilos que lo llamen 1000 veces, ¿cuánto vale el precio al
+2. Agregá un método que sume 1 a un precio usando el candado de **lectura** (ver "Romper el
+   `ReadWriteLock`", más abajo). Con 5 hilos que lo llamen 1000 veces, ¿cuánto vale el precio al
    final? ¿Qué garantía se rompió?
 3. En `obtenerOCalcular`, mové el `writeLock().lock()` adentro del bloque del `readLock()` (antes de
    soltarlo). ¿Qué pasa? ¿Por qué el verificador dice `[COLGADO]` pero no puede decirte quién espera a
@@ -74,6 +74,27 @@ Solo `ReentrantReadWriteLock` y colecciones comunes. Nada de `synchronized`, `Se
 5. Escenarios de la filmina: (A) una base que se consulta todo el tiempo y casi nunca cambia, y (B) una
    en la que los precios cambian todo el tiempo y casi nadie consulta. ¿En cuál conviene el
    `ReadWriteLock`? ¿Por qué en el otro puede salir más caro que un `synchronized`?
+
+### Más para pensar: romper el `ReadWriteLock`
+
+Sobre el `PricesInfo` del apunte práctico (o sobre tu catálogo), agregá este método:
+
+```java
+public void bumpPrice1() {
+    lock.readLock().lock();
+    price1 = price1 + 1;      // ¡escribe con el candado de LECTURA!
+    lock.readLock().unlock();
+}
+```
+
+1. ¿Compila? ¿Da error en tiempo de ejecución?
+2. Con 5 hilos llamando a este método 1000 veces cada uno, ¿cuánto vale `price1` al final? ¿Por qué
+   no vale 5000?
+3. ¿Qué garantía del `ReadWriteLock` se violó exactamente?
+
+> [!tip]- Pista
+> El `readLock` deja entrar a varios hilos a la vez. Volvé a la descomposición de `contador++` en
+> tres acciones atómicas (leer, sumar, escribir).
 
 ## Pistas
 
@@ -120,8 +141,8 @@ Solo `ReentrantReadWriteLock` y colecciones comunes. Nada de `synchronized`, `Se
 ## Conexión con la teoría y los TPs
 
 - Apuntes: "ReadWriteLock" (el ejemplo `PricesInfo`, "La responsabilidad es del programador" y
-  "¿Cuándo conviene un `ReadWriteLock`?"), y las actividades "Elegir el mecanismo" (caso b) y
-  "Romper el `ReadWriteLock`".
+  "¿Cuándo conviene un `ReadWriteLock`?"), el caso (b) de "Elegir el mecanismo" del ejercicio 3.1 y
+  "Romper el `ReadWriteLock`", más arriba.
 - Redes de Petri: lectores/escritores es uno de los modelos básicos del libro de la cátedra (§1.5.4).
   En el modelo clásico hay un lugar con N tokens: cada lector toma uno, y el escritor los toma
   **todos** de un saque (un arco de peso N). Es lo mismo que hace, con semáforos, un escritor que

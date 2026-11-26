@@ -1,70 +1,46 @@
-<?xml version="1.0" encoding="utf-8" standalone="no"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="620" height="330" viewBox="0 0 620 330" version="1.1">
-  <style>
-    text { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; fill: #78829a; }
-    .tit { font-size: 13.5px; font-weight: 600; }
-    .cap { font-size: 11.5px; }
-    .lb  { font-size: 11.5px; text-anchor: middle; }
-    .pl  { fill: none; stroke: #78829a; stroke-width: 1.8; }
-    .tr  { fill: none; stroke: #f0883e; stroke-width: 2.2; }
-    .edge { fill: none; stroke: #78829a; stroke-width: 1.5; marker-end: url(#ah); }
-  </style>
-  <defs>
-    <marker id="ah" markerWidth="9" markerHeight="7" refX="8.5" refY="3.5" orient="auto">
-      <polygon points="0 0, 9 3.5, 0 7" fill="#78829a"/>
-    </marker>
-    <marker id="ahb" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
-      <polygon points="0 0, 10 4, 0 8" fill="#c86bd8"/>
-    </marker>
-  </defs>
-
-  <text class="tit" x="20" y="28">Red de Petri ordinaria (desplegada)</text>
-  <text class="cap" x="20" y="46">Un lugar y una transición por cada color</text>
-
-  <circle class="pl" cx="80" cy="100" r="20"/>
-  <circle cx="80" cy="100" r="5.5" fill="#4c8dff"/>
-  <text class="lb" x="80" y="74">P1b</text>
-  <rect class="tr" x="66" y="146" width="28" height="9"/>
-  <text class="lb" x="42" y="156" fill="#f0883e">T1b</text>
-  <circle class="pl" cx="80" cy="200" r="20"/>
-  <text class="lb" x="80" y="236">P2b</text>
-  <line class="edge" x1="80" y1="122" x2="80" y2="140"/>
-  <line class="edge" x1="80" y1="157" x2="80" y2="176"/>
-
-  <circle class="pl" cx="200" cy="100" r="20"/>
-  <circle cx="200" cy="100" r="5.5" fill="#3fb950"/>
-  <text class="lb" x="200" y="74">P1g</text>
-  <rect class="tr" x="186" y="146" width="28" height="9"/>
-  <text class="lb" x="238" y="156" fill="#f0883e">T1g</text>
-  <circle class="pl" cx="200" cy="200" r="20"/>
-  <text class="lb" x="200" y="236">P2g</text>
-  <line class="edge" x1="200" y1="122" x2="200" y2="140"/>
-  <line class="edge" x1="200" y1="157" x2="200" y2="176"/>
-
-  <line x1="290" y1="20" x2="290" y2="290" stroke="#78829a" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
-
-  <path d="M 320 132 L 400 132" fill="none" stroke="#c86bd8" stroke-width="2" marker-end="url(#ahb)"/>
-  <text class="lb" x="360" y="124" fill="#c86bd8">plegado</text>
-  <path d="M 400 168 L 320 168" fill="none" stroke="#c86bd8" stroke-width="2" marker-end="url(#ahb)"/>
-  <text class="lb" x="360" y="190" fill="#c86bd8">despliegue</text>
-
-  <text class="tit" x="440" y="28" fill="#c86bd8">Red coloreada (plegada)</text>
-  <text class="cap" x="440" y="46">Los colores viajan en las fichas</text>
-
-  <circle class="pl" cx="520" cy="100" r="22"/>
-  <circle cx="512" cy="100" r="5.5" fill="#4c8dff"/>
-  <circle cx="528" cy="100" r="5.5" fill="#3fb950"/>
-  <text class="lb" x="520" y="72">P1 = {P1b, P1g}</text>
-  <rect class="tr" x="506" y="146" width="28" height="9"/>
-  <text class="lb" x="474" y="156" fill="#f0883e">T1</text>
-  <circle class="pl" cx="520" cy="200" r="22"/>
-  <text class="lb" x="520" y="238">P2 = {P2b, P2g}</text>
-  <line class="edge" x1="520" y1="122" x2="520" y2="140"/>
-  <line class="edge" x1="520" y1="157" x2="520" y2="174"/>
-  <text class="cap" x="546" y="130">id</text>
-  <text class="cap" x="546" y="172">id</text>
-
-  <text class="cap" x="20" y="278">Los arcos llevan FUNCIONES. Acá la función identidad: para disparar en el color &lt;b&gt; hace falta al menos una ficha &lt;b&gt; en P1,</text>
-  <text class="cap" x="20" y="296">y el disparo saca una &lt;b&gt; de P1 y pone una &lt;b&gt; en P2 — exactamente el disparo de T1b en la red desplegada.</text>
-  <text class="cap" x="20" y="318" fill="#3fb950">El despliegue completo de una red coloreada da siempre UNA red ordinaria única. Un color puede ser una n-tupla.</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="660" height="375" viewBox="0 0 660 375" version="1.1">
+<style>text { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; }</style>
+<defs><marker id="ah-78829a" markerWidth="9" markerHeight="7" refX="8.5" refY="3.5" orient="auto" markerUnits="userSpaceOnUse"><polygon points="0 0, 9 3.5, 0 7" fill="#78829a"/></marker><marker id="ah-c86dd7" markerWidth="9" markerHeight="7" refX="8.5" refY="3.5" orient="auto" markerUnits="userSpaceOnUse"><polygon points="0 0, 9 3.5, 0 7" fill="#c86dd7"/></marker></defs>
+<text x="20.0" y="28.0" text-anchor="start" style="font-size:13.5px;fill:#78829a;font-weight:600">Red ordinaria (desplegada)</text>
+<text x="20.0" y="48.0" text-anchor="start" style="font-size:11.5px;fill:#78829a">Una plaza y una transición por cada color</text>
+<circle cx="90" cy="105" r="20" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<circle cx="90" cy="105" r="5" fill="#4c8dff"/>
+<text x="90.0" y="77.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">P1b</text>
+<rect x="75.0" y="160.0" width="30" height="10" fill="none" stroke="#f0883e" stroke-width="2.2"/>
+<text x="69.0" y="169.0" text-anchor="end" style="font-size:11.5px;fill:#78829a">T1b</text>
+<circle cx="90" cy="225" r="20" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<text x="90.0" y="261.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">P2b</text>
+<path d="M 90.0 125.0 L 90.0 160.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 90.0 170.0 L 90.0 205.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<circle cx="230" cy="105" r="20" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<circle cx="230" cy="105" r="5" fill="#3fb950"/>
+<text x="230.0" y="77.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">P1g</text>
+<rect x="215.0" y="160.0" width="30" height="10" fill="none" stroke="#f0883e" stroke-width="2.2"/>
+<text x="251.0" y="169.0" text-anchor="start" style="font-size:11.5px;fill:#78829a">T1g</text>
+<circle cx="230" cy="225" r="20" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<text x="230.0" y="261.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">P2g</text>
+<path d="M 230.0 125.0 L 230.0 160.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<path d="M 230.0 170.0 L 230.0 205.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<line x1="330.0" y1="20.0" x2="330.0" y2="290.0" stroke="#78829a" stroke-width="1.2" stroke-dasharray="4 4"/>
+<line x1="355" y1="145" x2="440" y2="145" stroke="#c86dd7" stroke-width="2" marker-end="url(#ah-c86dd7)"/>
+<line x1="440" y1="190" x2="355" y2="190" stroke="#c86dd7" stroke-width="2" marker-end="url(#ah-c86dd7)"/>
+<text x="397.0" y="135.0" text-anchor="middle" style="font-size:11.5px;fill:#c86dd7">plegado</text>
+<text x="397.0" y="212.0" text-anchor="middle" style="font-size:11.5px;fill:#c86dd7">despliegue</text>
+<text x="470.0" y="28.0" text-anchor="start" style="font-size:13.5px;fill:#78829a;font-weight:600">Red coloreada (plegada)</text>
+<text x="470.0" y="48.0" text-anchor="start" style="font-size:11.5px;fill:#78829a">Los colores viajan en las fichas</text>
+<circle cx="545" cy="105" r="20" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<circle cx="538" cy="105" r="4.3" fill="#4c8dff"/>
+<circle cx="552" cy="105" r="4.3" fill="#3fb950"/>
+<text x="545.0" y="77.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">P1 = {P1b, P1g}</text>
+<rect x="530.0" y="160.0" width="30" height="10" fill="none" stroke="#f0883e" stroke-width="2.2"/>
+<text x="524.0" y="169.0" text-anchor="end" style="font-size:11.5px;fill:#78829a">T1</text>
+<circle cx="545" cy="225" r="20" fill="none" stroke="#78829a" stroke-width="1.8"/>
+<text x="545.0" y="261.0" text-anchor="middle" style="font-size:11.5px;fill:#78829a">P2 = {P2b, P2g}</text>
+<path d="M 545.0 125.0 L 545.0 160.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<text x="557.0" y="146.5" text-anchor="middle" style="font-size:11.5px;fill:#78829a">id</text>
+<path d="M 545.0 170.0 L 545.0 205.0" fill="none" stroke="#78829a" stroke-width="1.5" marker-end="url(#ah-78829a)"/>
+<text x="557.0" y="191.5" text-anchor="middle" style="font-size:11.5px;fill:#78829a">id</text>
+<text x="20.0" y="315.0" text-anchor="start" style="font-size:11.5px;fill:#78829a">Los arcos llevan FUNCIONES. Con la función identidad, disparar T1 en el color &lt;b&gt; pide al menos una ficha &lt;b&gt; en P1,</text>
+<text x="20.0" y="332.2" text-anchor="start" style="font-size:11.5px;fill:#78829a">la saca y pone una &lt;b&gt; en P2: exactamente el disparo de T1b en la red desplegada. El despliegue completo de una red</text>
+<text x="20.0" y="349.5" text-anchor="start" style="font-size:11.5px;fill:#78829a">coloreada da siempre UNA red ordinaria única.</text>
 </svg>

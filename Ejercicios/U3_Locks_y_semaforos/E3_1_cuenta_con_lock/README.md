@@ -76,8 +76,23 @@ controla).
 4. `extraerTodo` toma el candado y llama a `getSaldo()` y a `extraer()`, que lo vuelven a tomar.
    ¿Cuánto vale `candado.getHoldCount()` adentro de `extraer` en ese caso? ¿Qué pasaría si el lock no
    fuera reentrante?
-5. Mirá la actividad "Elegir el mecanismo" de los apuntes. Para los casos (a) y (e), ¿usarías
+5. Mirá "Elegir el mecanismo", más abajo. Para los casos (a) y (e), ¿usarías
    `synchronized` o `ReentrantLock`? ¿Qué capacidad del lock decide la respuesta?
+
+### Más para pensar: elegir el mecanismo
+
+Para cada situación, decidí qué mecanismo usarías (`synchronized`, `ReentrantLock`, `ReadWriteLock`
+o `Semaphore`) y justificá en una línea:
+
+- (a) Un contador de visitas que se incrementa desde muchos hilos y se lee de vez en cuando.
+- (b) Una caché en memoria que se consulta miles de veces por segundo y se recarga una vez por hora.
+- (c) Un pool de 5 conexiones a base de datos.
+- (d) Un hilo que debe esperar a que otro termine de inicializar el sistema antes de arrancar.
+- (e) Una sección crítica de la que hay que salir si no se puede entrar en 50 ms.
+
+> [!tip]- Pista
+> (d) y (e) descartan de entrada a `synchronized`. Para (d) pensá en un semáforo inicializado en 0, y
+> para (e) en `tryLock(long, TimeUnit)`.
 
 ## Pistas
 

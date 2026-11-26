@@ -75,6 +75,13 @@ verificador lo controla).
 5. En la largada, ¿qué pasa si el juez llama a `largar()` dos veces? ¿Y si llegan más corredores que
    los que se declararon en el constructor? ¿Cómo lo modelarías en una red de Petri?
 
+### Más para pensar: el deadlock en la red de Petri
+
+El buffer con tres semáforos corresponde a la red de Petri del productor/consumidor del apunte
+teórico (`huecos` y `productos` son plazas, y el `mutex` es una plaza con una ficha). Después del
+experimento A, construí un escenario con un buffer de 3 lugares que lleve a deadlock, y señalá en la
+red qué cambió al invertir el orden de `huecos.acquire()` y `mutex.acquire()`.
+
 ## Pistas
 
 > [!tip]- Pista 1: `sacar`

@@ -45,13 +45,29 @@ java src/Verificador.java
 1. `Latido` y `BuscadorDePrimos` terminan los dos al ser interrumpidos, pero por mecanismos distintos.
    Explicá cada uno.
 2. Cambiá `Latido.run()` para que el `try/catch` quede **adentro** del bucle y en el `catch` solo
-   haya `e.printStackTrace()`. Corré el verificador. ¿Qué caso falla y por qué? (Es la actividad de
-   los apuntes: el flag que `sleep` limpió.)
+   haya `e.printStackTrace()`. Corré el verificador. ¿Qué caso falla y por qué? (Es la pregunta 3 de
+   "Más para pensar", más abajo: el flag que `sleep` limpió.)
 3. ¿Por qué `detener` usa `join(timeoutMs)` y no `join()`? ¿Qué le pasaría al programa si el hilo no
    cooperara?
 4. El último caso del verificador ("Cadena") falla si `dormir` no restaura la marca. Dibujá la
    secuencia de eventos que lleva al bucle infinito.
 5. ¿Por qué `Thread.stop()` es peligroso? Pensá en un hilo cortado a la mitad de una sección crítica.
+
+### Más para pensar: interrupción, `sleep` y `join` juntos
+
+Escribí un programa aparte con un hilo `Contador` que imprime un número cada 500 ms,
+indefinidamente, hasta que lo interrumpan.
+
+1. Usá `sleep()` para el intervalo, y capturá la `InterruptedException` para salir del bucle
+   limpiamente.
+2. Desde el `main`, arrancá el hilo, esperá 3 segundos, interrumpilo y usá `join()` para esperar a
+   que efectivamente termine antes de imprimir "Listo".
+3. ¿Qué pasa si en el `catch` de `InterruptedException` solo hacés `e.printStackTrace()` sin salir
+   del bucle? Probalo y explicá el resultado con lo que sabés del flag de interrupción.
+
+> [!tip]- Pista para la 3
+> `sleep()` limpia el flag de interrupción al lanzar la excepción. Si el bucle no chequea nada más y
+> no hace `return` o `break`, ¿qué le impide seguir dando vueltas para siempre?
 
 ## Pistas
 

@@ -1,7 +1,7 @@
 # Ejercicios de Programación Concurrente en Java
 
 Ejercicios cortos para programar, ordenados por unidad y de menor a mayor dificultad. Salen de los
-[apuntes](../Apuntes/PROGRAMACION%20CONCURRENTE%20Y%20PARALELA.md), de las filminas y de los dos TPs
+[apunte práctico](../Apuntes/PROGRAMACION%20CONCURRENTE%20-%20PRACTICA.md) (con la teoría en el [apunte teórico](../Apuntes/PROGRAMACION%20CONCURRENTE%20-%20TEORIA.md)), de las filminas y de los dos TPs
 (TP1: granja de impresión 3D; TP final: monitor de una red de Petri de pagos). La idea es que al terminar
 la última unidad hayas programado, en chiquito, cada pieza de los TPs.
 

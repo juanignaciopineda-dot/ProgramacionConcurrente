@@ -63,6 +63,31 @@ esperan). Con una sola llave tardaría 800 ms.
 5. ¿Es un problema que `getLibresPlatea()` y `getLibresPalco()` se lean en dos momentos distintos?
    ¿Cuándo sí lo sería?
 
+### Más para pensar: encontrar el bug
+
+Un compañero escribió esta clase para contar accesos concurrentes:
+
+```java
+public class Contador {
+    private Integer valor = 0;
+
+    public void incrementar() {
+        synchronized (valor) {
+            valor = valor + 1;
+        }
+    }
+}
+```
+
+1. ¿Por qué es el mismo bug que el de `ContadorDeFunciones`?
+2. Proponé una corrección usando una llave que no cambie de identidad.
+3. ¿Por qué con pocas ejecuciones el bug no se nota?
+
+> [!tip]- Pista
+> `Integer` es inmutable. `valor = valor + 1` no modifica el objeto, sino que crea uno nuevo y
+> reasigna la referencia, así que el monitor que encuentra un segundo hilo en `synchronized(valor)`
+> ya no es el mismo.
+
 ## Pistas
 
 > [!tip]- Pista 1: estructura de `venderPlatea`
